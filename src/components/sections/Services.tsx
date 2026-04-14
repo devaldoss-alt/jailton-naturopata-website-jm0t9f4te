@@ -75,7 +75,8 @@ const services = [
   },
   {
     title: 'Trofoterapia',
-    description: 'O uso dos alimentos como tratamento para prevenção e cura de doenças.',
+    description:
+      'O uso dos alimentos como tratamento para prevenção e cura de patologias adversas.',
     benefits:
       'Prevenção e tratamento de patologias adversas, Fortalecimento do sistema imunológico, Saúde intestinal, Saúde mental.',
     icon: Apple,

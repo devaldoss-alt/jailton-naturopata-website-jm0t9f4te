@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, Instagram, Mail, Phone, MapPin, Leaf, Facebook } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import logoUrl from '../assets/logo-oficial-d840b.jpeg'
+import logoUrl from '../assets/logo-oficial_sem-fundo-420d8.png'
 
 export default function Layout() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -74,7 +74,7 @@ export default function Layout() {
             : 'bg-transparent',
         )}
       >
-        <div className="container px-4 h-20 flex items-center justify-between">
+        <div className="container px-4 h-24 flex items-center justify-between">
           <Link
             to="/"
             onClick={(e) => scrollToSection(e, { name: 'Home', href: '/#home', isHash: true })}
@@ -83,7 +83,7 @@ export default function Layout() {
             <img
               src={logoUrl}
               alt="Jailton Naturopata Logo"
-              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mix-blend-multiply brightness-[1.1] contrast-[1.2]"
+              className="h-20 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-sm"
             />
           </Link>
 
@@ -118,7 +118,7 @@ export default function Layout() {
                 <img
                   src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-16 w-auto object-contain mix-blend-multiply brightness-[1.1] contrast-[1.2]"
+                  className="h-20 w-auto object-contain drop-shadow-sm"
                 />
               </div>
               <nav className="flex flex-col gap-4 flex-grow">
@@ -178,7 +178,7 @@ export default function Layout() {
                 <img
                   src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-14 w-auto object-contain mix-blend-multiply brightness-[1.1] contrast-[1.2]"
+                  className="h-16 w-auto object-contain"
                 />
               </div>
               <p className="mb-6 max-w-sm">
