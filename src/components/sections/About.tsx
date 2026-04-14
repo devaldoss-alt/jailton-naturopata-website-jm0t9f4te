@@ -1,5 +1,6 @@
 import { FadeIn } from '@/components/ui/fade-in'
 import { CheckCircle2 } from 'lucide-react'
+import profilePic from '../../assets/foto-perfil-jailton-f8666.jpeg'
 
 export function About() {
   const benefits = [
@@ -14,11 +15,11 @@ export function About() {
       <div className="container px-4 md:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <FadeIn direction="right" className="order-2 lg:order-1 relative">
-            <div className="relative rounded-2xl overflow-hidden aspect-square md:aspect-[4/3] lg:aspect-square">
+            <div className="relative rounded-2xl overflow-hidden aspect-square md:aspect-[4/3] lg:aspect-[3/4] max-w-md mx-auto lg:mx-0">
               <img
-                src="https://img.usecurling.com/p/800/800?q=green%20leaf%20capsule%203d%20render&color=green"
+                src={profilePic}
                 alt="Jailton Naturopata"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-top"
               />
               <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl z-10 pointer-events-none"></div>
             </div>

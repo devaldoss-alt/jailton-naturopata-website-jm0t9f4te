@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Instagram, Mail, Phone, MapPin, Leaf } from 'lucide-react'
+import { Menu, Instagram, Mail, Phone, MapPin, Leaf, Facebook } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import logoUrl from '../assets/logo-oficial-d840b.jpeg'
 
 export default function Layout() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -80,16 +81,10 @@ export default function Layout() {
             className="flex items-center gap-2 group"
           >
             <img
-              src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=green&shape=fill"
+              src={logoUrl}
               alt="Jailton Naturopata Logo"
-              className="h-10 w-10 object-contain group-hover:scale-105 transition-transform"
+              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mix-blend-multiply"
             />
-            <div className="flex flex-col leading-none">
-              <span className="text-xl font-bold text-foreground">Jailton</span>
-              <span className="text-sm font-medium text-primary tracking-widest uppercase">
-                Naturopata
-              </span>
-            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -121,16 +116,10 @@ export default function Layout() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px] flex flex-col">
               <div className="flex items-center gap-2 mb-8 mt-4">
                 <img
-                  src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=green&shape=fill"
+                  src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-10 w-10 object-contain"
+                  className="h-16 w-auto object-contain mix-blend-multiply"
                 />
-                <div className="flex flex-col leading-none">
-                  <span className="text-xl font-bold text-foreground">Jailton</span>
-                  <span className="text-sm font-medium text-primary tracking-widest uppercase">
-                    Naturopata
-                  </span>
-                </div>
               </div>
               <nav className="flex flex-col gap-4 flex-grow">
                 {navLinks.map((link) => (
@@ -185,18 +174,12 @@ export default function Layout() {
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
-              <div className="flex items-center gap-2 mb-6 opacity-100">
+              <div className="flex items-center gap-2 mb-6 opacity-100 bg-white/95 p-3 rounded-xl inline-flex">
                 <img
-                  src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=white&shape=fill"
+                  src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-10 w-10 object-contain brightness-0 invert"
+                  className="h-14 w-auto object-contain mix-blend-multiply"
                 />
-                <div className="flex flex-col leading-none">
-                  <span className="text-xl font-bold text-white">Jailton</span>
-                  <span className="text-sm font-medium text-white/70 tracking-widest uppercase">
-                    Naturopata
-                  </span>
-                </div>
               </div>
               <p className="mb-6 max-w-sm">
                 Transformando vidas através do poder de cura da natureza. Terapias integrativas para
@@ -247,6 +230,20 @@ export default function Layout() {
                       className="hover:text-primary transition-colors"
                     >
                       @jailton_santos_nath
+                    </a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Facebook className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block text-white">Facebook</span>
+                    <a
+                      href="https://facebook.com/jsc.naturopatia.terapia"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-primary transition-colors"
+                    >
+                      jsc naturopatia terapia
                     </a>
                   </div>
                 </li>
