@@ -70,14 +70,14 @@ const services = [
     title: 'Fitoterapia',
     description: 'Prevenção e tratamento de doenças através do uso de plantas medicinais.',
     benefits:
-      'Tratamento natural de diversas condições de saúde, redução de dependência química de medicamentos alopáticos, melhora do sistema digestivo, fortalecimento da imunidade.',
+      'Tratamento natural de diversas condições de saúde, redução de dependência química, melhora do sistema digestivo, fortalecimento da imunidade.',
     icon: Pill,
   },
   {
     title: 'Trofoterapia',
     description: 'O uso dos alimentos como tratamento para prevenção e cura de doenças.',
     benefits:
-      'Prevenção e tratamento de doenças, Fortalecimento do sistema imunológico, Saúde intestinal, Saúde mental.',
+      'Prevenção e tratamento de patologias adversas, Fortalecimento do sistema imunológico, Saúde intestinal, Saúde mental.',
     icon: Apple,
   },
   {

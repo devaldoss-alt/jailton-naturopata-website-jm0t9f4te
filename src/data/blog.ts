@@ -27,29 +27,29 @@ export const BLOG_POSTS = [
     readTime: '4 min de leitura',
   },
   {
-    id: 'fitoterapia-imunidade',
-    title: 'Fitoterapia: 5 Plantas Poderosas para sua Imunidade',
+    id: 'iridologia-saude-integrativa',
+    title: 'Iridologia: O Mapa da Saúde Através dos Olhos',
     excerpt:
-      'Conheça o poder das ervas medicinais e como integrá-las à sua rotina para fortalecer o sistema imunológico naturalmente.',
+      'Entenda como a análise minuciosa da íris pode revelar desequilíbrios físicos e emocionais muito antes de se tornarem patologias crônicas.',
     content: `
-      <h2>O Poder da Natureza na Palma da Sua Mão</h2>
-      <p>A natureza nos oferece uma farmácia completa e incrivelmente acessível. A Fitoterapia utiliza o princípio ativo das plantas para prevenir e tratar doenças, e quando se trata de imunidade, algumas ervas atuam como verdadeiros escudos protetores para o nosso corpo.</p>
+      <h2>A Janela para o Seu Organismo</h2>
+      <p>Você sabia que os seus olhos podem revelar muito mais do que suas emoções? Na Naturopatia, a Iridologia é uma ferramenta de avaliação não invasiva que estuda a íris — a parte colorida dos olhos — para identificar predisposições genéticas, acúmulo de toxinas e desequilíbrios em órgãos específicos.</p>
 
-      <h2>Top 5 Plantas para a Imunidade</h2>
-      <ol>
-        <li><strong>Equinácea:</strong> Conhecida mundialmente por suas propriedades imunoestimulantes, ajuda a prevenir resfriados e infecções do trato respiratório.</li>
-        <li><strong>Gengibre:</strong> Potente anti-inflamatório e antioxidante, excelente para o sistema respiratório e para o trato gastrointestinal.</li>
-        <li><strong>Cúrcuma:</strong> O princípio ativo curcumina modula o sistema imune e combate inflamações crônicas.</li>
-        <li><strong>Alho:</strong> Considerado um antibiótico natural, rico em alicina, sendo um poderoso antiviral.</li>
-        <li><strong>Unha de Gato:</strong> Planta amazônica famosa por estimular a produção de glóbulos brancos de defesa.</li>
-      </ol>
+      <h2>Como a Iridologia Funciona?</h2>
+      <p>A íris possui uma complexa rede de fibras nervosas conectadas diretamente ao cérebro e ao sistema nervoso autônomo. Cada região da íris corresponde a um órgão ou sistema do corpo. Através de um mapeamento cuidadoso, o naturopata consegue observar sinais, manchas, descolorações e padrões estruturais que indicam como o corpo está funcionando.</p>
 
-      <h2>Como Integrar no Dia a Dia?</h2>
-      <p>O uso deve ser sempre orientado por um profissional naturopata, pois a dosagem, a interação com outros fitoterápicos e a forma de preparo (chá, tintura ou cápsula) fazem toda a diferença na absorção dos princípios ativos e na eficácia do tratamento.</p>
+      <h2>Principais Benefícios da Avaliação Iridológica</h2>
+      <ul>
+        <li><strong>Prevenção:</strong> Permite detectar tendências a desequilíbrios físicos antes que os sintomas clínicos se manifestem.</li>
+        <li><strong>Autoconhecimento:</strong> Revela aspectos do sistema nervoso e do estado emocional do indivíduo (como níveis de estresse e ansiedade).</li>
+        <li><strong>Tratamento Direcionado:</strong> Ajuda a personalizar os protocolos naturopáticos, focando exatamente nos sistemas que precisam de mais suporte.</li>
+      </ul>
+
+      <p>A Iridologia não dá um diagnóstico de doenças específicas, mas sim um panorama do terreno biológico da pessoa. Ao descobrir os pontos fortes e as vulnerabilidades do seu corpo, podemos atuar de forma preventiva e integrativa, usando fitoterapia, trofoterapia e desintoxicação para restaurar a sua vitalidade e equilíbrio natural.</p>
     `,
-    image: 'https://img.usecurling.com/p/1200/600?q=herbs%20medicinal&color=green',
+    image: 'https://img.usecurling.com/p/1200/600?q=eye%20iris%20macro&color=green',
     date: '05 de Abril, 2026',
-    category: 'Fitoterapia',
+    category: 'Iridologia',
     readTime: '5 min de leitura',
   },
   {
@@ -68,7 +68,6 @@ export const BLOG_POSTS = [
       <ul>
         <li><strong>Hidratação profunda:</strong> Água pura e de boa qualidade é o principal veículo de limpeza.</li>
         <li><strong>Alimentação viva:</strong> Foco total em vegetais, frutas e raízes orgânicas.</li>
-        <li><strong>Fitoterapia depurativa:</strong> Uso inteligente de chás como dente-de-leão, carqueja e alcachofra para apoiar o trabalho do fígado.</li>
         <li><strong>Técnicas corporais integrativas:</strong> Escovação a seco, respiração profunda e saunas para estimular o sistema linfático.</li>
       </ul>
 

@@ -83,7 +83,7 @@ export default function Layout() {
             <img
               src={logoUrl}
               alt="Jailton Naturopata Logo"
-              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mix-blend-multiply"
+              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform mix-blend-multiply brightness-[1.1] contrast-[1.2]"
             />
           </Link>
 
@@ -118,7 +118,7 @@ export default function Layout() {
                 <img
                   src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-16 w-auto object-contain mix-blend-multiply"
+                  className="h-16 w-auto object-contain mix-blend-multiply brightness-[1.1] contrast-[1.2]"
                 />
               </div>
               <nav className="flex flex-col gap-4 flex-grow">
@@ -178,7 +178,7 @@ export default function Layout() {
                 <img
                   src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-14 w-auto object-contain mix-blend-multiply"
+                  className="h-14 w-auto object-contain mix-blend-multiply brightness-[1.1] contrast-[1.2]"
                 />
               </div>
               <p className="mb-6 max-w-sm">
