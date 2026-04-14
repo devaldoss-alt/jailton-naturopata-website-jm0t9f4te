@@ -44,12 +44,15 @@ export default function Layout() {
     }
 
     const targetId = link.href.replace('/', '')
+    // Dynamic offset based on the new, taller header height
+    const scrollOffset = window.innerWidth >= 768 ? 144 : 112
+
     if (location.pathname !== '/') {
       navigate(`/${targetId}`)
       setTimeout(() => {
         const element = document.querySelector(targetId)
         if (element) {
-          const top = element.getBoundingClientRect().top + window.scrollY - 80
+          const top = element.getBoundingClientRect().top + window.scrollY - scrollOffset
           window.scrollTo({ top, behavior: 'smooth' })
         }
       }, 100)
@@ -58,7 +61,7 @@ export default function Layout() {
 
     const element = document.querySelector(targetId)
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 80
+      const top = element.getBoundingClientRect().top + window.scrollY - scrollOffset
       window.scrollTo({ top, behavior: 'smooth' })
     }
   }
@@ -74,7 +77,7 @@ export default function Layout() {
             : 'bg-transparent',
         )}
       >
-        <div className="container px-4 h-24 flex items-center justify-between">
+        <div className="container px-4 h-28 md:h-36 flex items-center justify-between transition-all duration-300">
           <Link
             to="/"
             onClick={(e) => scrollToSection(e, { name: 'Home', href: '/#home', isHash: true })}
@@ -83,7 +86,7 @@ export default function Layout() {
             <img
               src={logoUrl}
               alt="Jailton Naturopata Logo"
-              className="h-20 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-sm"
+              className="h-24 md:h-32 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-md"
             />
           </Link>
 
@@ -118,7 +121,7 @@ export default function Layout() {
                 <img
                   src={logoUrl}
                   alt="Jailton Naturopata Logo"
-                  className="h-20 w-auto object-contain drop-shadow-sm"
+                  className="h-24 sm:h-28 w-auto object-contain drop-shadow-md"
                 />
               </div>
               <nav className="flex flex-col gap-4 flex-grow">
