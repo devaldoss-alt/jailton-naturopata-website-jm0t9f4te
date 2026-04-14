@@ -252,29 +252,38 @@ export default function Layout() {
                   <div>
                     <span className="block text-white">E-mail</span>
                     <a
-                      href="mailto:contato@jailtonnaturopata.com"
-                      className="hover:text-primary transition-colors"
+                      href="mailto:jailtonnaturopata@hotmail.com"
+                      className="hover:text-primary transition-colors break-all"
                     >
-                      contato@jailtonnaturopata.com
+                      jailtonnaturopata@hotmail.com
                     </a>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-white">Atendimento</span>
-                    <span>Presencial e Online</span>
+                  <div className="space-y-2">
+                    <span className="block text-white">Endereços</span>
+                    <p className="text-sm leading-relaxed text-white/80 pr-4">
+                      Rua Camboja nº 602 E, Bairro Alto de Coutos, Salvador BA.
+                    </p>
+                    <p className="text-sm leading-relaxed text-white/80 pr-4">
+                      Av.Tancredo Neves nº 1.283, Ed. Empresarial Ômega, 9º Andar - Pituba, Salvador
+                      BA
+                    </p>
                   </div>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-sm">
-            <p>
-              &copy; {new Date().getFullYear()} Jailton Naturopata. Todos os direitos reservados.
-            </p>
-            <p className="mt-2 md:mt-0">Desenvolvido com excelência.</p>
+          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-sm gap-4 text-center md:text-left">
+            <div>
+              <p>
+                &copy; {new Date().getFullYear()} Jailton Naturopata. Todos os direitos reservados.
+              </p>
+              <p className="mt-1 text-white/60">CNPJ: 40.457.365/0001-64</p>
+            </div>
+            <p>Desenvolvido com excelência.</p>
           </div>
         </div>
       </footer>
