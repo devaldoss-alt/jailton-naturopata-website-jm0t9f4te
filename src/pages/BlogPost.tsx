@@ -1,14 +1,52 @@
-import { useParams, Link, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, Link, Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react'
-import { BLOG_POSTS } from '@/data/blog'
+import { ArrowLeft, Calendar, Clock, Share2, Loader2 } from 'lucide-react'
 import { FadeIn } from '@/components/ui/fade-in'
 import { useToast } from '@/hooks/use-toast'
+import { getPostBySlug, type BlogPost as BlogPostType } from '@/services/blog_posts'
+import { useRealtime } from '@/hooks/use-realtime'
+import pb from '@/lib/pocketbase/client'
 
 export default function BlogPost() {
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
   const { toast } = useToast()
-  const post = BLOG_POSTS.find((p) => p.id === id)
+
+  const [post, setPost] = useState<BlogPostType | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const loadPost = async () => {
+    if (!slug) return
+    try {
+      const data = await getPostBySlug(slug)
+      setPost(data)
+    } catch (err) {
+      navigate('/blog', { replace: true })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadPost()
+  }, [slug])
+
+  useRealtime('blog_posts', (e) => {
+    if (e.action === 'update' && e.record.slug === slug) {
+      loadPost()
+    } else if (e.action === 'delete' && e.record.slug === slug) {
+      navigate('/blog', { replace: true })
+    }
+  })
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   if (!post) {
     return <Navigate to="/blog" replace />
@@ -22,12 +60,24 @@ export default function BlogPost() {
     })
   }
 
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+
+  const imageUrl = post.cover_image
+    ? pb.files.getURL(post, post.cover_image)
+    : `https://img.usecurling.com/p/1920/1080?q=nature%20herbs&seed=${post.id}`
+
   return (
     <article className="pt-20 min-h-screen bg-slate-50/50">
       {/* Hero Section */}
       <div className="relative h-[40vh] md:h-[60vh] w-full bg-[#132A1B] overflow-hidden">
         <img
-          src={post.image}
+          src={imageUrl}
           alt={post.title}
           className="w-full h-full object-cover opacity-40 mix-blend-overlay"
         />
@@ -38,7 +88,7 @@ export default function BlogPost() {
             <FadeIn>
               <div className="mb-6">
                 <span className="bg-primary text-white px-4 py-1.5 rounded-full text-sm font-semibold uppercase tracking-wider">
-                  {post.category}
+                  Naturopatia
                 </span>
               </div>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -47,11 +97,11 @@ export default function BlogPost() {
               <div className="flex flex-wrap items-center text-white/80 gap-6 text-sm md:text-base">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <span>{post.date}</span>
+                  <span>{formatDate(post.created)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>{post.readTime}</span>
+                  <span>Leitura Rápida</span>
                 </div>
               </div>
             </FadeIn>
