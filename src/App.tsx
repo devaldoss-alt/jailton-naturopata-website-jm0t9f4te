@@ -5,6 +5,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import Index from './pages/Index'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
+import Blog from './pages/Blog'
+import BlogPost from './pages/BlogPost'
 
 const App = () => (
   <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: false }}>
@@ -14,6 +16,8 @@ const App = () => (
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Index />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

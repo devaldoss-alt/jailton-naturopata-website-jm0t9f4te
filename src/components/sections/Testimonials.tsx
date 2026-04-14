@@ -1,37 +1,256 @@
+import { useState } from 'react'
 import { FadeIn } from '@/components/ui/fade-in'
-import { Quote } from 'lucide-react'
+import { Quote, Star, MessageSquarePlus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+
+const MOCK_TESTIMONIALS = [
+  {
+    id: 1,
+    name: 'Maria Fernanda Silva',
+    role: 'Paciente de Terapias Integrativas',
+    message:
+      'A naturopatia mudou minha vida. As dores crônicas que me acompanhavam há anos desapareceram com o tratamento integrativo. O cuidado e a atenção do Jailton foram fundamentais nesse processo de cura profunda.',
+    rating: 5,
+    gender: 'female',
+    seed: 1,
+  },
+  {
+    id: 2,
+    name: 'Carlos Eduardo Souza',
+    role: 'Paciente de Acupuntura',
+    message:
+      'Excelente profissional. As sessões de acupuntura ajudaram significativamente a reduzir minha ansiedade e melhorar a qualidade do meu sono. Recomendo muito!',
+    rating: 5,
+    gender: 'male',
+    seed: 2,
+  },
+  {
+    id: 3,
+    name: 'Ana Luísa Costa',
+    role: 'Paciente de Fitoterapia',
+    message:
+      'Incrível como os tratamentos naturais me trouxeram mais energia e disposição para o dia a dia. O Jailton é muito atencioso e explica tudo em detalhes.',
+    rating: 5,
+    gender: 'female',
+    seed: 3,
+  },
+  {
+    id: 4,
+    name: 'Roberto Mendes',
+    role: 'Paciente de Auriculoterapia',
+    message:
+      'Os resultados da auriculoterapia superaram minhas expectativas. Dores de cabeça tensionais que eu tinha toda semana simplesmente sumiram. Gratidão pelo trabalho incrível.',
+    rating: 5,
+    gender: 'male',
+    seed: 5,
+  },
+]
 
 export function Testimonials() {
+  const [testimonials, setTestimonials] = useState(MOCK_TESTIMONIALS)
+  const [isOpen, setIsOpen] = useState(false)
+  const { toast } = useToast()
+
+  const [name, setName] = useState('')
+  const [rating, setRating] = useState(5)
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !message.trim()) {
+      toast({
+        title: 'Campos obrigatórios',
+        description: 'Por favor, preencha seu nome e depoimento para enviar.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const newTestimonial = {
+      id: Date.now(),
+      name,
+      role: 'Paciente',
+      message,
+      rating,
+      gender: 'female', // Random default placeholder
+      seed: Math.floor(Math.random() * 100),
+    }
+
+    setTestimonials([newTestimonial, ...testimonials])
+    setIsOpen(false)
+    setName('')
+    setRating(5)
+    setMessage('')
+
+    toast({
+      title: 'Depoimento enviado!',
+      description: 'Agradecemos de coração por compartilhar sua experiência conosco.',
+    })
+  }
+
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-24 relative overflow-hidden bg-[#0A1A10]">
       <div className="absolute inset-0 z-0">
         <img
           src="https://img.usecurling.com/p/1920/1080?q=calm%20nature%20stones%20water&color=green"
           alt="Fundo natureza"
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-10"
         />
-        <div className="absolute inset-0 bg-secondary/90 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1A10] via-transparent to-[#0A1A10]" />
       </div>
 
       <div className="container relative z-10 px-4 md:px-6">
-        <FadeIn className="max-w-4xl mx-auto text-center">
-          <Quote className="h-16 w-16 mx-auto text-white/30 mb-8" />
-          <p className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight mb-8">
-            "A naturopatia mudou minha vida. As dores crônicas que me acompanhavam há anos
-            desapareceram com o tratamento integrativo. O cuidado e a atenção do Jailton foram
-            fundamentais nesse processo de cura profunda."
+        <FadeIn className="text-center mb-16">
+          <Quote className="h-16 w-16 mx-auto text-primary/40 mb-6" />
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            O Que Dizem Nossos Pacientes
+          </h2>
+          <p className="text-white/70 max-w-2xl mx-auto text-lg">
+            Acompanhe as histórias de transformação e bem-estar de quem já experimentou o poder da
+            naturopatia.
           </p>
-          <div>
-            <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-4 border-2 border-white/20">
-              <img
-                src="https://img.usecurling.com/ppl/thumbnail?gender=female"
-                alt="Cliente"
-                className="w-full h-full object-cover"
-              />
+        </FadeIn>
+
+        <div className="max-w-6xl mx-auto">
+          <Carousel
+            opts={{
+              align: 'start',
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4 md:-ml-6">
+              {testimonials.map((t) => (
+                <CarouselItem key={t.id} className="pl-4 md:pl-6 md:basis-1/2 lg:basis-1/3">
+                  <div className="h-full">
+                    <Card className="h-full bg-white/5 border-white/10 backdrop-blur-sm shadow-xl hover:bg-white/10 transition-colors">
+                      <CardContent className="p-8 flex flex-col h-full justify-between gap-6">
+                        <div>
+                          <div className="flex text-yellow-400 mb-6">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={cn(
+                                  'h-5 w-5',
+                                  i < t.rating ? 'fill-current' : 'text-white/20',
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-white/90 italic leading-relaxed">"{t.message}"</p>
+                        </div>
+                        <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/10">
+                          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/50 shrink-0">
+                            <img
+                              src={`https://img.usecurling.com/ppl/thumbnail?gender=${t.gender}&seed=${t.seed}`}
+                              alt={t.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-white">{t.name}</h4>
+                            <p className="text-primary text-sm">{t.role}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-12 gap-4">
+              <CarouselPrevious className="static translate-y-0 w-12 h-12 bg-white/10 hover:bg-white/20 text-white border-0 transition-colors" />
+              <CarouselNext className="static translate-y-0 w-12 h-12 bg-white/10 hover:bg-white/20 text-white border-0 transition-colors" />
             </div>
-            <h4 className="text-lg font-bold text-white">Maria Fernanda Silva</h4>
-            <p className="text-white/70">Paciente de Terapias Integrativas</p>
-          </div>
+          </Carousel>
+        </div>
+
+        <FadeIn className="mt-20 text-center">
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="rounded-full gap-2 px-8 py-6 text-lg">
+                <MessageSquarePlus className="w-5 h-5" />
+                Compartilhe sua Experiência
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">Seu Depoimento</DialogTitle>
+                <DialogDescription>
+                  Conte para nós como foi sua experiência com as terapias naturais do Jailton
+                  Naturopata.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Seu Nome</Label>
+                  <Input
+                    id="name"
+                    placeholder="Ex: João Silva"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Avaliação</Label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className="p-1 focus:outline-none focus-visible:ring-2 ring-primary rounded transition-transform hover:scale-110"
+                      >
+                        <Star
+                          className={cn(
+                            'w-8 h-8',
+                            star <= rating
+                              ? 'fill-yellow-400 text-yellow-400'
+                              : 'text-muted-foreground/30',
+                          )}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message">Seu Depoimento</Label>
+                  <Textarea
+                    id="message"
+                    placeholder="Como as terapias ajudaram no seu processo de cura?"
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="resize-none"
+                  />
+                </div>
+                <Button type="submit" className="w-full rounded-full" size="lg">
+                  Enviar Depoimento
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </FadeIn>
       </div>
     </section>

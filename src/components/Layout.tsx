@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, Instagram, Mail, Phone, MapPin, Leaf } from 'lucide-react'
@@ -18,24 +18,46 @@ export default function Layout() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const navigate = useNavigate()
+
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'Sobre', href: '#sobre' },
-    { name: 'Serviços', href: '#servicos' },
-    { name: 'Produtos', href: '#produtos' },
-    { name: 'Contato', href: '#contato' },
+    { name: 'Home', href: '/#home', isHash: true },
+    { name: 'Sobre', href: '/#sobre', isHash: true },
+    { name: 'Serviços', href: '/#servicos', isHash: true },
+    { name: 'Produtos', href: '/#produtos', isHash: true },
+    { name: 'Blog', href: '/blog', isHash: false },
+    { name: 'Contato', href: '/#contato', isHash: true },
   ]
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const scrollToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    link: { href: string; isHash: boolean },
+  ) => {
     e.preventDefault()
     setIsMobileMenuOpen(false)
-    if (location.pathname !== '/') {
-      window.location.href = `/${href}`
+
+    if (!link.isHash) {
+      navigate(link.href)
+      window.scrollTo(0, 0)
       return
     }
-    const element = document.querySelector(href)
+
+    const targetId = link.href.replace('/', '')
+    if (location.pathname !== '/') {
+      navigate(`/${targetId}`)
+      setTimeout(() => {
+        const element = document.querySelector(targetId)
+        if (element) {
+          const top = element.getBoundingClientRect().top + window.scrollY - 80
+          window.scrollTo({ top, behavior: 'smooth' })
+        }
+      }, 100)
+      return
+    }
+
+    const element = document.querySelector(targetId)
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 80 // offset for fixed header
+      const top = element.getBoundingClientRect().top + window.scrollY - 80
       window.scrollTo({ top, behavior: 'smooth' })
     }
   }
@@ -54,12 +76,14 @@ export default function Layout() {
         <div className="container px-4 h-20 flex items-center justify-between">
           <Link
             to="/"
-            onClick={(e) => scrollToSection(e, '#home')}
+            onClick={(e) => scrollToSection(e, { name: 'Home', href: '/#home', isHash: true })}
             className="flex items-center gap-2 group"
           >
-            <div className="bg-primary p-1.5 rounded-lg group-hover:bg-primary/90 transition-colors">
-              <Leaf className="h-6 w-6 text-white" />
-            </div>
+            <img
+              src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=green&shape=fill"
+              alt="Jailton Naturopata Logo"
+              className="h-10 w-10 object-contain group-hover:scale-105 transition-transform"
+            />
             <div className="flex flex-col leading-none">
               <span className="text-xl font-bold text-foreground">Jailton</span>
               <span className="text-sm font-medium text-primary tracking-widest uppercase">
@@ -74,8 +98,8 @@ export default function Layout() {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={(e) => scrollToSection(e, link.href)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                onClick={(e) => scrollToSection(e, link)}
+                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors cursor-pointer"
               >
                 {link.name}
               </a>
@@ -96,9 +120,11 @@ export default function Layout() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] flex flex-col">
               <div className="flex items-center gap-2 mb-8 mt-4">
-                <div className="bg-primary p-1.5 rounded-lg">
-                  <Leaf className="h-6 w-6 text-white" />
-                </div>
+                <img
+                  src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=green&shape=fill"
+                  alt="Jailton Naturopata Logo"
+                  className="h-10 w-10 object-contain"
+                />
                 <div className="flex flex-col leading-none">
                   <span className="text-xl font-bold text-foreground">Jailton</span>
                   <span className="text-sm font-medium text-primary tracking-widest uppercase">
@@ -111,8 +137,8 @@ export default function Layout() {
                   <a
                     key={link.name}
                     href={link.href}
-                    onClick={(e) => scrollToSection(e, link.href)}
-                    className="text-lg font-medium py-2 border-b border-border text-foreground hover:text-primary transition-colors"
+                    onClick={(e) => scrollToSection(e, link)}
+                    className="text-lg font-medium py-2 border-b border-border text-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     {link.name}
                   </a>
@@ -160,9 +186,11 @@ export default function Layout() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-6 opacity-100">
-                <div className="bg-white/10 p-1.5 rounded-lg">
-                  <Leaf className="h-6 w-6 text-white" />
-                </div>
+                <img
+                  src="https://img.usecurling.com/i?q=naturopathy%20leaf%20logo&color=white&shape=fill"
+                  alt="Jailton Naturopata Logo"
+                  className="h-10 w-10 object-contain brightness-0 invert"
+                />
                 <div className="flex flex-col leading-none">
                   <span className="text-xl font-bold text-white">Jailton</span>
                   <span className="text-sm font-medium text-white/70 tracking-widest uppercase">
@@ -183,8 +211,8 @@ export default function Layout() {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      onClick={(e) => scrollToSection(e, link.href)}
-                      className="hover:text-white transition-colors flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-primary before:rounded-full"
+                      onClick={(e) => scrollToSection(e, link)}
+                      className="hover:text-white transition-colors flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-primary before:rounded-full cursor-pointer"
                     >
                       {link.name}
                     </a>
