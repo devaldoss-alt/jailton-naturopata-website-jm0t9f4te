@@ -223,6 +223,18 @@ export default function Layout() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
+                  <Mail className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <span className="block text-white">E-mail</span>
+                    <a
+                      href="mailto:contato@jailtonnaturopata.com"
+                      className="hover:text-primary transition-colors"
+                    >
+                      contato@jailtonnaturopata.com
+                    </a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="block text-white">Atendimento</span>

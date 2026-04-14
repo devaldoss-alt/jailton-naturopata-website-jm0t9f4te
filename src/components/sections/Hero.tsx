@@ -30,14 +30,15 @@ export function Hero() {
 
         <FadeIn delay={200}>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-4xl mb-6">
-            Terapias Naturais <span className="text-primary">Integrativas</span>
+            Desintoxique seu corpo <span className="text-primary">naturalmente</span>
           </h1>
         </FadeIn>
 
         <FadeIn delay={300}>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-            Recupere seu equilíbrio físico, mental e emocional através de tratamentos naturais e
-            personalizados. A cura verdadeira começa de dentro para fora.
+            Seu corpo precisa de limpeza, não de remédio. Recupere seu equilíbrio físico, mental e
+            emocional através de tratamentos naturais e personalizados. A cura verdadeira começa de
+            dentro para fora.
           </p>
         </FadeIn>
 
