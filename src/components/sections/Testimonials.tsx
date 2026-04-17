@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FadeIn } from '@/components/ui/fade-in'
-import { Quote, Star, MessageSquarePlus, Loader2 } from 'lucide-react'
+import { Quote, Star, MessageSquarePlus, Loader2, User } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -88,10 +89,11 @@ export function Testimonials() {
   }
 
   const getAvatarUrl = (t: Testimonial) => {
-    if (t.avatar) {
-      return pb.files.getURL(t, t.avatar)
+    if (!t.avatar) return null
+    if (t.avatar.startsWith('http://') || t.avatar.startsWith('https://')) {
+      return t.avatar
     }
-    return `https://img.usecurling.com/ppl/thumbnail?seed=${t.id}`
+    return pb.files.getURL(t, t.avatar)
   }
 
   return (
@@ -151,13 +153,16 @@ export function Testimonials() {
                             <p className="text-white/90 italic leading-relaxed">"{t.message}"</p>
                           </div>
                           <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/10">
-                            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/50 shrink-0">
-                              <img
-                                src={getAvatarUrl(t)}
+                            <Avatar className="w-14 h-14 border-2 border-primary/50 shrink-0 bg-transparent">
+                              <AvatarImage
+                                src={getAvatarUrl(t) || ''}
                                 alt={t.name}
-                                className="w-full h-full object-cover"
+                                className="object-cover"
                               />
-                            </div>
+                              <AvatarFallback className="bg-white/10 text-white/50">
+                                <User className="w-6 h-6" />
+                              </AvatarFallback>
+                            </Avatar>
                             <div>
                               <h4 className="font-bold text-white">{t.name}</h4>
                               <p className="text-primary text-sm">Paciente</p>
