@@ -183,23 +183,30 @@ export default function Resultado() {
         .content-html strong { font-weight: bold; color: #1a4025; }
         
         @media print {
-          body { background-color: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; }
+          html, body, #root { 
+            height: auto !important; 
+            min-height: auto !important; 
+            overflow: visible !important; 
+            background-color: white !important; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-print-color-adjust: exact; 
+          }
+          
           .no-print { display: none !important; }
           
-          html, body, #root, [data-radix-scroll-area-viewport] {
-            height: auto !important; overflow: visible !important; position: static !important;
-          }
-
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
           
           #printable-pdf {
-            position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important;
+            position: absolute; left: 0; top: 0; width: 100%; 
+            margin: 0 !important; padding: 0 !important; 
+            border: none !important; box-shadow: none !important;
           }
 
           .content-html { page-break-inside: auto; }
           .content-html p, .content-html li { page-break-inside: avoid; }
-          h3 { page-break-after: avoid; }
+          h1, h2, h3, h4 { page-break-after: avoid; }
           .avoid-break { page-break-inside: avoid; }
 
           @page { margin: 15mm; }
@@ -282,11 +289,16 @@ export default function Resultado() {
                         letterSpacing: '1px',
                       }}
                     >
-                      ANAMNESE INTEGRATIVA
+                      PLANO TERAPÊUTICO
                     </h2>
                     <p style={{ fontSize: '14px', margin: '5px 0 0' }}>
                       Paciente: <strong>{anamnese.nome_paciente}</strong>
                     </p>
+                    {anamnese.data_nascimento && (
+                      <p style={{ fontSize: '12px', margin: '2px 0 0', color: '#4a5568' }}>
+                        Nasc.: {format(new Date(anamnese.data_nascimento), 'dd/MM/yyyy')}
+                      </p>
+                    )}
                   </div>
                 </div>
               </td>
@@ -318,10 +330,19 @@ export default function Resultado() {
                         {format(new Date(anamnese.data_atendimento), 'dd/MM/yyyy')}
                       </p>
                       <p style={{ margin: '0', fontSize: '14px' }}>
-                        <strong>Telefone:</strong> {anamnese.telefone || 'N/I'}
+                        <strong>Contato:</strong>{' '}
+                        {anamnese.telefone_paciente || anamnese.telefone || 'N/I'}
+                      </p>
+                      <p style={{ margin: '0', fontSize: '14px' }}>
+                        <strong>Profissão:</strong> {anamnese.profissao || 'N/I'}
                       </p>
                       <p style={{ margin: '0', fontSize: '14px', width: '100%' }}>
                         <strong>Motivo / Queixa Principal:</strong> {anamnese.motivo_consulta}
+                      </p>
+                      <p style={{ margin: '0', fontSize: '14px', width: '100%' }}>
+                        <strong>Diagnóstico Naturopático:</strong> Avaliação baseada no histórico de{' '}
+                        {anamnese.nome_paciente}, hábitos e correlações sistêmicas relatadas na
+                        anamnese integrativa.
                       </p>
                     </div>
                   </div>
