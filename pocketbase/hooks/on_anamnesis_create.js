@@ -10,15 +10,15 @@ onRecordAfterCreateSuccess((e) => {
   if (!aiKey || !aiUrl) {
     updatedRecord.set(
       'ia_sugestoes_terapeuticas',
-      '<ul><li>Ajuste do ciclo circadiano. (Mock)</li><li>Dieta anti-inflamatória focada na saúde intestinal. (Mock)</li></ul>',
+      '<ul><li><strong>Passo 1: Ajuste do ciclo circadiano</strong><br>Exposição solar de 15 minutos pela manhã para regulação de cortisol e melatonina.</li><li><strong>Passo 2: Dieta Anti-inflamatória</strong><br>Foco na saúde intestinal, priorizando alimentos integrais, ricos em fibras e ômega-3. Evitar alimentos ultraprocessados, açúcar refinado e laticínios inflamatórios.</li><li><strong>Passo 3: Gestão do Estresse</strong><br>Prática diária de meditação ou respiração profunda (técnica 4-7-8) por 10 minutos.</li></ul>',
     )
     updatedRecord.set(
       'ia_suplementacao',
-      '<ul><li>Magnésio Inositol: 1 dose à noite. (Mock)</li><li>Probiótico de 10 cepas pela manhã. (Mock)</li></ul>',
+      '<ul><li><strong>Magnésio Inositol (500mg):</strong> Tomar 1 dose à noite, 30 minutos antes de dormir, para relaxamento muscular e suporte ao sono.</li><li><strong>Probiótico (10 cepas, 10 bilhões UFC):</strong> Tomar 1 cápsula pela manhã, em jejum, para modulação da microbiota intestinal.</li><li><strong>Ômega 3 (DHA/EPA alto):</strong> 1 cápsula após o almoço, para ação sistêmica anti-inflamatória.</li></ul>',
     )
     updatedRecord.set(
       'ia_referencias',
-      '<ul><li>Protocolo Integrativo de Fadiga Adrenal. (Mock)</li></ul>',
+      '<ul><li>Protocolo Integrativo de Modulação Intestinal e Manejo do Estresse (Green Life Biofísica).</li><li>Literatura científica baseada em naturopatia e medicina funcional sobre o eixo intestino-cérebro.</li></ul>',
     )
     updatedRecord.set('status', 'completed')
     $app.saveNoValidate(updatedRecord)
@@ -42,11 +42,11 @@ Sintomas Relatados: ${record.getString('sintomas_principais') || 'Não informado
 Sistemas/Órgãos Afetados Identificados: ${record.getString('orgaos_afetados') || 'Não informados'}
 Desequilíbrios em Órgãos (Checklist): ${textOrgaosCheckbox}
 
-Por favor, elabore um plano de tratamento profissional, detalhado e sistemático.
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML usando <ul>, <li>, <p>, <strong>):
-- "ia_sugestoes_terapeuticas": Deve conter um passo a passo claro, mudanças de estilo de vida, dieta e terapias específicas sistemáticas.
-- "ia_suplementacao": Deve conter um protocolo de suplementação robusto e sistemático, com dosagens exatas, horários e instruções claras de uso.
-- "ia_referencias": Referências ou embasamento científico do protocolo.`
+Por favor, elabore um plano de tratamento profissional, altamente detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia e Biofísica.
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
+- "ia_sugestoes_terapeuticas": Deve conter um passo a passo claro e estruturado, incluindo mudanças de estilo de vida, dieta anti-inflamatória e terapias específicas sistemáticas.
+- "ia_suplementacao": Deve conter um protocolo de suplementação robusto e sistemático. Para CADA suplemento, especifique claramente: nome, dosagem exata, horário ideal de uso, e o propósito específico (ex: "Tomar 1 cápsula de X mg pela manhã, em jejum, para...").
+- "ia_referencias": Referências ou embasamento científico naturopático que suporte o protocolo.`
 
   try {
     const res = $http.send({

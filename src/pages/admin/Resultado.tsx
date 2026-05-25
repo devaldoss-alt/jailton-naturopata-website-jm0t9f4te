@@ -31,6 +31,12 @@ const ContentEditableField = ({
     }
   }
 
+  const execCommand = (command: string, arg?: string) => {
+    document.execCommand(command, false, arg)
+    ref.current?.focus()
+    handleInput()
+  }
+
   if (!isEditing) {
     return (
       <div
@@ -42,20 +48,69 @@ const ContentEditableField = ({
   }
 
   return (
-    <>
-      <div className="text-xs text-gray-500 mb-2 font-medium">
-        Modo de edição ativo. Você pode alterar o texto livremente (atalhos como Ctrl+B e Ctrl+I
-        funcionam).
+    <div className="mb-6 border-2 border-primary/30 rounded-md bg-white shadow-sm overflow-hidden transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+      <div className="bg-gray-50 border-b border-gray-200 p-2 flex gap-1 flex-wrap">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs font-bold"
+          onClick={() => execCommand('bold')}
+          title="Negrito (Ctrl+B)"
+        >
+          B
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs italic"
+          onClick={() => execCommand('italic')}
+          title="Itálico (Ctrl+I)"
+        >
+          I
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs underline"
+          onClick={() => execCommand('underline')}
+          title="Sublinhado (Ctrl+U)"
+        >
+          U
+        </Button>
+        <div className="w-px h-5 bg-gray-300 mx-1 self-center"></div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs"
+          onClick={() => execCommand('insertUnorderedList')}
+          title="Lista com marcadores"
+        >
+          • Lista
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs"
+          onClick={() => execCommand('insertOrderedList')}
+          title="Lista numerada"
+        >
+          1. Lista
+        </Button>
       </div>
       <div
         ref={ref}
         contentEditable
         onInput={handleInput}
-        className="content-html min-h-[150px] p-4 border-2 border-primary/30 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white shadow-sm mb-6 transition-colors"
+        className="content-html min-h-[150px] p-4 focus:outline-none"
         style={{ fontSize: '14px' }}
         dangerouslySetInnerHTML={{ __html: value }}
       />
-    </>
+    </div>
   )
 }
 
@@ -131,6 +186,7 @@ export default function Resultado() {
     <div className="max-w-4xl mx-auto pb-12 animate-fade-in-up">
       <style>{`
         .content-html ul { list-style-type: disc; padding-left: 20px; margin-bottom: 10px; }
+        .content-html ol { list-style-type: decimal; padding-left: 20px; margin-bottom: 10px; }
         .content-html li { margin-bottom: 6px; line-height: 1.5; }
         .content-html p { margin-bottom: 10px; line-height: 1.6; }
         .content-html strong { font-weight: 600; color: #1a4025; }
@@ -192,7 +248,7 @@ export default function Resultado() {
             </>
           )}
 
-          {!isEditing && (
+          {!isEditing && anamnese.status === 'completed' && (
             <Button
               onClick={() => window.print()}
               className="bg-gray-900 text-white hover:bg-gray-800"
