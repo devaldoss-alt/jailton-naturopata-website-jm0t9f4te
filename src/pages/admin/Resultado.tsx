@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { ArrowLeft, Printer, Loader2, Edit, Save, X } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
+import { extractFieldErrors, getErrorMessage } from '@/lib/pocketbase/errors'
 
 const ContentEditableField = ({
   value,
@@ -121,6 +122,7 @@ export default function Resultado() {
   const [saving, setSaving] = useState(false)
   const [sugestoes, setSugestoes] = useState('')
   const [suplementacao, setSuplementacao] = useState('')
+  const [referencias, setReferencias] = useState('')
 
   useEffect(() => {
     if (id) {
@@ -130,6 +132,7 @@ export default function Resultado() {
           if (!isEditing) {
             setSugestoes(data.ia_sugestoes_terapeuticas || '')
             setSuplementacao(data.ia_suplementacao || '')
+            setReferencias(data.ia_referencias || '')
           }
         })
         .catch(console.error)
@@ -142,6 +145,7 @@ export default function Resultado() {
       if (!isEditing) {
         setSugestoes(e.record.ia_sugestoes_terapeuticas || '')
         setSuplementacao(e.record.ia_suplementacao || '')
+        setReferencias(e.record.ia_referencias || '')
       }
     }
   })
@@ -152,11 +156,20 @@ export default function Resultado() {
       await updateAnamnese(id as string, {
         ia_sugestoes_terapeuticas: sugestoes,
         ia_suplementacao: suplementacao,
+        ia_referencias: referencias,
       })
       toast.success('Alterações salvas com sucesso!')
       setIsEditing(false)
     } catch (error) {
-      toast.error('Erro ao salvar as alterações.')
+      const fieldErrors = extractFieldErrors(error)
+      if (Object.keys(fieldErrors).length > 0) {
+        const msg = Object.entries(fieldErrors)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\n')
+        toast.error(`Erro de validação:\n${msg}`)
+      } else {
+        toast.error(`Erro ao salvar: ${getErrorMessage(error)}`)
+      }
       console.error(error)
     } finally {
       setSaving(false)
@@ -168,6 +181,7 @@ export default function Resultado() {
     if (anamnese) {
       setSugestoes(anamnese.ia_sugestoes_terapeuticas || '')
       setSuplementacao(anamnese.ia_suplementacao || '')
+      setReferencias(anamnese.ia_referencias || '')
     }
   }
 
@@ -192,19 +206,34 @@ export default function Resultado() {
         .content-html strong { font-weight: 600; color: #1a4025; }
         
         @media print {
-          body { background-color: white !important; }
+          body { background-color: white !important; margin: 0; padding: 0; }
+          .no-print { display: none !important; }
+          
+          /* Reset parent containers that might clip absolute items */
+          html, body, #root, [data-radix-scroll-area-viewport] {
+            height: auto !important;
+            overflow: visible !important;
+            position: static !important;
+          }
+
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
+          
           #printable-pdf {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             border: none !important;
+            box-shadow: none !important;
           }
-          .no-print { display: none !important; }
+
+          .content-html { page-break-inside: auto; }
+          h3 { page-break-after: avoid; }
+          li, p { page-break-inside: avoid; }
+
           @page { margin: 1cm; }
         }
       `}</style>
@@ -265,7 +294,7 @@ export default function Resultado() {
             border: '2px solid #1a4025',
             padding: '40px',
             fontFamily: 'Arial, sans-serif',
-            minHeight: '1000px',
+            minHeight: '100%',
             color: '#111',
             backgroundColor: '#fff',
           }}
@@ -290,7 +319,7 @@ export default function Resultado() {
                 color: '#1a4025',
               }}
             >
-              Relatório de Anamnese Integrativa
+              RELATÓRIO DE ANAMNESE INTEGRATIVA
             </h2>
           </div>
 
@@ -303,17 +332,20 @@ export default function Resultado() {
               border: '1px solid #e2e8e4',
             }}
           >
-            <h3
-              style={{
-                fontSize: '16px',
-                fontWeight: 'bold',
-                marginBottom: '12px',
-                color: '#1a4025',
-                textTransform: 'uppercase',
-              }}
-            >
-              Dados do Paciente
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+              <h3
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  color: '#4a5568',
+                  textTransform: 'uppercase',
+                  margin: 0,
+                }}
+              >
+                DADOS DO PACIENTE
+              </h3>
+            </div>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
               <p style={{ margin: '0', fontSize: '15px' }}>
                 <strong>Tipo:</strong>{' '}
@@ -408,27 +440,34 @@ export default function Resultado() {
             />
           )}
 
-          {anamnese.ia_referencias && !isEditing && (
-            <>
-              <h3
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  marginTop: '40px',
-                  marginBottom: '10px',
-                  color: '#4a5568',
-                  borderBottom: '1px solid #e2e8f0',
-                  paddingBottom: '5px',
-                }}
-              >
-                Referências e Embasamento
-              </h3>
-              <div
-                className="content-html"
-                dangerouslySetInnerHTML={{ __html: anamnese.ia_referencias }}
-                style={{ fontSize: '13px', color: '#718096' }}
-              />
-            </>
+          <h3
+            style={{
+              fontSize: '16px',
+              fontWeight: 'bold',
+              marginTop: '40px',
+              marginBottom: '10px',
+              color: '#4a5568',
+              borderBottom: '1px solid #e2e8f0',
+              paddingBottom: '5px',
+            }}
+          >
+            Referências e Embasamento
+          </h3>
+          {anamnese.status === 'pending' ? (
+            <div className="flex items-center text-gray-500 mb-6 py-4">
+              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+              <span>Processando referências...</span>
+            </div>
+          ) : anamnese.status === 'error' ? (
+            <div className="text-red-500 mb-6 py-4">
+              <p>Erro ao gerar referências.</p>
+            </div>
+          ) : (
+            <ContentEditableField
+              value={referencias}
+              onChange={setReferencias}
+              isEditing={isEditing}
+            />
           )}
 
           <div
