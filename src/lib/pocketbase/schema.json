@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-17T15:46:21.274Z",
+  "generatedAt": "2026-05-25T17:19:11.306Z",
   "collections": [
     {
       "name": "users",
@@ -165,6 +165,96 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_blog_posts_slug ON blog_posts (slug)"]
+    },
+    {
+      "name": "anamnesis",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "nome_paciente",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "data_atendimento",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "motivo_consulta",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "sintomas_principais",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "orgaos_afetados",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ia_sugestoes_terapeuticas",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ia_suplementacao",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ia_referencias",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pending", "completed", "error"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_anamnesis_user ON anamnesis (user_id)"]
     }
   ]
 }
