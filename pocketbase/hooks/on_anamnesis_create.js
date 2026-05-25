@@ -7,24 +7,6 @@ onRecordAfterCreateSuccess((e) => {
 
   const updatedRecord = $app.findRecordById('anamnesis', record.id)
 
-  if (!aiKey || !aiUrl) {
-    updatedRecord.set(
-      'ia_sugestoes_terapeuticas',
-      '<ul><li><strong>Passo 1: Ajuste do ciclo circadiano</strong><br>Exposição solar de 15 minutos pela manhã para regulação de cortisol e melatonina.</li><li><strong>Passo 2: Dieta Anti-inflamatória</strong><br>Foco na saúde intestinal, priorizando alimentos integrais, ricos em fibras e ômega-3. Evitar alimentos ultraprocessados, açúcar refinado e laticínios inflamatórios.</li><li><strong>Passo 3: Gestão do Estresse</strong><br>Prática diária de meditação ou respiração profunda (técnica 4-7-8) por 10 minutos.</li></ul>',
-    )
-    updatedRecord.set(
-      'ia_suplementacao',
-      '<ul><li><strong>Magnésio Inositol (500mg):</strong> Tomar 1 dose à noite, 30 minutos antes de dormir, para relaxamento muscular e suporte ao sono.</li><li><strong>Probiótico (10 cepas, 10 bilhões UFC):</strong> Tomar 1 cápsula pela manhã, em jejum, para modulação da microbiota intestinal.</li><li><strong>Ômega 3 (DHA/EPA alto):</strong> 1 cápsula após o almoço, para ação sistêmica anti-inflamatória.</li></ul>',
-    )
-    updatedRecord.set(
-      'ia_referencias',
-      '<ul><li>Protocolo Integrativo de Modulação Intestinal e Manejo do Estresse (Green Life Biofísica).</li><li>Literatura científica baseada em naturopatia e medicina funcional sobre o eixo intestino-cérebro.</li></ul>',
-    )
-    updatedRecord.set('status', 'completed')
-    $app.saveNoValidate(updatedRecord)
-    return e.next()
-  }
-
   const orgaosAfetados = []
   if (record.getBool('sintomas_figado')) orgaosAfetados.push('Fígado')
   if (record.getBool('sintomas_coracao')) orgaosAfetados.push('Coração')
@@ -32,6 +14,27 @@ onRecordAfterCreateSuccess((e) => {
   if (record.getBool('sintomas_pulmao')) orgaosAfetados.push('Pulmão')
   if (record.getBool('sintomas_rins')) orgaosAfetados.push('Rins')
   const textOrgaosCheckbox = orgaosAfetados.length > 0 ? orgaosAfetados.join(', ') : 'Nenhum'
+
+  const nomePaciente = record.getString('nome_paciente') || 'Paciente'
+  const sintomasPrincipais = record.getString('sintomas_principais') || 'sintomas inespecíficos'
+
+  if (!aiKey || !aiUrl) {
+    updatedRecord.set(
+      'ia_sugestoes_terapeuticas',
+      `<ul><li><strong>Passo 1: Ajuste do Ciclo Circadiano para ${nomePaciente}</strong><br>Para auxiliar no manejo de ${sintomasPrincipais}, recomendamos exposição solar de 15 minutos pela manhã para regulação de cortisol e melatonina.</li><li><strong>Passo 2: Dieta Anti-inflamatória e Suporte aos Órgãos (${textOrgaosCheckbox})</strong><br>Foco na saúde intestinal, priorizando alimentos integrais, ricos em fibras e ômega-3. Evitar alimentos ultraprocessados, açúcar refinado e laticínios inflamatórios.</li><li><strong>Passo 3: Gestão do Estresse</strong><br>Prática diária de meditação ou respiração profunda por 10 minutos.</li></ul>`,
+    )
+    updatedRecord.set(
+      'ia_suplementacao',
+      `<ul><li><strong>Magnésio Inositol (500mg) - Recomendação para ${nomePaciente}:</strong> Tomar 1 dose à noite, 30 minutos antes de dormir, para relaxamento.</li><li><strong>Probiótico (10 cepas, 10 bilhões UFC):</strong> Tomar 1 cápsula pela manhã, em jejum, para modulação da microbiota intestinal.</li><li><strong>Ômega 3 (DHA/EPA alto):</strong> 1 cápsula após o almoço, para ação sistêmica anti-inflamatória.</li></ul>`,
+    )
+    updatedRecord.set(
+      'ia_referencias',
+      '<ul><li>Protocolo Integrativo de Modulação Intestinal e Manejo do Estresse (Green Life Biofísica).</li><li>Literatura científica baseada em naturopatia e medicina funcional aplicadas à individualidade bioquímica.</li></ul>',
+    )
+    updatedRecord.set('status', 'completed')
+    $app.saveNoValidate(updatedRecord)
+    return e.next()
+  }
 
   const prompt = `Atue como um especialista em Naturopatia e Saúde Integrativa.
 Analise a seguinte anamnese:

@@ -5,7 +5,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { ArrowLeft, Printer, Loader2, Edit, Save, X } from 'lucide-react'
-import logoUrl from '@/assets/image-09e0a.png'
+import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
 
 const ContentEditableField = ({
