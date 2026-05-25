@@ -25,18 +25,28 @@ onRecordAfterCreateSuccess((e) => {
     return e.next()
   }
 
+  const orgaosAfetados = []
+  if (record.getBool('sintomas_figado')) orgaosAfetados.push('Fígado')
+  if (record.getBool('sintomas_coracao')) orgaosAfetados.push('Coração')
+  if (record.getBool('sintomas_baco')) orgaosAfetados.push('Baço/Pâncreas')
+  if (record.getBool('sintomas_pulmao')) orgaosAfetados.push('Pulmão')
+  if (record.getBool('sintomas_rins')) orgaosAfetados.push('Rins')
+  const textOrgaosCheckbox = orgaosAfetados.length > 0 ? orgaosAfetados.join(', ') : 'Nenhum'
+
   const prompt = `Atue como um especialista em Naturopatia e Saúde Integrativa.
 Analise a seguinte anamnese:
 Paciente: ${record.getString('nome_paciente')}
 Tipo de Atendimento: ${record.getString('tipo_atendimento') || 'consulta'}
 Motivo da consulta / Histórico: ${record.getString('motivo_consulta')}
 Sintomas Relatados: ${record.getString('sintomas_principais') || 'Não informados'}
-Órgãos Afetados Identificados: ${record.getString('orgaos_afetados') || 'Não informados'}
+Sistemas/Órgãos Afetados Identificados: ${record.getString('orgaos_afetados') || 'Não informados'}
+Desequilíbrios em Órgãos (Checklist): ${textOrgaosCheckbox}
 
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável em HTML com tags <ul> e <li>):
-- "ia_sugestoes_terapeuticas"
-- "ia_suplementacao"
-- "ia_referencias"`
+Por favor, elabore um plano de tratamento profissional, detalhado e sistemático.
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML usando <ul>, <li>, <p>, <strong>):
+- "ia_sugestoes_terapeuticas": Deve conter um passo a passo claro, mudanças de estilo de vida, dieta e terapias específicas sistemáticas.
+- "ia_suplementacao": Deve conter um protocolo de suplementação robusto e sistemático, com dosagens exatas, horários e instruções claras de uso.
+- "ia_referencias": Referências ou embasamento científico do protocolo.`
 
   try {
     const res = $http.send({

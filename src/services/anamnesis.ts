@@ -4,6 +4,9 @@ export const getAnamnesis = () => pb.collection('anamnesis').getFullList({ sort:
 
 export const getAnamnese = (id: string) => pb.collection('anamnesis').getOne(id)
 
+export const updateAnamnese = (id: string, data: Partial<any>) =>
+  pb.collection('anamnesis').update(id, data)
+
 export const createAnamnese = (data: {
   user_id: string
   nome_paciente: string
