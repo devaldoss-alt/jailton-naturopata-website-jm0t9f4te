@@ -7,11 +7,11 @@ routerAdd(
     try {
       record = $app.findRecordById('anamnesis', id)
     } catch (err) {
-      return e.notFoundError('Anamnesis not found')
+      throw new NotFoundError('Anamnesis not found')
     }
 
     if (!e.hasSuperuserAuth() && record.getString('user_id') !== e.auth?.id) {
-      return e.forbiddenError('Not allowed')
+      throw new ForbiddenError('Not allowed')
     }
 
     const aiUrl = $secrets.get('SKIP_AI_GATEWAY_URL')
@@ -97,11 +97,17 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
 
       if (res.statusCode === 200) {
         const data = res.json
-        const content = JSON.parse(data.choices[0].message.content)
-        record.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
-        record.set('ia_suplementacao', content.ia_suplementacao || '')
-        record.set('ia_referencias', content.ia_referencias || '')
-        record.set('status', 'completed')
+        const contentStr = data?.choices?.[0]?.message?.content
+        if (contentStr) {
+          const content = JSON.parse(contentStr)
+          record.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
+          record.set('ia_suplementacao', content.ia_suplementacao || '')
+          record.set('ia_referencias', content.ia_referencias || '')
+          record.set('status', 'completed')
+        } else {
+          $app.logger().error('AI Empty Response', 'status', res.statusCode)
+          record.set('status', 'error')
+        }
       } else {
         $app
           .logger()

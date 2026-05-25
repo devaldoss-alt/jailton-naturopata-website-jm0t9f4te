@@ -84,11 +84,17 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
 
     if (res.statusCode === 200) {
       const data = res.json
-      const content = JSON.parse(data.choices[0].message.content)
-      updatedRecord.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
-      updatedRecord.set('ia_suplementacao', content.ia_suplementacao || '')
-      updatedRecord.set('ia_referencias', content.ia_referencias || '')
-      updatedRecord.set('status', 'completed')
+      const contentStr = data?.choices?.[0]?.message?.content
+      if (contentStr) {
+        const content = JSON.parse(contentStr)
+        updatedRecord.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
+        updatedRecord.set('ia_suplementacao', content.ia_suplementacao || '')
+        updatedRecord.set('ia_referencias', content.ia_referencias || '')
+        updatedRecord.set('status', 'completed')
+      } else {
+        $app.logger().error('AI Empty Response', 'status', res.statusCode)
+        updatedRecord.set('status', 'error')
+      }
     } else {
       $app
         .logger()
