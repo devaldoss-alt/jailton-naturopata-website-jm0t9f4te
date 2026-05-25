@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T17:48:04.486Z",
+  "generatedAt": "2026-05-25T18:12:46.007Z",
   "collections": [
     {
       "name": "users",
@@ -259,6 +259,36 @@
           "required": false,
           "system": false,
           "selectValues": ["consulta", "revisão"]
+        },
+        {
+          "name": "sintomas_figado",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sintomas_coracao",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sintomas_baco",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sintomas_pulmao",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sintomas_rins",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

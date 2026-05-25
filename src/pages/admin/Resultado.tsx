@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getAnamnese } from '@/services/anamnesis'
+import { useRealtime } from '@/hooks/use-realtime'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { ArrowLeft, Printer } from 'lucide-react'
+import { ArrowLeft, Printer, Loader2 } from 'lucide-react'
 import logoUrl from '@/assets/logo-oficial_sem-fundo-420d8.png'
 
 export default function Resultado() {
@@ -15,6 +16,12 @@ export default function Resultado() {
       getAnamnese(id).then(setAnamnese).catch(console.error)
     }
   }, [id])
+
+  useRealtime('anamnesis', (e) => {
+    if (e.record.id === id) {
+      setAnamnese(e.record)
+    }
+  })
 
   if (!anamnese) {
     return (
@@ -144,7 +151,7 @@ export default function Resultado() {
               paddingBottom: '5px',
             }}
           >
-            Sintomas e Sistemas
+            Anamnese Integrativa (Checklist results)
           </h3>
           <p style={{ fontSize: '14px', lineHeight: '1.5', marginBottom: '10px' }}>
             <strong>Queixa principal / Histórico:</strong> {anamnese.motivo_consulta}
@@ -170,13 +177,24 @@ export default function Resultado() {
           >
             Sugestões Terapêuticas
           </h3>
-          <div
-            className="content-html"
-            dangerouslySetInnerHTML={{
-              __html: anamnese.ia_sugestoes_terapeuticas || '<p>Processando...</p>',
-            }}
-            style={{ fontSize: '14px', marginBottom: '25px' }}
-          />
+          {anamnese.status === 'pending' ? (
+            <div className="flex items-center text-gray-500 mb-6 py-4">
+              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+              <span>Processando sugestões... A IA está analisando os dados.</span>
+            </div>
+          ) : anamnese.status === 'error' ? (
+            <div className="text-red-500 mb-6 py-4">
+              <p>Erro ao gerar sugestões. Por favor, edite a anamnese ou gere novamente.</p>
+            </div>
+          ) : (
+            <div
+              className="content-html"
+              dangerouslySetInnerHTML={{
+                __html: anamnese.ia_sugestoes_terapeuticas || '<p>Nenhuma sugestão gerada.</p>',
+              }}
+              style={{ fontSize: '14px', marginBottom: '25px' }}
+            />
+          )}
 
           <h3
             style={{
@@ -188,15 +206,26 @@ export default function Resultado() {
               paddingBottom: '5px',
             }}
           >
-            Protocolo de Suplementação
+            Suplementação
           </h3>
-          <div
-            className="content-html"
-            dangerouslySetInnerHTML={{
-              __html: anamnese.ia_suplementacao || '<p>Processando...</p>',
-            }}
-            style={{ fontSize: '14px', marginBottom: '25px' }}
-          />
+          {anamnese.status === 'pending' ? (
+            <div className="flex items-center text-gray-500 mb-6 py-4">
+              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+              <span>Processando protocolo de suplementação...</span>
+            </div>
+          ) : anamnese.status === 'error' ? (
+            <div className="text-red-500 mb-6 py-4">
+              <p>Erro ao gerar protocolo.</p>
+            </div>
+          ) : (
+            <div
+              className="content-html"
+              dangerouslySetInnerHTML={{
+                __html: anamnese.ia_suplementacao || '<p>Nenhum protocolo gerado.</p>',
+              }}
+              style={{ fontSize: '14px', marginBottom: '25px' }}
+            />
+          )}
 
           {anamnese.ia_referencias && (
             <>

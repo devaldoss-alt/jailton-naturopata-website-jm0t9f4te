@@ -100,6 +100,12 @@ export default function NovaAnamnese() {
     const selectedSymptoms = Object.values(symptoms).flat()
     const affectedOrgans = Object.keys(symptoms).filter((k) => symptoms[k].length > 0)
 
+    const sintomas_figado = (symptoms['Fígado e Vesícula Biliar'] || []).length > 0
+    const sintomas_coracao = (symptoms['Coração e Intestino Delgado'] || []).length > 0
+    const sintomas_baco = (symptoms['Baço, Pâncreas e Estômago'] || []).length > 0
+    const sintomas_pulmao = (symptoms['Pulmão e Intestino Grosso'] || []).length > 0
+    const sintomas_rins = (symptoms['Rins e Bexiga'] || []).length > 0
+
     setLoading(true)
     try {
       const result = await createAnamnese({
@@ -114,9 +120,14 @@ export default function NovaAnamnese() {
             : 'Nenhum sintoma marcado no checklist.',
         orgaos_afetados:
           affectedOrgans.length > 0 ? affectedOrgans.join(', ') : 'Nenhum órgão marcado.',
+        sintomas_figado,
+        sintomas_coracao,
+        sintomas_baco,
+        sintomas_pulmao,
+        sintomas_rins,
         status: 'pending',
       })
-      toast.success('Anamnese processada com sucesso!')
+      toast.success('Anamnese enviada para análise IA!')
       navigate(`/resultado/${result.id}`)
     } catch (err) {
       toast.error('Erro ao processar anamnese. Verifique os dados e tente novamente.')

@@ -1,40 +1,42 @@
-onRecordCreateRequest((e) => {
-  const body = e.requestInfo().body || {}
-  if (!body.motivo_consulta) return e.next()
-
-  if (e.auth) {
-    body.user_id = e.auth.id
-  }
+onRecordAfterCreateSuccess((e) => {
+  const record = e.record
+  if (record.getString('status') !== 'pending') return e.next()
 
   const aiUrl = $secrets.get('SKIP_AI_GATEWAY_URL')
   const aiKey = $secrets.get('SKIP_AI_GATEWAY_API_KEY')
 
+  const updatedRecord = $app.findRecordById('anamnesis', record.id)
+
   if (!aiKey || !aiUrl) {
-    if (!body.sintomas_principais)
-      body.sintomas_principais = 'Fadiga crônica, dores de cabeça, má digestão (Mock).'
-    if (!body.orgaos_afetados)
-      body.orgaos_afetados = 'Fígado, Glândulas Suprarrenais, Intestino (Mock).'
-    body.ia_sugestoes_terapeuticas =
-      '<ul><li>Ajuste do ciclo circadiano.</li><li>Dieta anti-inflamatória focada na saúde intestinal.</li></ul>'
-    body.ia_suplementacao =
-      '<ul><li>Magnésio Inositol: 1 dose à noite.</li><li>Probiótico de 10 cepas pela manhã.</li></ul>'
-    body.ia_referencias = '<ul><li>Protocolo Integrativo de Fadiga Adrenal.</li></ul>'
-    body.status = 'completed'
+    updatedRecord.set(
+      'ia_sugestoes_terapeuticas',
+      '<ul><li>Ajuste do ciclo circadiano. (Mock)</li><li>Dieta anti-inflamatória focada na saúde intestinal. (Mock)</li></ul>',
+    )
+    updatedRecord.set(
+      'ia_suplementacao',
+      '<ul><li>Magnésio Inositol: 1 dose à noite. (Mock)</li><li>Probiótico de 10 cepas pela manhã. (Mock)</li></ul>',
+    )
+    updatedRecord.set(
+      'ia_referencias',
+      '<ul><li>Protocolo Integrativo de Fadiga Adrenal. (Mock)</li></ul>',
+    )
+    updatedRecord.set('status', 'completed')
+    $app.saveNoValidate(updatedRecord)
     return e.next()
   }
 
   const prompt = `Atue como um especialista em Naturopatia e Saúde Integrativa.
 Analise a seguinte anamnese:
-Paciente: ${body.nome_paciente}
-Tipo de Atendimento: ${body.tipo_atendimento || 'consulta'}
-Motivo da consulta / Histórico: ${body.motivo_consulta}
-Sintomas Relatados: ${body.sintomas_principais || 'Não informados'}
-Órgãos Afetados Identificados: ${body.orgaos_afetados || 'Não informados'}
+Paciente: ${record.getString('nome_paciente')}
+Tipo de Atendimento: ${record.getString('tipo_atendimento') || 'consulta'}
+Motivo da consulta / Histórico: ${record.getString('motivo_consulta')}
+Sintomas Relatados: ${record.getString('sintomas_principais') || 'Não informados'}
+Órgãos Afetados Identificados: ${record.getString('orgaos_afetados') || 'Não informados'}
 
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável):
-- "ia_sugestoes_terapeuticas" (texto em HTML estruturado com <ul> e <li>)
-- "ia_suplementacao" (texto em HTML estruturado com <ul> e <li>)
-- "ia_referencias" (texto em HTML estruturado ou texto simples)`
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável em HTML com tags <ul> e <li>):
+- "ia_sugestoes_terapeuticas"
+- "ia_suplementacao"
+- "ia_referencias"`
 
   try {
     const res = $http.send({
@@ -55,10 +57,10 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
     if (res.statusCode === 200) {
       const data = res.json
       const content = JSON.parse(data.choices[0].message.content)
-      body.ia_sugestoes_terapeuticas = content.ia_sugestoes_terapeuticas || ''
-      body.ia_suplementacao = content.ia_suplementacao || ''
-      body.ia_referencias = content.ia_referencias || ''
-      body.status = 'completed'
+      updatedRecord.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
+      updatedRecord.set('ia_suplementacao', content.ia_suplementacao || '')
+      updatedRecord.set('ia_referencias', content.ia_referencias || '')
+      updatedRecord.set('status', 'completed')
     } else {
       $app
         .logger()
@@ -69,12 +71,13 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
           'body',
           res.body ? new TextDecoder().decode(res.body) : '',
         )
-      body.status = 'error'
+      updatedRecord.set('status', 'error')
     }
   } catch (err) {
     $app.logger().error('AI Request Failed', 'error', err.message)
-    body.status = 'error'
+    updatedRecord.set('status', 'error')
   }
 
+  $app.saveNoValidate(updatedRecord)
   e.next()
 }, 'anamnesis')

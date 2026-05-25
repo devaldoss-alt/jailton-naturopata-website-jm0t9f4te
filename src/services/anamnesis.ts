@@ -12,5 +12,10 @@ export const createAnamnese = (data: {
   motivo_consulta: string
   sintomas_principais?: string
   orgaos_afetados?: string
+  sintomas_figado?: boolean
+  sintomas_coracao?: boolean
+  sintomas_baco?: boolean
+  sintomas_pulmao?: boolean
+  sintomas_rins?: boolean
   status: string
 }) => pb.collection('anamnesis').create(data)
