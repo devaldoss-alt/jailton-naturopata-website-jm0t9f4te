@@ -7,7 +7,7 @@ import { format } from 'date-fns'
 import { ArrowLeft, Printer, Loader2, Edit, Save, X } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
-import { extractFieldErrors, getErrorMessage } from '@/lib/pocketbase/errors'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const ContentEditableField = ({
   value,
@@ -43,7 +43,7 @@ const ContentEditableField = ({
       <div
         className="content-html"
         dangerouslySetInnerHTML={{ __html: value || '<p>Nenhum dado informado.</p>' }}
-        style={{ fontSize: '14px', marginBottom: '25px' }}
+        style={{ fontSize: '14px', marginBottom: '25px', color: '#111' }}
       />
     )
   }
@@ -55,9 +55,8 @@ const ContentEditableField = ({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs font-bold"
+          className="h-8 px-2 font-bold"
           onClick={() => execCommand('bold')}
-          title="Negrito (Ctrl+B)"
         >
           B
         </Button>
@@ -65,9 +64,8 @@ const ContentEditableField = ({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs italic"
+          className="h-8 px-2 italic"
           onClick={() => execCommand('italic')}
-          title="Itálico (Ctrl+I)"
         >
           I
         </Button>
@@ -75,9 +73,8 @@ const ContentEditableField = ({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs underline"
+          className="h-8 px-2 underline"
           onClick={() => execCommand('underline')}
-          title="Sublinhado (Ctrl+U)"
         >
           U
         </Button>
@@ -86,9 +83,8 @@ const ContentEditableField = ({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs"
+          className="h-8 px-2"
           onClick={() => execCommand('insertUnorderedList')}
-          title="Lista com marcadores"
         >
           • Lista
         </Button>
@@ -96,9 +92,8 @@ const ContentEditableField = ({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs"
+          className="h-8 px-2"
           onClick={() => execCommand('insertOrderedList')}
-          title="Lista numerada"
         >
           1. Lista
         </Button>
@@ -107,8 +102,8 @@ const ContentEditableField = ({
         ref={ref}
         contentEditable
         onInput={handleInput}
-        className="content-html min-h-[150px] p-4 focus:outline-none"
-        style={{ fontSize: '14px' }}
+        className="content-html min-h-[200px] p-5 focus:outline-none bg-white"
+        style={{ fontSize: '14px', color: '#111' }}
         dangerouslySetInnerHTML={{ __html: value }}
       />
     </div>
@@ -161,27 +156,9 @@ export default function Resultado() {
       toast.success('Alterações salvas com sucesso!')
       setIsEditing(false)
     } catch (error) {
-      const fieldErrors = extractFieldErrors(error)
-      if (Object.keys(fieldErrors).length > 0) {
-        const msg = Object.entries(fieldErrors)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join('\n')
-        toast.error(`Erro de validação:\n${msg}`)
-      } else {
-        toast.error(`Erro ao salvar: ${getErrorMessage(error)}`)
-      }
-      console.error(error)
+      toast.error(`Erro ao salvar: ${getErrorMessage(error)}`)
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleCancel = () => {
-    setIsEditing(false)
-    if (anamnese) {
-      setSugestoes(anamnese.ia_sugestoes_terapeuticas || '')
-      setSuplementacao(anamnese.ia_suplementacao || '')
-      setReferencias(anamnese.ia_referencias || '')
     }
   }
 
@@ -199,67 +176,56 @@ export default function Resultado() {
   return (
     <div className="max-w-4xl mx-auto pb-12 animate-fade-in-up">
       <style>{`
-        .content-html ul { list-style-type: disc; padding-left: 20px; margin-bottom: 10px; }
-        .content-html ol { list-style-type: decimal; padding-left: 20px; margin-bottom: 10px; }
-        .content-html li { margin-bottom: 6px; line-height: 1.5; }
-        .content-html p { margin-bottom: 10px; line-height: 1.6; }
-        .content-html strong { font-weight: 600; color: #1a4025; }
+        .content-html ul { list-style-type: disc; padding-left: 20px; margin-bottom: 12px; }
+        .content-html ol { list-style-type: decimal; padding-left: 20px; margin-bottom: 12px; }
+        .content-html li { margin-bottom: 8px; line-height: 1.6; }
+        .content-html p { margin-bottom: 12px; line-height: 1.6; }
+        .content-html strong { font-weight: bold; color: #1a4025; }
         
         @media print {
-          body { background-color: white !important; margin: 0; padding: 0; }
+          body { background-color: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; }
           .no-print { display: none !important; }
           
-          /* Reset parent containers that might clip absolute items */
           html, body, #root, [data-radix-scroll-area-viewport] {
-            height: auto !important;
-            overflow: visible !important;
-            position: static !important;
+            height: auto !important; overflow: visible !important; position: static !important;
           }
 
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
           
           #printable-pdf {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
+            position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important;
           }
 
           .content-html { page-break-inside: auto; }
+          .content-html p, .content-html li { page-break-inside: avoid; }
           h3 { page-break-after: avoid; }
-          li, p { page-break-inside: avoid; }
+          .avoid-break { page-break-inside: avoid; }
 
-          @page { margin: 1cm; }
+          @page { margin: 15mm; }
         }
       `}</style>
 
       <div className="flex justify-between items-center mb-8 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h1 className="text-xl font-bold text-gray-800 ml-2">Relatório Gerado</h1>
+        <h1 className="text-xl font-bold text-gray-800 ml-2">Relatório Terapêutico</h1>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
             <Link to="/painel">
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Link>
           </Button>
-
           {anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
               onClick={() => setIsEditing(true)}
               className="text-primary border-primary hover:bg-primary/5"
             >
-              <Edit className="mr-2 h-4 w-4" /> Editar Recomendações
+              <Edit className="mr-2 h-4 w-4" /> Editar
             </Button>
           )}
-
           {isEditing && (
             <>
-              <Button variant="ghost" onClick={handleCancel} disabled={saving}>
+              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>
                 <X className="mr-2 h-4 w-4" /> Cancelar
               </Button>
               <Button
@@ -271,220 +237,201 @@ export default function Resultado() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
-                )}
-                Salvar Alterações
+                )}{' '}
+                Salvar
               </Button>
             </>
           )}
-
           {!isEditing && anamnese.status === 'completed' && (
             <Button
               onClick={() => window.print()}
               className="bg-gray-900 text-white hover:bg-gray-800"
             >
-              <Printer className="mr-2 h-4 w-4" /> Gerar PDF
+              <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
             </Button>
           )}
         </div>
       </div>
 
       <div id="printable-pdf" className="bg-white shadow-sm border border-gray-200">
-        <div
-          style={{
-            border: '2px solid #1a4025',
-            padding: '40px',
-            fontFamily: 'Arial, sans-serif',
-            minHeight: '100%',
-            color: '#111',
-            backgroundColor: '#fff',
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <img
-              src={logoUrl}
-              alt="Green Life Biofísica"
-              style={{
-                height: '140px',
-                width: 'auto',
-                margin: '0 auto 20px',
-                objectFit: 'contain',
-              }}
-            />
-            <h2
-              style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                color: '#1a4025',
-              }}
-            >
-              RELATÓRIO DE ANAMNESE INTEGRATIVA
-            </h2>
-          </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead className="print-header">
+            <tr>
+              <td>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '30px 40px 10px',
+                    borderBottom: '2px solid #1a4025',
+                  }}
+                >
+                  <img
+                    src={logoUrl}
+                    alt="Green Life Biofísica"
+                    style={{ height: '70px', objectFit: 'contain' }}
+                  />
+                  <div style={{ textAlign: 'right', color: '#1a4025' }}>
+                    <h2
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        margin: 0,
+                        letterSpacing: '1px',
+                      }}
+                    >
+                      ANAMNESE INTEGRATIVA
+                    </h2>
+                    <p style={{ fontSize: '14px', margin: '5px 0 0' }}>
+                      Paciente: <strong>{anamnese.nome_paciente}</strong>
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div
+                  style={{
+                    padding: '30px 40px 40px',
+                    fontFamily: 'Arial, sans-serif',
+                    color: '#111',
+                  }}
+                >
+                  <div
+                    className="avoid-break"
+                    style={{
+                      backgroundColor: '#f4f7f5',
+                      padding: '15px 20px',
+                      borderRadius: '8px',
+                      marginBottom: '30px',
+                      border: '1px solid #e2e8e4',
+                    }}
+                  >
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                      <p style={{ margin: '0', fontSize: '14px' }}>
+                        <strong>Data:</strong>{' '}
+                        {format(new Date(anamnese.data_atendimento), 'dd/MM/yyyy')}
+                      </p>
+                      <p style={{ margin: '0', fontSize: '14px' }}>
+                        <strong>Telefone:</strong> {anamnese.telefone || 'N/I'}
+                      </p>
+                      <p style={{ margin: '0', fontSize: '14px', width: '100%' }}>
+                        <strong>Motivo / Queixa Principal:</strong> {anamnese.motivo_consulta}
+                      </p>
+                    </div>
+                  </div>
 
-          <div
-            style={{
-              backgroundColor: '#f4f7f5',
-              padding: '20px',
-              borderRadius: '8px',
-              marginBottom: '30px',
-              border: '1px solid #e2e8e4',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-              <h3
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  color: '#4a5568',
-                  textTransform: 'uppercase',
-                  margin: 0,
-                }}
-              >
-                DADOS DO PACIENTE
-              </h3>
-            </div>
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      marginBottom: '15px',
+                      color: '#1a4025',
+                      borderBottom: '1px solid #1a4025',
+                      paddingBottom: '5px',
+                    }}
+                  >
+                    Plano de Ação e Sugestões Terapêuticas
+                  </h3>
+                  {anamnese.status === 'pending' ? (
+                    <div className="flex items-center text-gray-500 mb-6 py-4">
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                      <span>Analisando correlações sistêmicas...</span>
+                    </div>
+                  ) : anamnese.status === 'error' ? (
+                    <p className="text-red-500 mb-6">Erro ao gerar sugestões.</p>
+                  ) : (
+                    <ContentEditableField
+                      value={sugestoes}
+                      onChange={setSugestoes}
+                      isEditing={isEditing}
+                    />
+                  )}
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-              <p style={{ margin: '0', fontSize: '15px' }}>
-                <strong>Tipo:</strong>{' '}
-                <span style={{ textTransform: 'capitalize' }}>
-                  {anamnese.tipo_atendimento || 'Consulta'}
-                </span>
-              </p>
-              <p style={{ margin: '0', fontSize: '15px' }}>
-                <strong>Nome:</strong> {anamnese.nome_paciente}
-              </p>
-              <p style={{ margin: '0', fontSize: '15px' }}>
-                <strong>Data:</strong> {format(new Date(anamnese.data_atendimento), 'dd/MM/yyyy')}
-              </p>
-            </div>
-          </div>
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      marginBottom: '15px',
+                      color: '#1a4025',
+                      borderBottom: '1px solid #1a4025',
+                      paddingBottom: '5px',
+                      marginTop: '30px',
+                    }}
+                  >
+                    Protocolo de Suplementação
+                  </h3>
+                  {anamnese.status === 'pending' ? (
+                    <div className="flex items-center text-gray-500 mb-6 py-4">
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                      <span>Processando suplementação...</span>
+                    </div>
+                  ) : anamnese.status === 'error' ? (
+                    <p className="text-red-500 mb-6">Erro ao gerar protocolo.</p>
+                  ) : (
+                    <ContentEditableField
+                      value={suplementacao}
+                      onChange={setSuplementacao}
+                      isEditing={isEditing}
+                    />
+                  )}
 
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#1a4025',
-              borderBottom: '2px solid #1a4025',
-              paddingBottom: '8px',
-            }}
-          >
-            Análise e Sintomas (Checklist)
-          </h3>
-          <p style={{ fontSize: '15px', lineHeight: '1.6', marginBottom: '12px' }}>
-            <strong>Queixa principal / Histórico:</strong> {anamnese.motivo_consulta}
-          </p>
-          <p style={{ fontSize: '15px', lineHeight: '1.6', marginBottom: '12px' }}>
-            <strong>Sintomas Identificados:</strong>{' '}
-            {anamnese.sintomas_principais || 'Nenhum sintoma marcado.'}
-          </p>
-          <p style={{ fontSize: '15px', lineHeight: '1.6', marginBottom: '30px' }}>
-            <strong>Órgãos/Sistemas Relacionados:</strong>{' '}
-            {anamnese.orgaos_afetados || 'Nenhum órgão marcado.'}
-          </p>
-
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#1a4025',
-              borderBottom: '2px solid #1a4025',
-              paddingBottom: '8px',
-            }}
-          >
-            Plano Terapêutico e Sugestões
-          </h3>
-          {anamnese.status === 'pending' ? (
-            <div className="flex items-center text-gray-500 mb-6 py-4">
-              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-              <span>Processando plano terapêutico... A IA está analisando os dados.</span>
-            </div>
-          ) : anamnese.status === 'error' ? (
-            <div className="text-red-500 mb-6 py-4">
-              <p>Erro ao gerar sugestões. Por favor, edite a anamnese ou gere novamente.</p>
-            </div>
-          ) : (
-            <ContentEditableField value={sugestoes} onChange={setSugestoes} isEditing={isEditing} />
-          )}
-
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#1a4025',
-              borderBottom: '2px solid #1a4025',
-              paddingBottom: '8px',
-            }}
-          >
-            Protocolo de Suplementação Sistemática
-          </h3>
-          {anamnese.status === 'pending' ? (
-            <div className="flex items-center text-gray-500 mb-6 py-4">
-              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-              <span>Processando protocolo de suplementação...</span>
-            </div>
-          ) : anamnese.status === 'error' ? (
-            <div className="text-red-500 mb-6 py-4">
-              <p>Erro ao gerar protocolo.</p>
-            </div>
-          ) : (
-            <ContentEditableField
-              value={suplementacao}
-              onChange={setSuplementacao}
-              isEditing={isEditing}
-            />
-          )}
-
-          <h3
-            style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginTop: '40px',
-              marginBottom: '10px',
-              color: '#4a5568',
-              borderBottom: '1px solid #e2e8f0',
-              paddingBottom: '5px',
-            }}
-          >
-            Referências e Embasamento
-          </h3>
-          {anamnese.status === 'pending' ? (
-            <div className="flex items-center text-gray-500 mb-6 py-4">
-              <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-              <span>Processando referências...</span>
-            </div>
-          ) : anamnese.status === 'error' ? (
-            <div className="text-red-500 mb-6 py-4">
-              <p>Erro ao gerar referências.</p>
-            </div>
-          ) : (
-            <ContentEditableField
-              value={referencias}
-              onChange={setReferencias}
-              isEditing={isEditing}
-            />
-          )}
-
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: '60px',
-              fontSize: '13px',
-              color: '#718096',
-              borderTop: '1px solid #e2e8f0',
-              paddingTop: '20px',
-            }}
-          >
-            <strong>Green Life Biofísica</strong> - Ciência que transforma. Vida que floresce.
-            <br />
-            Plano terapêutico de suporte clínico complementar.
-          </div>
-        </div>
+                  <div className="avoid-break">
+                    <h3
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                        marginTop: '40px',
+                        marginBottom: '10px',
+                        color: '#4a5568',
+                        borderBottom: '1px solid #e2e8f0',
+                        paddingBottom: '5px',
+                      }}
+                    >
+                      Referências
+                    </h3>
+                    {anamnese.status === 'pending' ? (
+                      <p className="text-gray-500 text-sm">Aguardando elaboração...</p>
+                    ) : (
+                      <ContentEditableField
+                        value={referencias}
+                        onChange={setReferencias}
+                        isEditing={isEditing}
+                      />
+                    )}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot className="print-footer">
+            <tr>
+              <td>
+                <div
+                  style={{
+                    textAlign: 'center',
+                    fontSize: '11px',
+                    color: '#718096',
+                    borderTop: '1px solid #e2e8f0',
+                    paddingTop: '10px',
+                    paddingBottom: '20px',
+                    margin: '0 40px',
+                  }}
+                >
+                  <strong>Green Life Biofísica</strong> - Ciência que transforma. Vida que floresce.
+                  <br />
+                  Plano terapêutico de suporte clínico complementar. As orientações não substituem a
+                  avaliação médica.
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
     </div>
   )

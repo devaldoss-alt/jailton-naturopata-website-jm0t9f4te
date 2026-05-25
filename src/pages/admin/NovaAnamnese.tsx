@@ -4,129 +4,191 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useAuth } from '@/hooks/use-auth'
 import { createAnamnese } from '@/services/anamnesis'
 import { toast } from 'sonner'
 import { Loader2, Activity } from 'lucide-react'
 
-const ORGAN_SYSTEMS = [
+const HISTORY_CHECKBOXES = [
+  { id: 'hiv_status', label: 'É soropositivo / Tem HIV' },
+  { id: 'hipertenso', label: 'É Hipertenso(a)' },
+  { id: 'hipotenso', label: 'É Hipotenso(a)' },
+  { id: 'atividade_fisica', label: 'Faz atividade Física?' },
+  { id: 'marcapasso', label: 'Tem marcapasso' },
+  { id: 'alergia', label: 'Tem alergia' },
+  { id: 'histerectomia', label: 'Removeu Útero/Histerectomia' },
+  { id: 'animais_casa', label: 'Tem animais em casa?' },
+  { id: 'renite', label: 'Tem Renite' },
+  { id: 'platina', label: 'Tem Platina' },
+  { id: 'tireoide_removida', label: 'Removeu a Tireóide' },
+  { id: 'arritmia', label: 'Sente arritmia Cardíaca' },
+  { id: 'cancer', label: 'Oncológico(a) / Tem Câncer?' },
+  { id: 'vesicula_removida', label: 'Removeu a Vesícula' },
+  { id: 'bebida_alcoolica', label: 'Toma Bebida alcoólica' },
+  { id: 'amalgama_preta', label: 'Tem dentes obturado com amálgamas Preta?' },
+]
+
+const ORGANS = {
+  Rins: [
+    { id: 'pressao_alta', label: 'Tem Pressão alta' },
+    { id: 'urina_espumosa', label: 'Urina sai espumosa' },
+    { id: 'dores_nuca', label: 'Sente dores na nuca' },
+    { id: 'tremores_maos', label: 'Sente tremores nas mãos' },
+    { id: 'gosto_metalico', label: 'Sente um gosto metálico na boca quando se alimenta?' },
+  ],
+  Pulmão: [
+    { id: 'asma', label: 'Tem asma' },
+    { id: 'pele_ressecada', label: 'Pele ressecada' },
+    { id: 'tristeza', label: 'Tem sensação de tristeza' },
+    { id: 'gripes_frequentes', label: 'Teve gripes nos últimos 30 dias' },
+  ],
+  Baço: [
+    { id: 'refluxo', label: 'Sente refluxo' },
+    { id: 'cansaco_fraqueza', label: 'Sente Cansaço/Fraqueza' },
+    { id: 'fadiga_palidez', label: 'Sente Fadiga/Palidez' },
+    { id: 'dores_costela', label: 'Sente dores do lado esquerdo embaixo da última costela' },
+    { id: 'removeu_utero_baco', label: 'Removeu Útero' },
+  ],
+  Iodo: [
+    { id: 'dores_corpo', label: 'Dores constantes pelo corpo' },
+    { id: 'excesso_gases', label: 'Excesso de gases' },
+    { id: 'maos_pes_gelados', label: 'Mão e pés gelados' },
+    { id: 'mucosa_fezes', label: 'Presença de mucosa nas fezes' },
+  ],
+  Fígado: [
+    { id: 'visao_turva', label: 'Visão Turva' },
+    { id: 'barriga_inchada', label: 'Barriga inchada' },
+    { id: 'fezes_esbranquicadas', label: 'Fezes Esbranquiçada' },
+    { id: 'manchas_pele', label: 'Aparece mancha na pele' },
+    { id: 'urina_escura', label: 'Urina sai escura' },
+  ],
+  'Pressão arterial': [
+    { id: 'dor_cabeca', label: 'Dores de cabeça' },
+    { id: 'enxaqueca', label: 'Enxaquecas' },
+    { id: 'pressao_nuca_art', label: 'Pressão na nuca' },
+    { id: 'tontura', label: 'Tontura' },
+    { id: 'zumbido', label: 'Zumbido no ouvido' },
+  ],
+}
+
+const PATHOGENS = [
+  { id: 'gases_candida', label: 'Tem Gases e dores abdominais? (Cândida, Giárdia e Strongilóide)' },
   {
-    name: 'Fígado e Vesícula Biliar',
-    symptoms: [
-      'Enxaqueca / Dor de cabeça',
-      'Irritabilidade / Raiva fácil',
-      'Gosto amargo na boca',
-      'Acorda entre 1h e 3h da manhã',
-      'TPM forte / Cólicas',
-      'Visão turva / Olhos secos ou vermelhos',
-      'Má digestão de gorduras',
-    ],
+    id: 'cansaco_ascaris',
+    label: 'Sente Cansaço Extremo? (Áscaris Lumbricóide, Toxoplasma, Giárdia)',
+  },
+  { id: 'dores_cabeca_toxoplasma', label: 'Sente Dores de Cabeça? (Toxoplasma, Tênia Solium)' },
+  { id: 'acne_candida', label: 'Tem acne, Rosácea, Psoríase? (Cândida Albicans, Giárdia)' },
+  { id: 'nervoso_mental', label: 'Tem Névoa Mental? (Cândida Albicans, Toxoplasma Gondii)' },
+  {
+    id: 'diarreia_etamoeba',
+    label: 'Tem Diarréia e Dores Abdominais? (Etamoeba Histolística, Giárdia Lambia)',
+  },
+  { id: 'constipacao_ascaris', label: 'Tem Constipação? (Áscaris Lumbricóide, Tênia)' },
+  { id: 'inchaco_candida', label: 'Tem inchaço? (Cândida Albicans, Giárdia)' },
+  { id: 'falta_foco', label: 'Está com falta de Foco? (Toxoplasma Gondii, Candida Albicans)' },
+  { id: 'insonia_toxoplasma', label: 'Tem Insônia? (Toxoplasma Gondii, Cândida Albicans)' },
+  { id: 'ansiedade_toxoplasma', label: 'Sente Ansiedade? (Toxoplasma Gondii, Cândida Glabata)' },
+  { id: 'irritabilidade_giardia', label: 'Sente Irritabilidade? (Giárdia e Strongilóides)' },
+  { id: 'depressao_candida', label: 'Tem Depressão? (Candida Glabata e Toxoplasma Gondii)' },
+  { id: 'compulsao_doces', label: 'Tem Compulsão por doces? (Cândida Albicans, Giárdia Lambia)' },
+  { id: 'dores_migram', label: 'Sente dores que migram? (Strongilóides e Trichinella Spiralís)' },
+  {
+    id: 'resfriado_frequente',
+    label: 'Tem Resfriado freqüente? (Áscaris Lumbricóides, Etamoeba Histólistica)',
   },
   {
-    name: 'Coração e Intestino Delgado',
-    symptoms: [
-      'Insônia / Dificuldade para dormir',
-      'Palpitações / Taquicardia',
-      'Agitação mental / Ansiedade',
-      'Ponta da língua muito vermelha',
-      'Transpiração excessiva',
-      'Dores articulares migratórias',
-    ],
+    id: 'palpitacao_toxoplasma',
+    label: 'Sente Palpitação? (Toxoplasma Gondii, Áscaris Lumbricóide)',
   },
-  {
-    name: 'Baço, Pâncreas e Estômago',
-    symptoms: [
-      'Preocupação excessiva / Pensamento acelerado',
-      'Fadiga após as refeições',
-      'Gases / Distensão abdominal',
-      'Fezes amolecidas',
-      'Vontade excessiva de doces',
-      'Hematomas frequentes',
-      'Mãos e pés frios',
-    ],
-  },
-  {
-    name: 'Pulmão e Intestino Grosso',
-    symptoms: [
-      'Tristeza / Melancolia',
-      'Tosse crônica ou frequente',
-      'Intestino preso / Constipação',
-      'Pele ressecada',
-      'Rinite / Sinusite / Alergias respiratórias',
-      'Baixa imunidade',
-    ],
-  },
-  {
-    name: 'Rins e Bexiga',
-    symptoms: [
-      'Medos / Insegurança',
-      'Zumbido no ouvido',
-      'Dores lombares crônicas',
-      'Urina muito frequente, especialmente à noite',
-      'Queda de cabelo / Cabelo fraco',
-      'Falta de energia vital / Cansaço crônico',
-    ],
-  },
+  { id: 'ma_digestao_giardia', label: 'Tem Má Digestão? (Giárdia Lambia, Etamoeba Histolística)' },
+  { id: 'azia_etamoeba', label: 'Tem Azia?/Má Digestão? (Etamoeba Histolistica, Giária Lambia)' },
+  { id: 'coceira_corpo', label: 'Coceira pelo corpo todo / Acúmulo de toxinas' },
 ]
 
 export default function NovaAnamnese() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState<Record<string, any>>({
     nome_paciente: '',
     data_atendimento: new Date().toISOString().split('T')[0],
-    tipo_atendimento: 'consulta',
+    endereco: '',
+    telefone: '',
+    rg: '',
+    cpf: '',
+    tem_filhos: false,
+    peso: '',
+    altura: '',
+    regiao_atendimento: '',
+    hiv_status: false,
+    hipertenso: false,
+    hipotenso: false,
+    atividade_fisica: false,
+    marcapasso: false,
+    alergia: false,
+    histerectomia: false,
+    habito_intestinal: '',
+    remedio_verme_tempo: '',
+    animais_casa: false,
+    remedios_continuos: '',
     motivo_consulta: '',
+    cansaco_grau: '',
+    status: 'pending',
   })
-  const [symptoms, setSymptoms] = useState<Record<string, string[]>>({})
 
-  const handleSymptomToggle = (system: string, symptom: string) => {
-    setSymptoms((prev) => {
-      const current = prev[system] || []
-      const updated = current.includes(symptom)
-        ? current.filter((s) => s !== symptom)
-        : [...current, symptom]
-      return { ...prev, [system]: updated }
-    })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value })
   }
+
+  const handleCheckbox = (id: string, checked: boolean) => {
+    setFormData({ ...formData, [id]: checked })
+  }
+
+  const renderCheckboxes = (items: { id: string; label: string }[], cols = 3) => (
+    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${cols} gap-4`}>
+      {items.map((item) => (
+        <div key={item.id} className="flex items-start space-x-3">
+          <Checkbox
+            id={item.id}
+            checked={!!formData[item.id]}
+            onCheckedChange={(val) => handleCheckbox(item.id, val === true)}
+            className="mt-0.5 border-primary/50 text-primary"
+          />
+          <Label
+            htmlFor={item.id}
+            className="text-sm text-gray-700 font-normal leading-snug cursor-pointer select-none"
+          >
+            {item.label}
+          </Label>
+        </div>
+      ))}
+    </div>
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
 
-    const selectedSymptoms = Object.values(symptoms).flat()
-    const affectedOrgans = Object.keys(symptoms).filter((k) => symptoms[k].length > 0)
-
-    const sintomas_figado = (symptoms['Fígado e Vesícula Biliar'] || []).length > 0
-    const sintomas_coracao = (symptoms['Coração e Intestino Delgado'] || []).length > 0
-    const sintomas_baco = (symptoms['Baço, Pâncreas e Estômago'] || []).length > 0
-    const sintomas_pulmao = (symptoms['Pulmão e Intestino Grosso'] || []).length > 0
-    const sintomas_rins = (symptoms['Rins e Bexiga'] || []).length > 0
+    if (!formData.nome_paciente || !formData.data_atendimento || !formData.motivo_consulta) {
+      toast.error('Preencha os campos obrigatórios (Nome, Data, Motivo).')
+      return
+    }
 
     setLoading(true)
     try {
-      const result = await createAnamnese({
+      const payload = {
+        ...formData,
         user_id: user.id,
-        nome_paciente: formData.nome_paciente,
         data_atendimento: formData.data_atendimento + ' 12:00:00.000Z',
-        tipo_atendimento: formData.tipo_atendimento,
-        motivo_consulta: formData.motivo_consulta,
-        sintomas_principais:
-          selectedSymptoms.length > 0
-            ? selectedSymptoms.join(', ')
-            : 'Nenhum sintoma marcado no checklist.',
-        orgaos_afetados:
-          affectedOrgans.length > 0 ? affectedOrgans.join(', ') : 'Nenhum órgão marcado.',
-        sintomas_figado,
-        sintomas_coracao,
-        sintomas_baco,
-        sintomas_pulmao,
-        sintomas_rins,
-        status: 'pending',
-      })
+        peso: formData.peso ? parseFloat(formData.peso) : null,
+        altura: formData.altura ? parseFloat(formData.altura) : null,
+        cansaco_grau: formData.cansaco_grau ? parseInt(formData.cansaco_grau) : null,
+      }
+      const result = await createAnamnese(payload)
       toast.success('Anamnese enviada para análise IA!')
       navigate(`/resultado/${result.id}`)
     } catch (err) {
@@ -138,129 +200,216 @@ export default function NovaAnamnese() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100 animate-fade-in-up">
-      <div className="mb-8 border-b pb-6">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <Activity className="w-6 h-6 text-primary" /> Nova Anamnese Integrativa
+    <div className="max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 animate-fade-in-up mb-12">
+      <div className="mb-8 border-b border-gray-200 pb-6 text-center md:text-left">
+        <h1 className="text-3xl font-extrabold text-primary flex items-center justify-center md:justify-start gap-3 uppercase tracking-wide">
+          <Activity className="w-8 h-8" /> ANAMNESE INTEGRATIVA
         </h1>
         <p className="text-gray-500 mt-2">
-          Preencha os dados do paciente e o checklist de sintomas para que a IA analise e gere o
-          protocolo inicial.
+          Preencha detalhadamente o perfil clínico do paciente para a geração sistêmica do plano
+          terapêutico.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <div className="space-y-6">
-          <div>
-            <Label className="text-base font-semibold mb-4 block">Tipo de Atendimento</Label>
-            <RadioGroup
-              value={formData.tipo_atendimento}
-              onValueChange={(val) => setFormData({ ...formData, tipo_atendimento: val })}
-              className="flex gap-6"
-            >
-              <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg border border-gray-100 pr-6">
-                <RadioGroupItem value="consulta" id="consulta" />
-                <Label htmlFor="consulta" className="cursor-pointer">
-                  Consulta (Primeira vez)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg border border-gray-100 pr-6">
-                <RadioGroupItem value="revisão" id="revisao" />
-                <Label htmlFor="revisao" className="cursor-pointer">
-                  Revisão (Retorno)
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <Label htmlFor="nome" className="text-sm font-semibold">
-                Nome do Paciente
-              </Label>
+      <form onSubmit={handleSubmit} className="space-y-12">
+        {/* DADOS DEMOGRÁFICOS */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Dados Pessoais</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="nome_paciente">Nome Completo *</Label>
               <Input
-                id="nome"
-                required
-                placeholder="Ex: João Silva"
+                id="nome_paciente"
                 value={formData.nome_paciente}
-                onChange={(e) => setFormData({ ...formData, nome_paciente: e.target.value })}
-                className="h-12"
+                onChange={handleChange}
+                required
               />
             </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="data" className="text-sm font-semibold">
-                Data do Atendimento
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="data_atendimento">Data *</Label>
               <Input
-                id="data"
+                id="data_atendimento"
                 type="date"
-                required
                 value={formData.data_atendimento}
-                onChange={(e) => setFormData({ ...formData, data_atendimento: e.target.value })}
-                className="h-12"
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="telefone">Telefone</Label>
+              <Input id="telefone" value={formData.telefone} onChange={handleChange} />
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="endereco">Endereço</Label>
+              <Input id="endereco" value={formData.endereco} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rg">RG</Label>
+              <Input id="rg" value={formData.rg} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cpf">CPF</Label>
+              <Input id="cpf" value={formData.cpf} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="peso">Peso (kg)</Label>
+              <Input
+                id="peso"
+                type="number"
+                step="0.1"
+                value={formData.peso}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="altura">Altura (m)</Label>
+              <Input
+                id="altura"
+                type="number"
+                step="0.01"
+                value={formData.altura}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="regiao_atendimento">Região de Atendimento</Label>
+              <Input
+                id="regiao_atendimento"
+                value={formData.regiao_atendimento}
+                onChange={handleChange}
               />
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="space-y-4">
-          <Label className="text-base font-semibold block border-b pb-2">
-            Checklist de Sistemas e Órgãos
-          </Label>
-          <p className="text-sm text-gray-500 mb-4">
-            Marque os sintomas apresentados pelo paciente para identificação do desequilíbrio
-            orgânico.
-          </p>
+        {/* HISTÓRICO GERAL */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+            Histórico Geral e Estilo de Vida
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="motivo_consulta">Qual o motivo que nos procura? *</Label>
+              <Textarea
+                id="motivo_consulta"
+                value={formData.motivo_consulta}
+                onChange={handleChange}
+                required
+                className="h-20"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="remedios_continuos">Faz uso contínuo de remédios? Quais?</Label>
+              <Textarea
+                id="remedios_continuos"
+                value={formData.remedios_continuos}
+                onChange={handleChange}
+                className="h-20"
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="remedio_verme_tempo">
+                  Tem quanto tempo que tomou um remédio de verme?
+                </Label>
+                <Input
+                  id="remedio_verme_tempo"
+                  value={formData.remedio_verme_tempo}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2 pt-2">
+                <Label className="text-gray-700 font-semibold">
+                  Quantas vezes vai no banheiro fazer cocô?
+                </Label>
+                <RadioGroup
+                  value={formData.habito_intestinal}
+                  onValueChange={(v) => setFormData({ ...formData, habito_intestinal: v })}
+                  className="flex gap-4 pt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="1" id="h1" />
+                    <Label htmlFor="h1">Uma</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="2" id="h2" />
+                    <Label htmlFor="h2">Duas</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="3" id="h3" />
+                    <Label htmlFor="h3">Três ou Mais</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50/80 p-6 rounded-lg border border-gray-100 shadow-sm">
+            {renderCheckboxes(HISTORY_CHECKBOXES, 4)}
+          </div>
+        </section>
+
+        {/* ÓRGÃOS E SISTEMAS */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+            Desequilíbrios Físicos por Sistema
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            {ORGAN_SYSTEMS.map((system) => (
-              <div key={system.name} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <h3 className="font-medium text-gray-800 mb-3 text-sm">{system.name}</h3>
-                <div className="space-y-3">
-                  {system.symptoms.map((symptom) => (
-                    <div key={symptom} className="flex items-start space-x-3">
-                      <Checkbox
-                        id={symptom}
-                        checked={(symptoms[system.name] || []).includes(symptom)}
-                        onCheckedChange={() => handleSymptomToggle(system.name, symptom)}
-                        className="mt-0.5"
-                      />
-                      <Label
-                        htmlFor={symptom}
-                        className="text-sm text-gray-600 font-normal leading-snug cursor-pointer select-none"
-                      >
-                        {symptom}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
+            {Object.entries(ORGANS).map(([organ, symptoms]) => (
+              <div
+                key={organ}
+                className="space-y-3 bg-white p-4 rounded-md border border-gray-100 shadow-sm"
+              >
+                <h3 className="font-bold text-primary uppercase text-sm tracking-wider">{organ}</h3>
+                {renderCheckboxes(symptoms, 1)}
+                {organ === 'Pulmão' && (
+                  <div className="flex items-center space-x-3 pt-3 mt-2 border-t border-gray-100">
+                    <Label
+                      htmlFor="cansaco_grau"
+                      className="text-sm font-semibold text-gray-700 whitespace-nowrap"
+                    >
+                      Grau de Cansaço (0 a 10):
+                    </Label>
+                    <Input
+                      id="cansaco_grau"
+                      type="number"
+                      min="0"
+                      max="10"
+                      className="w-20 h-9"
+                      value={formData.cansaco_grau}
+                      onChange={handleChange}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="space-y-3">
-          <Label htmlFor="motivo" className="text-base font-semibold">
-            Histórico Médico / Observações Adicionais
-          </Label>
-          <Textarea
-            id="motivo"
-            required
-            className="min-h-[150px] resize-y p-4 text-base leading-relaxed"
-            placeholder="Descreva detalhes adicionais, uso de medicações, estilo de vida..."
-            value={formData.motivo_consulta}
-            onChange={(e) => setFormData({ ...formData, motivo_consulta: e.target.value })}
-          />
-        </div>
+        {/* PATÓGENOS */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+            Indicadores Analíticos de Patógenos
+          </h2>
+          <div className="bg-green-50/50 p-6 rounded-lg border border-green-100 shadow-sm">
+            {renderCheckboxes(PATHOGENS, 2)}
+          </div>
+        </section>
 
-        <Button type="submit" className="w-full h-14 text-lg font-medium" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full h-14 text-lg font-bold shadow-md hover:shadow-lg transition-all"
+          disabled={loading}
+        >
           {loading ? (
             <>
-              <Loader2 className="mr-3 h-5 w-5 animate-spin" /> Processando Análise IA... Aguarde.
+              <Loader2 className="mr-3 h-6 w-6 animate-spin" /> Analisando e Gerando
+              Protocolo...{' '}
             </>
           ) : (
-            'Gerar Análise e Protocolo'
+            'Gerar Análise IA e Protocolo Terapêutico'
           )}
         </Button>
       </form>
