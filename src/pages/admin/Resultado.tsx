@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getAnamnese, updateAnamnese } from '@/services/anamnesis'
+import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnesis'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
@@ -115,6 +115,21 @@ export default function Resultado() {
   const [anamnese, setAnamnese] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [retrying, setRetrying] = useState(false)
+
+  const handleRetry = async () => {
+    setRetrying(true)
+    try {
+      setAnamnese((prev: any) => ({ ...prev, status: 'pending' }))
+      await retryAnamneseAi(id as string)
+      toast.success('Geração iniciada! Aguarde a conclusão.')
+    } catch (error) {
+      toast.error(`Erro ao tentar novamente: ${getErrorMessage(error)}`)
+      setAnamnese((prev: any) => ({ ...prev, status: 'error' }))
+    } finally {
+      setRetrying(false)
+    }
+  }
   const [sugestoes, setSugestoes] = useState('')
   const [suplementacao, setSuplementacao] = useState('')
   const [referencias, setReferencias] = useState('')
@@ -362,10 +377,23 @@ export default function Resultado() {
                   {anamnese.status === 'pending' ? (
                     <div className="flex items-center text-gray-500 mb-6 py-4">
                       <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                      <span>Analisando correlações sistêmicas...</span>
+                      <span>Processando análise clínica...</span>
                     </div>
                   ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6">Erro ao gerar sugestões.</p>
+                    <div className="bg-red-50/50 p-4 rounded-md border border-red-100 mb-6">
+                      <p className="text-red-500 mb-4">
+                        Erro ao gerar o plano de ação e sugestões.
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={handleRetry}
+                        disabled={retrying}
+                        className="bg-white no-print"
+                      >
+                        {retrying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Tentar Novamente
+                      </Button>
+                    </div>
                   ) : (
                     <ContentEditableField
                       value={sugestoes}
@@ -393,7 +421,7 @@ export default function Resultado() {
                       <span>Processando suplementação...</span>
                     </div>
                   ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6">Erro ao gerar protocolo.</p>
+                    <p className="text-red-500 mb-6">A geração do protocolo falhou.</p>
                   ) : (
                     <ContentEditableField
                       value={suplementacao}
@@ -418,6 +446,10 @@ export default function Resultado() {
                     </h3>
                     {anamnese.status === 'pending' ? (
                       <p className="text-gray-500 text-sm">Aguardando elaboração...</p>
+                    ) : anamnese.status === 'error' ? (
+                      <p className="text-gray-500 text-sm mb-6">
+                        A IA não está configurada neste ambiente ou ocorreu um erro.
+                      </p>
                     ) : (
                       <ContentEditableField
                         value={referencias}

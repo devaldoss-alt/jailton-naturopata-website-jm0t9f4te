@@ -8,3 +8,6 @@ export const updateAnamnese = (id: string, data: Partial<any>) =>
   pb.collection('anamnesis').update(id, data)
 
 export const createAnamnese = (data: Record<string, any>) => pb.collection('anamnesis').create(data)
+
+export const retryAnamneseAi = (id: string) =>
+  pb.send(`/backend/v1/anamnesis/${id}/retry`, { method: 'POST' })
