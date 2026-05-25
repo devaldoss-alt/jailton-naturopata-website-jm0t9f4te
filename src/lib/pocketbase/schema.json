@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T19:42:29.905Z",
+  "generatedAt": "2026-05-25T20:04:05.525Z",
   "collections": [
     {
       "name": "users",
@@ -287,6 +287,73 @@
         {
           "name": "sintomas_rins",
           "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "email_paciente",
+          "type": "email",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "telefone_paciente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data_nascimento",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "endereco",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profissao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "historico_familiar",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "habitos_alimentares",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "qualidade_sono",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ruim", "regular", "bom", "excelente"]
+        },
+        {
+          "name": "ingestao_agua",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "medicamentos_em_uso",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "observacoes_gerais",
+          "type": "text",
           "required": false,
           "system": false
         }

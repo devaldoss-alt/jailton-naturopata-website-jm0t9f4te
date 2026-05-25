@@ -6,10 +6,18 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useAuth } from '@/hooks/use-auth'
 import { createAnamnese } from '@/services/anamnesis'
 import { toast } from 'sonner'
 import { Loader2, Activity } from 'lucide-react'
+import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 
 const HISTORY_CHECKBOXES = [
   { id: 'hiv_status', label: 'É soropositivo / Tem HIV' },
@@ -27,7 +35,7 @@ const HISTORY_CHECKBOXES = [
   { id: 'cancer', label: 'Oncológico(a) / Tem Câncer?' },
   { id: 'vesicula_removida', label: 'Removeu a Vesícula' },
   { id: 'bebida_alcoolica', label: 'Toma Bebida alcoólica' },
-  { id: 'amalgama_preta', label: 'Tem dentes obturado com amálgamas Preta?' },
+  { id: 'amalgama_preta', label: 'Tem dentes obturados com amálgamas Preta?' },
 ]
 
 const ORGANS = {
@@ -115,37 +123,37 @@ export default function NovaAnamnese() {
 
   const [formData, setFormData] = useState<Record<string, any>>({
     nome_paciente: '',
-    data_atendimento: new Date().toISOString().split('T')[0],
+    email_paciente: '',
+    telefone_paciente: '',
+    data_nascimento: '',
     endereco: '',
-    telefone: '',
-    rg: '',
-    cpf: '',
-    tem_filhos: false,
+    profissao: '',
+    data_atendimento: new Date().toISOString().split('T')[0],
     peso: '',
     altura: '',
-    regiao_atendimento: '',
-    hiv_status: false,
-    hipertenso: false,
-    hipotenso: false,
-    atividade_fisica: false,
-    marcapasso: false,
-    alergia: false,
-    histerectomia: false,
+    motivo_consulta: '',
+    historico_familiar: '',
+    habitos_alimentares: '',
+    qualidade_sono: '',
+    ingestao_agua: '',
+    medicamentos_em_uso: '',
+    observacoes_gerais: '',
     habito_intestinal: '',
     remedio_verme_tempo: '',
-    animais_casa: false,
-    remedios_continuos: '',
-    motivo_consulta: '',
     cansaco_grau: '',
     status: 'pending',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value })
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+  }
+
+  const handleSelectChange = (key: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }))
   }
 
   const handleCheckbox = (id: string, checked: boolean) => {
-    setFormData({ ...formData, [id]: checked })
+    setFormData((prev) => ({ ...prev, [id]: checked }))
   }
 
   const renderCheckboxes = (items: { id: string; label: string }[], cols = 3) => (
@@ -184,6 +192,9 @@ export default function NovaAnamnese() {
         ...formData,
         user_id: user.id,
         data_atendimento: formData.data_atendimento + ' 12:00:00.000Z',
+        data_nascimento: formData.data_nascimento
+          ? formData.data_nascimento + ' 12:00:00.000Z'
+          : null,
         peso: formData.peso ? parseFloat(formData.peso) : null,
         altura: formData.altura ? parseFloat(formData.altura) : null,
         cansaco_grau: formData.cansaco_grau ? parseInt(formData.cansaco_grau) : null,
@@ -201,20 +212,25 @@ export default function NovaAnamnese() {
 
   return (
     <div className="max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 animate-fade-in-up mb-12">
-      <div className="mb-8 border-b border-gray-200 pb-6 text-center md:text-left">
-        <h1 className="text-3xl font-extrabold text-primary flex items-center justify-center md:justify-start gap-3 uppercase tracking-wide">
-          <Activity className="w-8 h-8" /> ANAMNESE INTEGRATIVA
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Preencha detalhadamente o perfil clínico do paciente para a geração sistêmica do plano
-          terapêutico.
-        </p>
+      <div className="mb-8 border-b border-gray-200 pb-6 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-primary flex items-center justify-center md:justify-start gap-3 uppercase tracking-wide">
+            <Activity className="w-8 h-8" /> ANAMNESE INTEGRATIVA
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Preencha detalhadamente o perfil clínico do paciente para a geração sistêmica do plano
+            terapêutico.
+          </p>
+        </div>
+        <img src={logoUrl} alt="Logo" className="w-48 object-contain" />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-12">
-        {/* DADOS DEMOGRÁFICOS */}
+        {/* SEÇÃO 1: Identificação do Paciente */}
         <section className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Dados Pessoais</h2>
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+            1. Identificação do Paciente
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="nome_paciente">Nome Completo *</Label>
@@ -226,7 +242,16 @@ export default function NovaAnamnese() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="data_atendimento">Data *</Label>
+              <Label htmlFor="data_nascimento">Data de Nascimento</Label>
+              <Input
+                id="data_nascimento"
+                type="date"
+                value={formData.data_nascimento}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="data_atendimento">Data do Atendimento *</Label>
               <Input
                 id="data_atendimento"
                 type="date"
@@ -235,21 +260,30 @@ export default function NovaAnamnese() {
                 required
               />
             </div>
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="email_paciente">E-mail</Label>
+              <Input
+                id="email_paciente"
+                type="email"
+                value={formData.email_paciente}
+                onChange={handleChange}
+              />
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="telefone">Telefone</Label>
-              <Input id="telefone" value={formData.telefone} onChange={handleChange} />
+              <Label htmlFor="telefone_paciente">Telefone / WhatsApp</Label>
+              <Input
+                id="telefone_paciente"
+                value={formData.telefone_paciente}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profissao">Profissão</Label>
+              <Input id="profissao" value={formData.profissao} onChange={handleChange} />
             </div>
             <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="endereco">Endereço</Label>
+              <Label htmlFor="endereco">Endereço Completo</Label>
               <Input id="endereco" value={formData.endereco} onChange={handleChange} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="rg">RG</Label>
-              <Input id="rg" value={formData.rg} onChange={handleChange} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input id="cpf" value={formData.cpf} onChange={handleChange} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="peso">Peso (kg)</Label>
@@ -271,26 +305,18 @@ export default function NovaAnamnese() {
                 onChange={handleChange}
               />
             </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="regiao_atendimento">Região de Atendimento</Label>
-              <Input
-                id="regiao_atendimento"
-                value={formData.regiao_atendimento}
-                onChange={handleChange}
-              />
-            </div>
           </div>
         </section>
 
-        {/* HISTÓRICO GERAL */}
+        {/* SEÇÃO 2: Histórico Clínico e Familiar */}
         <section className="space-y-6">
           <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
-            Histórico Geral e Estilo de Vida
+            2. Histórico Clínico e Familiar
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="motivo_consulta">Qual o motivo que nos procura? *</Label>
+              <Label htmlFor="motivo_consulta">Queixa Principal / Motivo da Consulta *</Label>
               <Textarea
                 id="motivo_consulta"
                 value={formData.motivo_consulta}
@@ -300,60 +326,125 @@ export default function NovaAnamnese() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="remedios_continuos">Faz uso contínuo de remédios? Quais?</Label>
+              <Label htmlFor="historico_familiar">
+                Histórico Familiar de Doenças (Ex: Câncer, Diabetes)
+              </Label>
               <Textarea
-                id="remedios_continuos"
-                value={formData.remedios_continuos}
+                id="historico_familiar"
+                value={formData.historico_familiar}
                 onChange={handleChange}
                 className="h-20"
               />
             </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="remedio_verme_tempo">
-                  Tem quanto tempo que tomou um remédio de verme?
-                </Label>
-                <Input
-                  id="remedio_verme_tempo"
-                  value={formData.remedio_verme_tempo}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="space-y-2 pt-2">
-                <Label className="text-gray-700 font-semibold">
-                  Quantas vezes vai no banheiro fazer cocô?
-                </Label>
-                <RadioGroup
-                  value={formData.habito_intestinal}
-                  onValueChange={(v) => setFormData({ ...formData, habito_intestinal: v })}
-                  className="flex gap-4 pt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="1" id="h1" />
-                    <Label htmlFor="h1">Uma</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="2" id="h2" />
-                    <Label htmlFor="h2">Duas</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="3" id="h3" />
-                    <Label htmlFor="h3">Três ou Mais</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="medicamentos_em_uso">Faz uso contínuo de medicamentos? Quais?</Label>
+              <Textarea
+                id="medicamentos_em_uso"
+                value={formData.medicamentos_em_uso}
+                onChange={handleChange}
+                className="h-20"
+              />
             </div>
           </div>
 
           <div className="bg-gray-50/80 p-6 rounded-lg border border-gray-100 shadow-sm">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase">
+              Condições Pré-existentes e Procedimentos
+            </h3>
             {renderCheckboxes(HISTORY_CHECKBOXES, 4)}
           </div>
         </section>
 
-        {/* ÓRGÃOS E SISTEMAS */}
+        {/* SEÇÃO 3: Estilo de Vida e Hábitos */}
         <section className="space-y-6">
           <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
-            Desequilíbrios Físicos por Sistema
+            3. Estilo de Vida e Hábitos
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="habitos_alimentares">Hábitos Alimentares (Resumo)</Label>
+              <Input
+                id="habitos_alimentares"
+                value={formData.habitos_alimentares}
+                onChange={handleChange}
+                placeholder="Ex: Consome muito doce, fast food..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ingestao_agua">Ingestão Diária de Água</Label>
+              <Input
+                id="ingestao_agua"
+                value={formData.ingestao_agua}
+                onChange={handleChange}
+                placeholder="Ex: 2 litros"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="qualidade_sono">Qualidade do Sono</Label>
+              <Select
+                value={formData.qualidade_sono}
+                onValueChange={(v) => handleSelectChange('qualidade_sono', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ruim">Ruim</SelectItem>
+                  <SelectItem value="regular">Regular</SelectItem>
+                  <SelectItem value="bom">Bom</SelectItem>
+                  <SelectItem value="excelente">Excelente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="remedio_verme_tempo">Última desparasitação (Remédio de verme)</Label>
+              <Input
+                id="remedio_verme_tempo"
+                value={formData.remedio_verme_tempo}
+                onChange={handleChange}
+                placeholder="Ex: Há 2 anos"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-700 font-semibold mb-2 block">
+                Evacuações diárias (Hábito Intestinal)
+              </Label>
+              <RadioGroup
+                value={formData.habito_intestinal}
+                onValueChange={(v) => handleSelectChange('habito_intestinal', v)}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="1" id="h1" />
+                  <Label htmlFor="h1">Uma</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="2" id="h2" />
+                  <Label htmlFor="h2">Duas</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="3" id="h3" />
+                  <Label htmlFor="h3">Três ou Mais</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="space-y-2 lg:col-span-3">
+              <Label htmlFor="observacoes_gerais">Observações Gerais</Label>
+              <Textarea
+                id="observacoes_gerais"
+                value={formData.observacoes_gerais}
+                onChange={handleChange}
+                className="h-20"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* SEÇÃO 4: Mapeamento de Sintomas e Patógenos */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+            4. Mapeamento de Sintomas (Sistemas e Órgãos)
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -386,13 +477,10 @@ export default function NovaAnamnese() {
               </div>
             ))}
           </div>
-        </section>
 
-        {/* PATÓGENOS */}
-        <section className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
+          <h3 className="text-lg font-bold text-gray-800 mt-8 mb-4">
             Indicadores Analíticos de Patógenos
-          </h2>
+          </h3>
           <div className="bg-green-50/50 p-6 rounded-lg border border-green-100 shadow-sm">
             {renderCheckboxes(PATHOGENS, 2)}
           </div>
@@ -405,8 +493,7 @@ export default function NovaAnamnese() {
         >
           {loading ? (
             <>
-              <Loader2 className="mr-3 h-6 w-6 animate-spin" /> Analisando e Gerando
-              Protocolo...{' '}
+              <Loader2 className="mr-3 h-6 w-6 animate-spin" /> Analisando e Gerando Protocolo...
             </>
           ) : (
             'Gerar Análise IA e Protocolo Terapêutico'

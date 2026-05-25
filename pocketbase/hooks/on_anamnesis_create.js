@@ -101,6 +101,17 @@ onRecordAfterCreateSuccess((e) => {
   const habitoIntestinal = record.getString('habito_intestinal')
   const grauCansaco = record.getFloat('cansaco_grau')
 
+  const emailPaciente = record.getString('email_paciente')
+  const telefonePaciente = record.getString('telefone_paciente')
+  const dataNascimento = record.getString('data_nascimento')
+  const profissao = record.getString('profissao')
+  const historicoFamiliar = record.getString('historico_familiar')
+  const habitosAlimentares = record.getString('habitos_alimentares')
+  const qualidadeSono = record.getString('qualidade_sono')
+  const ingestaoAgua = record.getString('ingestao_agua')
+  const medicamentosEmUso = record.getString('medicamentos_em_uso')
+  const observacoesGerais = record.getString('observacoes_gerais')
+
   if (!aiKey || !aiUrl) {
     updatedRecord.set(
       'ia_sugestoes_terapeuticas',
@@ -116,23 +127,40 @@ onRecordAfterCreateSuccess((e) => {
   const prompt = `Atue como um especialista em Naturopatia, Biofísica e Saúde Integrativa.
 Analise a seguinte anamnese detalhada do paciente:
 Nome: ${nomePaciente}
+Nascimento: ${dataNascimento || 'N/I'} | Profissão: ${profissao || 'N/I'}
 Motivo da consulta: ${motivo}
 Peso: ${peso || 'N/I'} kg, Altura: ${altura || 'N/I'} m
+
+ESTILO DE VIDA E HÁBITOS:
 Hábito Intestinal: ${habitoIntestinal || 'N/I'}
+Qualidade do Sono: ${qualidadeSono || 'N/I'}
+Ingestão de Água: ${ingestaoAgua || 'N/I'}
+Hábitos Alimentares: ${habitosAlimentares || 'N/I'}
 Cansaço (0 a 10): ${grauCansaco || 'N/I'}
+
+HISTÓRICO CLÍNICO E FAMILIAR:
+Histórico Familiar: ${historicoFamiliar || 'N/I'}
+Histórico Médico e Condições: ${historicoContext}
+Medicamentos em uso: ${medicamentosEmUso || remediosContinuos || 'N/I'}
 Remédio de verme (última vez): ${remedioVerme || 'N/I'}
-Remédios contínuos: ${remediosContinuos || 'N/I'}
+Observações Gerais: ${observacoesGerais || 'N/I'}
 
-Histórico Médico e Hábitos: ${historicoContext}
-Sintomas Físicos e Desequilíbrios de Órgãos: ${sintomasContext}
-Indicadores Clínicos de Patógenos (Parasitas, Fungos, Bactérias): ${patogenosContext}
+SINTOMAS E DESEQUILÍBRIOS (ÓRGÃOS):
+${sintomasContext}
 
-Por favor, elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica.
-Evite textos genéricos ou fictícios. Analise e correlacione as informações e sintomas reais marcados para sugerir protocolos terapêuticos factíveis.
+INDICADORES DE PATÓGENOS (Parasitas, Fungos, Bactérias):
+${patogenosContext}
+
+INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
+- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica.
+- OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se "Sintomas do Fígado" estiverem presentes, o protocolo DEVE focar na desintoxicação hepática. Se parasitas forem indicados, o protocolo DEVE conter desparasitação direcionada.
+- EVITE COMPLETAMENTE conselhos genéricos e respostas enlatadas que não se relacionam com o quadro acima.
+- Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente.
+
 Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
-- "ia_sugestoes_terapeuticas": Deve conter um passo a passo claro e estruturado (ex: "Passo 1:", "Passo 2:", etc.), direcionado especificamente para as queixas e patógenos suspeitos, incluindo mudanças de estilo de vida e terapias naturopáticas. Mencione o nome do paciente.
-- "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Específico para as indicações (ex: se marcou candidíase, inclua antifúngicos naturais; se parasitas, vermífugos ou tinturas).
-- "ia_referencias": Referências ou embasamento científico naturopático correlacionando os sintomas aos desequilíbrios apontados e ao protocolo sugerido.`
+- "ia_sugestoes_terapeuticas": Deve conter um passo a passo claro e estruturado (ex: "Passo 1: Desparasitação", "Passo 2: Reparação do Terreno Biológico", etc.), direcionado ESPECIFICAMENTE para as queixas e patógenos suspeitos mapeados acima, incluindo mudanças de estilo de vida e terapias naturopáticas adaptadas para a realidade do paciente.
+- "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Extremamente focado nas necessidades individuais reveladas nos sintomas.
+- "ia_referencias": Referências ou embasamento científico naturopático correlacionando os sintomas específicos aos desequilíbrios apontados e ao protocolo sugerido.`
 
   try {
     const res = $http.send({
