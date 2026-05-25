@@ -8,6 +8,9 @@ export const createAnamnese = (data: {
   user_id: string
   nome_paciente: string
   data_atendimento: string
+  tipo_atendimento?: string
   motivo_consulta: string
+  sintomas_principais?: string
+  orgaos_afetados?: string
   status: string
 }) => pb.collection('anamnesis').create(data)

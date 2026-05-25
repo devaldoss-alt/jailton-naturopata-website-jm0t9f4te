@@ -10,8 +10,10 @@ onRecordCreateRequest((e) => {
   const aiKey = $secrets.get('SKIP_AI_GATEWAY_API_KEY')
 
   if (!aiKey || !aiUrl) {
-    body.sintomas_principais = 'Fadiga crônica, dores de cabeça, má digestão (Mock).'
-    body.orgaos_afetados = 'Fígado, Glândulas Suprarrenais, Intestino (Mock).'
+    if (!body.sintomas_principais)
+      body.sintomas_principais = 'Fadiga crônica, dores de cabeça, má digestão (Mock).'
+    if (!body.orgaos_afetados)
+      body.orgaos_afetados = 'Fígado, Glândulas Suprarrenais, Intestino (Mock).'
     body.ia_sugestoes_terapeuticas =
       '<ul><li>Ajuste do ciclo circadiano.</li><li>Dieta anti-inflamatória focada na saúde intestinal.</li></ul>'
     body.ia_suplementacao =
@@ -24,11 +26,12 @@ onRecordCreateRequest((e) => {
   const prompt = `Atue como um especialista em Naturopatia e Saúde Integrativa.
 Analise a seguinte anamnese:
 Paciente: ${body.nome_paciente}
+Tipo de Atendimento: ${body.tipo_atendimento || 'consulta'}
 Motivo da consulta / Histórico: ${body.motivo_consulta}
+Sintomas Relatados: ${body.sintomas_principais || 'Não informados'}
+Órgãos Afetados Identificados: ${body.orgaos_afetados || 'Não informados'}
 
 Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável):
-- "sintomas_principais" (string - resumo dos sintomas)
-- "orgaos_afetados" (string - órgãos e sistemas possivelmente afetados)
 - "ia_sugestoes_terapeuticas" (texto em HTML estruturado com <ul> e <li>)
 - "ia_suplementacao" (texto em HTML estruturado com <ul> e <li>)
 - "ia_referencias" (texto em HTML estruturado ou texto simples)`
@@ -52,8 +55,6 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
     if (res.statusCode === 200) {
       const data = res.json
       const content = JSON.parse(data.choices[0].message.content)
-      body.sintomas_principais = content.sintomas_principais || ''
-      body.orgaos_afetados = content.orgaos_afetados || ''
       body.ia_sugestoes_terapeuticas = content.ia_sugestoes_terapeuticas || ''
       body.ia_suplementacao = content.ia_suplementacao || ''
       body.ia_referencias = content.ia_referencias || ''

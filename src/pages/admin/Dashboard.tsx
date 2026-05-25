@@ -67,6 +67,9 @@ export default function Dashboard() {
                   Data
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Tipo
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -82,6 +85,9 @@ export default function Dashboard() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                     {format(new Date(item.data_atendimento), 'dd/MM/yyyy')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">
+                    {item.tipo_atendimento || 'consulta'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -114,7 +120,7 @@ export default function Dashboard() {
               ))}
               {recentes.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                     Nenhum atendimento registrado ainda. Clique em "Nova Anamnese" para começar.
                   </td>
                 </tr>

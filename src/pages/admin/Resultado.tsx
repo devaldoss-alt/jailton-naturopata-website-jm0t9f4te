@@ -4,6 +4,7 @@ import { getAnamnese } from '@/services/anamnesis'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { ArrowLeft, Printer } from 'lucide-react'
+import logoUrl from '@/assets/logo-oficial_sem-fundo-420d8.png'
 
 export default function Resultado() {
   const { id } = useParams()
@@ -34,15 +35,9 @@ export default function Resultado() {
         .content-html p { margin-bottom: 10px; line-height: 1.6; }
         
         @media print {
-          body {
-            background-color: white !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          #printable-pdf, #printable-pdf * {
-            visibility: visible;
-          }
+          body { background-color: white !important; }
+          body * { visibility: hidden; }
+          #printable-pdf, #printable-pdf * { visibility: visible; }
           #printable-pdf {
             position: absolute;
             left: 0;
@@ -52,9 +47,8 @@ export default function Resultado() {
             padding: 0;
             border: none !important;
           }
-          .no-print {
-            display: none !important;
-          }
+          .no-print { display: none !important; }
+          @page { margin: 1cm; }
         }
       `}</style>
 
@@ -82,95 +76,163 @@ export default function Resultado() {
             padding: '40px',
             fontFamily: 'Arial, sans-serif',
             minHeight: '1000px',
+            color: '#111',
+            backgroundColor: '#fff',
           }}
         >
-          <h2
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <img
+              src={logoUrl}
+              alt="Logo"
+              style={{ height: '100px', width: 'auto', margin: '0 auto 20px' }}
+            />
+            <h2
+              style={{
+                fontSize: '22px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+              }}
+            >
+              Relatório de Anamnese Integrativa
+            </h2>
+          </div>
+
+          <div
             style={{
-              textAlign: 'center',
-              marginBottom: '40px',
-              fontSize: '24px',
-              fontWeight: 'bold',
-              color: '#111',
+              backgroundColor: '#f9f9f9',
+              padding: '15px',
+              borderRadius: '8px',
+              marginBottom: '25px',
+              border: '1px solid #eee',
             }}
           >
-            Relatório de Anamnese Integrativa
-          </h2>
-
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: '#222' }}>
-            Dados do Paciente
-          </h3>
-          <p style={{ marginBottom: '6px' }}>
-            <strong>Nome:</strong> {anamnese.nome_paciente}
-          </p>
-          <p style={{ marginBottom: '6px' }}>
-            <strong>Data do Atendimento:</strong>{' '}
-            {format(new Date(anamnese.data_atendimento), 'dd/MM/yyyy')}
-          </p>
-          <p style={{ marginBottom: '6px', lineHeight: '1.5' }}>
-            <strong>Motivo da Consulta:</strong> {anamnese.motivo_consulta}
-          </p>
-
-          <hr style={{ margin: '30px 0', borderTop: '1px solid #ddd' }} />
-
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: '#222' }}>
-            Sintomas Principais
-          </h3>
-          <p style={{ lineHeight: '1.5', color: '#333' }}>{anamnese.sintomas_principais}</p>
+            <h3
+              style={{
+                fontSize: '16px',
+                fontWeight: 'bold',
+                marginBottom: '10px',
+                color: '#2a5a3b',
+                textTransform: 'uppercase',
+              }}
+            >
+              Dados do Paciente
+            </h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+              <p style={{ margin: '0' }}>
+                <strong>Tipo:</strong>{' '}
+                <span style={{ textTransform: 'capitalize' }}>
+                  {anamnese.tipo_atendimento || 'Consulta'}
+                </span>
+              </p>
+              <p style={{ margin: '0' }}>
+                <strong>Nome:</strong> {anamnese.nome_paciente}
+              </p>
+              <p style={{ margin: '0' }}>
+                <strong>Data:</strong> {format(new Date(anamnese.data_atendimento), 'dd/MM/yyyy')}
+              </p>
+            </div>
+          </div>
 
           <h3
             style={{
-              fontSize: '18px',
+              fontSize: '16px',
               fontWeight: 'bold',
-              marginTop: '25px',
-              marginBottom: '12px',
-              color: '#222',
+              marginBottom: '10px',
+              color: '#2a5a3b',
+              borderBottom: '1px solid #ccc',
+              paddingBottom: '5px',
             }}
           >
-            Órgãos/Sistemas Relacionados
+            Sintomas e Sistemas
           </h3>
-          <p style={{ lineHeight: '1.5', color: '#333' }}>{anamnese.orgaos_afetados}</p>
+          <p style={{ fontSize: '14px', lineHeight: '1.5', marginBottom: '10px' }}>
+            <strong>Queixa principal / Histórico:</strong> {anamnese.motivo_consulta}
+          </p>
+          <p style={{ fontSize: '14px', lineHeight: '1.5', marginBottom: '10px' }}>
+            <strong>Sintomas Identificados:</strong>{' '}
+            {anamnese.sintomas_principais || 'Nenhum sintoma marcado.'}
+          </p>
+          <p style={{ fontSize: '14px', lineHeight: '1.5', marginBottom: '25px' }}>
+            <strong>Órgãos/Sistemas Relacionados:</strong>{' '}
+            {anamnese.orgaos_afetados || 'Nenhum órgão marcado.'}
+          </p>
 
-          <hr style={{ margin: '30px 0', borderTop: '1px solid #ddd' }} />
-
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: '#222' }}>
+          <h3
+            style={{
+              fontSize: '16px',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              color: '#2a5a3b',
+              borderBottom: '1px solid #ccc',
+              paddingBottom: '5px',
+            }}
+          >
             Sugestões Terapêuticas
           </h3>
           <div
             className="content-html"
-            dangerouslySetInnerHTML={{ __html: anamnese.ia_sugestoes_terapeuticas }}
-            style={{ color: '#333' }}
+            dangerouslySetInnerHTML={{
+              __html: anamnese.ia_sugestoes_terapeuticas || '<p>Processando...</p>',
+            }}
+            style={{ fontSize: '14px', marginBottom: '25px' }}
           />
 
           <h3
             style={{
-              fontSize: '18px',
+              fontSize: '16px',
               fontWeight: 'bold',
-              marginTop: '25px',
-              marginBottom: '12px',
-              color: '#222',
+              marginBottom: '10px',
+              color: '#2a5a3b',
+              borderBottom: '1px solid #ccc',
+              paddingBottom: '5px',
             }}
           >
             Protocolo de Suplementação
           </h3>
           <div
             className="content-html"
-            dangerouslySetInnerHTML={{ __html: anamnese.ia_suplementacao }}
-            style={{ color: '#333' }}
+            dangerouslySetInnerHTML={{
+              __html: anamnese.ia_suplementacao || '<p>Processando...</p>',
+            }}
+            style={{ fontSize: '14px', marginBottom: '25px' }}
           />
 
-          <hr style={{ margin: '30px 0', borderTop: '1px solid #ddd' }} />
+          {anamnese.ia_referencias && (
+            <>
+              <h3
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  marginBottom: '10px',
+                  color: '#2a5a3b',
+                  borderBottom: '1px solid #ccc',
+                  paddingBottom: '5px',
+                }}
+              >
+                Referências
+              </h3>
+              <div
+                className="content-html"
+                dangerouslySetInnerHTML={{ __html: anamnese.ia_referencias }}
+                style={{ fontSize: '12px', color: '#555' }}
+              />
+            </>
+          )}
 
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: '#222' }}>
-            Referências
-          </h3>
-          <div
-            className="content-html"
-            dangerouslySetInnerHTML={{ __html: anamnese.ia_referencias }}
-            style={{ fontSize: '14px', color: '#555' }}
-          />
-
-          <p style={{ textAlign: 'center', marginTop: '60px', fontSize: '12px', color: '#888' }}>
-            Relatório gerado automaticamente por IA com base nas respostas coletadas.
+          <p
+            style={{
+              textAlign: 'center',
+              marginTop: '50px',
+              fontSize: '11px',
+              color: '#999',
+              borderTop: '1px solid #eee',
+              paddingTop: '15px',
+            }}
+          >
+            Relatório gerado automaticamente por IA para suporte clínico.
+            <br />
+            Jailton Naturopata - Terapia Integrativa
           </p>
         </div>
       </div>
