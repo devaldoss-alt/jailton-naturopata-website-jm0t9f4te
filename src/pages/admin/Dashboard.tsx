@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { getAnamnesis } from '@/services/anamnesis'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { FileText, Users, Activity } from 'lucide-react'
+import { FileText, Users, Activity, AlertTriangle } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function Dashboard() {
   const [lista, setLista] = useState<any[]>([])
@@ -90,21 +91,35 @@ export default function Dashboard() {
                     {item.tipo_atendimento || 'consulta'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.status === 'completed'
-                          ? 'bg-green-100 text-green-800'
-                          : item.status === 'error'
-                            ? 'bg-red-100 text-red-800'
+                    {item.status === 'error' ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="px-2.5 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 cursor-help">
+                            <AlertTriangle className="w-3 h-3" />
+                            Erro
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="top"
+                          className="max-w-[300px] whitespace-normal bg-red-900 text-white border-red-800"
+                        >
+                          <p className="font-semibold text-sm mb-1">Falha na geração (IA)</p>
+                          <p className="text-xs text-red-100 break-words">
+                            {item.erro_detalhado || 'Erro desconhecido.'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span
+                        className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          item.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {item.status === 'completed'
-                        ? 'Concluído'
-                        : item.status === 'error'
-                          ? 'Erro'
-                          : 'Pendente'}
-                    </span>
+                        }`}
+                      >
+                        {item.status === 'completed' ? 'Concluído' : 'Pendente'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Button variant="ghost" size="sm" asChild>

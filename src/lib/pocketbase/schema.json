@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T20:47:55.828Z",
+  "generatedAt": "2026-05-26T22:11:15.580Z",
   "collections": [
     {
       "name": "users",
@@ -353,6 +353,12 @@
         },
         {
           "name": "observacoes_gerais",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "erro_detalhado",
           "type": "text",
           "required": false,
           "system": false

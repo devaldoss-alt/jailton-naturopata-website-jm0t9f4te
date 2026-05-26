@@ -4,7 +4,7 @@ import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnes
 import { useRealtime } from '@/hooks/use-realtime'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { ArrowLeft, Printer, Loader2, Edit, Save, X } from 'lucide-react'
+import { ArrowLeft, Printer, Loader2, Edit, Save, X, AlertCircle } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
@@ -329,6 +329,48 @@ export default function Resultado() {
                     color: '#111',
                   }}
                 >
+                  {anamnese.status === 'error' && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-md no-print">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0">
+                          <AlertCircle className="h-5 w-5 text-red-500" />
+                        </div>
+                        <div className="ml-3">
+                          <h3 className="text-sm font-medium text-red-800">
+                            Não foi possível gerar o plano terapêutico
+                          </h3>
+                          <div className="mt-2 text-sm text-red-700">
+                            <p>
+                              Ocorreu um erro técnico na comunicação com o serviço de Inteligência
+                              Artificial.
+                            </p>
+                            {anamnese.erro_detalhado && (
+                              <div className="mt-3 bg-red-100/50 p-3 rounded text-xs font-mono break-all border border-red-200">
+                                {anamnese.erro_detalhado}
+                              </div>
+                            )}
+                          </div>
+                          <div className="mt-4">
+                            <Button
+                              variant="outline"
+                              onClick={handleRetry}
+                              disabled={retrying || anamnese.status === 'pending'}
+                              className="bg-white border-red-200 text-red-700 hover:bg-red-50"
+                              size="sm"
+                            >
+                              {anamnese.status === 'pending' || retrying ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : null}
+                              {anamnese.status === 'pending' || retrying
+                                ? 'Processando...'
+                                : 'Tentar Novamente'}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div
                     className="avoid-break"
                     style={{
@@ -380,20 +422,9 @@ export default function Resultado() {
                       <span>Processando análise clínica...</span>
                     </div>
                   ) : anamnese.status === 'error' ? (
-                    <div className="bg-red-50/50 p-4 rounded-md border border-red-100 mb-6">
-                      <p className="text-red-500 mb-4">
-                        Erro ao gerar o plano de ação e sugestões.
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={handleRetry}
-                        disabled={retrying}
-                        className="bg-white no-print"
-                      >
-                        {retrying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Tentar Novamente
-                      </Button>
-                    </div>
+                    <p className="text-red-500 mb-6 text-sm">
+                      Operação falhou. Veja os detalhes do erro acima.
+                    </p>
                   ) : (
                     <ContentEditableField
                       value={sugestoes}
@@ -421,7 +452,9 @@ export default function Resultado() {
                       <span>Processando suplementação...</span>
                     </div>
                   ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6">A geração do protocolo falhou.</p>
+                    <p className="text-red-500 mb-6 text-sm">
+                      Operação falhou. Veja os detalhes do erro acima.
+                    </p>
                   ) : (
                     <ContentEditableField
                       value={suplementacao}
@@ -447,8 +480,8 @@ export default function Resultado() {
                     {anamnese.status === 'pending' ? (
                       <p className="text-gray-500 text-sm">Aguardando elaboração...</p>
                     ) : anamnese.status === 'error' ? (
-                      <p className="text-gray-500 text-sm mb-6">
-                        A IA não está configurada neste ambiente ou ocorreu um erro.
+                      <p className="text-red-500 text-sm mb-6">
+                        Operação falhou. Veja os detalhes do erro acima.
                       </p>
                     ) : (
                       <ContentEditableField

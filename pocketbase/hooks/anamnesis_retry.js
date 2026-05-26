@@ -19,11 +19,16 @@ routerAdd(
 
     if (!aiKey || !aiUrl) {
       record.set('status', 'error')
+      record.set(
+        'erro_detalhado',
+        'Configuração ausente: Chave de API ou URL do Gateway de IA não configurados.',
+      )
       $app.saveNoValidate(record)
       return e.json(500, { error: 'AI not configured' })
     }
 
     record.set('status', 'pending')
+    record.set('erro_detalhado', '')
     $app.saveNoValidate(record)
 
     const nomePaciente = record.getString('nome_paciente') || 'Paciente'
@@ -104,25 +109,26 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
           record.set('ia_suplementacao', content.ia_suplementacao || '')
           record.set('ia_referencias', content.ia_referencias || '')
           record.set('status', 'completed')
+          record.set('erro_detalhado', '')
         } else {
           $app.logger().error('AI Empty Response', 'status', res.statusCode)
           record.set('status', 'error')
+          record.set('erro_detalhado', 'Resposta vazia ou inválida da IA.')
         }
       } else {
-        $app
-          .logger()
-          .error(
-            'AI Error',
-            'status',
-            res.statusCode,
-            'body',
-            res.body ? new TextDecoder().decode(res.body) : '',
-          )
+        const bodyStr = res.body ? new TextDecoder().decode(res.body) : ''
+        let errorMsg = `Erro HTTP ${res.statusCode}`
+        if (res.statusCode === 401) errorMsg = 'Não autorizado: Chave de API inválida.'
+        if (res.statusCode === 429) errorMsg = 'Muitas requisições: Limite de cota excedido.'
+
+        $app.logger().error('AI Error', 'status', res.statusCode, 'body', bodyStr)
         record.set('status', 'error')
+        record.set('erro_detalhado', `${errorMsg} | Detalhes: ${bodyStr}`.substring(0, 1000))
       }
     } catch (err) {
       $app.logger().error('AI Request Failed', 'error', err.message)
       record.set('status', 'error')
+      record.set('erro_detalhado', `Erro de comunicação: ${err.message}`)
     }
 
     $app.saveNoValidate(record)
