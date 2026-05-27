@@ -66,8 +66,12 @@ Sintomas Principais Relatados: ${sintomasPrincipais}
 Órgãos com Sintomas Assinalados (Desequilíbrio): ${orgaosSintomasStr}
 
 INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
-- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica. O tom deve ser em modo imperativo direto e acolhedor (ex: "Estabeleça uma rotina de sono consistente", "Reavalie a sua dieta", "Pratique atividades físicas regularmente").
-- É PROIBIDO usar expressões em primeira pessoa como "Eu sugiro", "Eu proponho" ou "Eu recomendo". Em vez disso, use comandos diretos.
+- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica.
+- MODO IMPERATIVO OBRIGATÓRIO: Você deve usar instruções diretas no modo imperativo e tom acolhedor.
+  * Incorreto: "Eu sugiro que você estabeleça..." -> Correto: "Estabeleça..."
+  * Incorreto: "Eu proponho uma reavaliação..." -> Correto: "Reavalie..."
+  * Incorreto: "Eu recomendo que você pratique..." -> Correto: "Pratique..."
+- É ESTRITAMENTE PROIBIDO usar expressões em primeira pessoa como "Eu sugiro", "Eu proponho" ou "Eu recomendo". Em vez disso, use comandos diretos.
 - OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se órgãos específicos como ${orgaosSintomasStr} estiverem assinalados, o protocolo DEVE focar na desintoxicação/suporte destes órgãos.
 - Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente (ex: motivo da consulta: ${motivo}).
 

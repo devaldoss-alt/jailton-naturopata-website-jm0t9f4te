@@ -145,6 +145,8 @@ export default function NovaAnamnese() {
   const [formData, setFormData] = useState<Record<string, any>>({
     tipo_atendimento: '',
     nome_paciente: '',
+    cpf: '',
+    rg: '',
     email_paciente: '',
     telefone_paciente: '',
     data_nascimento: '',
@@ -273,16 +275,26 @@ export default function NovaAnamnese() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="nome_paciente">Nome Completo *</Label>{' '}
-              <Input
-                id="nome_paciente"
-                value={formData.nome_paciente}
-                onChange={handleChange}
-                required
-              />
+            <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="nome_paciente">Nome Completo *</Label>{' '}
+                <Input
+                  id="nome_paciente"
+                  value={formData.nome_paciente}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cpf">CPF</Label>
+                <Input id="cpf" value={formData.cpf} onChange={handleChange} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rg">RG</Label>
+                <Input id="rg" value={formData.rg} onChange={handleChange} />
+              </div>
             </div>
-            <div className="space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <Label htmlFor="data_nascimento">Data de Nascimento</Label>
               <Input
                 id="data_nascimento"
@@ -291,7 +303,7 @@ export default function NovaAnamnese() {
                 onChange={handleChange}
               />
             </div>
-            <div className="space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <Label htmlFor="data_atendimento">Data do Atendimento *</Label>
               <Input
                 id="data_atendimento"

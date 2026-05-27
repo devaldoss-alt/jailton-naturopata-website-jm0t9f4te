@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T12:01:21.726Z",
+  "generatedAt": "2026-05-27T13:58:54.910Z",
   "collections": [
     {
       "name": "users",
@@ -359,6 +359,18 @@
         },
         {
           "name": "erro_detalhado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cpf",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rg",
           "type": "text",
           "required": false,
           "system": false

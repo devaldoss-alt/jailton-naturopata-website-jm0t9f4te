@@ -5,7 +5,17 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { ArrowLeft, Printer, Loader2, Edit, Save, X, AlertCircle, Copy } from 'lucide-react'
+import {
+  ArrowLeft,
+  Printer,
+  Loader2,
+  Edit,
+  Save,
+  X,
+  AlertCircle,
+  Copy,
+  MessageCircle,
+} from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
@@ -243,7 +253,7 @@ export default function Resultado() {
           Relatório Terapêutico
           {isAuthenticated && (
             <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary border border-primary/20">
-              Modo Profissional
+              Modo Profissional Ativo
             </span>
           )}
         </h1>
@@ -294,6 +304,19 @@ export default function Resultado() {
                 <Copy className="mr-2 h-4 w-4" /> Copiar Link
               </Button>
               <Button
+                variant="outline"
+                className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                onClick={() => {
+                  const url = `https://jailtonnatutopata.goskip.app/resultado/${id}`
+                  const text = encodeURIComponent(
+                    `Olá! Aqui está o link para o seu Plano Terapêutico: ${url}`,
+                  )
+                  window.open(`https://wa.me/5571999292989?text=${text}`, '_blank')
+                }}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+              </Button>
+              <Button
                 onClick={() => window.print()}
                 className="bg-gray-900 text-white hover:bg-gray-800"
               >
@@ -341,6 +364,16 @@ export default function Resultado() {
                     {anamnese.data_nascimento && (
                       <p style={{ fontSize: '12px', margin: '2px 0 0', color: '#4a5568' }}>
                         Nasc.: {format(new Date(anamnese.data_nascimento), 'dd/MM/yyyy')}
+                      </p>
+                    )}
+                    {anamnese.cpf && (
+                      <p style={{ fontSize: '12px', margin: '2px 0 0', color: '#4a5568' }}>
+                        CPF: {anamnese.cpf}
+                      </p>
+                    )}
+                    {anamnese.rg && (
+                      <p style={{ fontSize: '12px', margin: '2px 0 0', color: '#4a5568' }}>
+                        RG: {anamnese.rg}
                       </p>
                     )}
                   </div>
@@ -519,6 +552,30 @@ export default function Resultado() {
                         isEditing={isEditing}
                       />
                     )}
+                  </div>
+
+                  <div className="avoid-break" style={{ marginTop: '50px', textAlign: 'center' }}>
+                    <img
+                      src="https://img.usecurling.com/i?q=signature&shape=hand-drawn&color=black"
+                      alt="Assinatura"
+                      style={{ height: '60px', margin: '0 auto', objectFit: 'contain' }}
+                    />
+                    <p
+                      style={{
+                        margin: '10px 0 0',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        color: '#1a4025',
+                      }}
+                    >
+                      JAILTON SANTOS CONCEIÇÃO
+                    </p>
+                    <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
+                      CBO-3221-25
+                    </p>
+                    <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
+                      Whatsapp (071) 99929-2989
+                    </p>
                   </div>
                 </div>
               </td>
