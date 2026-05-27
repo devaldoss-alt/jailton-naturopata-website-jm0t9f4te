@@ -556,7 +556,11 @@ export default function Resultado() {
 
                   <div className="avoid-break" style={{ marginTop: '50px', textAlign: 'center' }}>
                     <img
-                      src="https://img.usecurling.com/i?q=signature&shape=hand-drawn&color=black"
+                      src="/assinatura.png"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          'https://img.usecurling.com/i?q=signature&shape=hand-drawn&color=black'
+                      }}
                       alt="Assinatura"
                       style={{ height: '60px', margin: '0 auto', objectFit: 'contain' }}
                     />
@@ -574,7 +578,7 @@ export default function Resultado() {
                       CBO-3221-25
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      Whatsapp (071) 99929-2989
+                      WhatsApp: (071) 99929-2989
                     </p>
                   </div>
                 </div>
