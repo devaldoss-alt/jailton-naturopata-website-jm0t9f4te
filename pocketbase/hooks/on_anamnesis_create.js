@@ -66,19 +66,18 @@ Sintomas Principais Relatados: ${sintomasPrincipais}
 Órgãos com Sintomas Assinalados (Desequilíbrio): ${orgaosSintomasStr}
 
 INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
-- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica.
-- MODO IMPERATIVO OBRIGATÓRIO: Você deve usar instruções diretas no modo imperativo e tom acolhedor, especialmente nas seções "Sugestões Terapêuticas" e "Suplementação".
-  * Incorreto: "Eu sugiro que você estabeleça..." -> Correto: "Estabeleça..."
-  * Incorreto: "Eu proponho uma reavaliação..." -> Correto: "Reavalie..."
-  * Incorreto: "Eu recomendo que você pratique..." -> Correto: "Pratique..."
-  * Incorreto: "Você deve evitar..." -> Correto: "Evite..."
-- É ESTRITAMENTE PROIBIDO usar expressões em primeira pessoa como "Eu sugiro", "Eu proponho" ou "Eu recomendo". Em vez disso, use comandos diretos e focados na ação.
+- Elabore um diagnóstico naturopático e um plano de tratamento profissional, altamente personalizado, detalhado e sistemático.
+- MODO IMPERATIVO OBRIGATÓRIO: Você DEVE usar instruções diretas no modo imperativo e tom acolhedor nas seções de sugestões e suplementação. NUNCA use expressões em primeira pessoa como "Eu sugiro", "Eu proponho", "Eu recomendo" ou frases como "Você deve evitar".
+  * Exemplo Incorreto: "Eu sugiro que você estabeleça..." -> Correto: "Estabeleça..."
+  * Exemplo Incorreto: "Eu recomendo que você pratique..." -> Correto: "Pratique..."
+  * Exemplo Incorreto: "Você deve evitar..." -> Correto: "Evite..."
 - OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se órgãos específicos como ${orgaosSintomasStr} estiverem assinalados, o protocolo DEVE focar na desintoxicação/suporte destes órgãos.
 - Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente (ex: motivo da consulta: ${motivo}).
 
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, em tom imperativo para o paciente, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
-- "ia_sugestoes_terapeuticas": Passo a passo claro e estruturado, direcionado para as queixas mapeadas. Fale diretamente com o paciente usando o modo imperativo.
-- "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Focado nas necessidades.
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
+- "ia_diagnostico": Diagnóstico naturopático profundo, explicando as correlações sistêmicas dos sintomas, estilo de vida e órgãos afetados, usando linguagem profissional para o paciente.
+- "ia_sugestoes_terapeuticas": Passo a passo claro e estruturado, direcionado para as queixas mapeadas. Fale diretamente com o paciente usando o modo imperativo estrito.
+- "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Modo imperativo estrito.
 - "ia_referencias": Referências ou embasamento científico naturopático correlacionando os sintomas ao protocolo sugerido.`
 
   try {
@@ -99,6 +98,7 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
       const contentStr = data?.choices?.[0]?.message?.content
       if (contentStr) {
         const content = JSON.parse(contentStr)
+        updatedRecord.set('ia_diagnostico', content.ia_diagnostico || '')
         updatedRecord.set('ia_sugestoes_terapeuticas', content.ia_sugestoes_terapeuticas || '')
         updatedRecord.set('ia_suplementacao', content.ia_suplementacao || '')
         updatedRecord.set('ia_referencias', content.ia_referencias || '')

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T14:01:37.853Z",
+  "generatedAt": "2026-05-27T14:37:18.004Z",
   "collections": [
     {
       "name": "users",
@@ -372,6 +372,12 @@
         {
           "name": "rg",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ia_diagnostico",
+          "type": "editor",
           "required": false,
           "system": false
         }

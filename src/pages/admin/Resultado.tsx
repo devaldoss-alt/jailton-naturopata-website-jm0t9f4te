@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnesis'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
@@ -17,6 +17,7 @@ import {
   MessageCircle,
 } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
+import assinaturaUrl from '@/assets/assinaturajailton-removebg-preview-82f7a.png'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
 
@@ -124,6 +125,7 @@ const ContentEditableField = ({
 export default function Resultado() {
   const { id } = useParams()
   const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const [anamnese, setAnamnese] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -142,6 +144,7 @@ export default function Resultado() {
       setRetrying(false)
     }
   }
+  const [diagnostico, setDiagnostico] = useState('')
   const [sugestoes, setSugestoes] = useState('')
   const [suplementacao, setSuplementacao] = useState('')
   const [referencias, setReferencias] = useState('')
@@ -152,6 +155,7 @@ export default function Resultado() {
         .then((data) => {
           setAnamnese(data)
           if (!isEditing) {
+            setDiagnostico(data.ia_diagnostico || '')
             setSugestoes(data.ia_sugestoes_terapeuticas || '')
             setSuplementacao(data.ia_suplementacao || '')
             setReferencias(data.ia_referencias || '')
@@ -165,6 +169,7 @@ export default function Resultado() {
     if (e.record.id === id) {
       setAnamnese(e.record)
       if (!isEditing) {
+        setDiagnostico(e.record.ia_diagnostico || '')
         setSugestoes(e.record.ia_sugestoes_terapeuticas || '')
         setSuplementacao(e.record.ia_suplementacao || '')
         setReferencias(e.record.ia_referencias || '')
@@ -176,6 +181,7 @@ export default function Resultado() {
     setSaving(true)
     try {
       await updateAnamnese(id as string, {
+        ia_diagnostico: diagnostico,
         ia_sugestoes_terapeuticas: sugestoes,
         ia_suplementacao: suplementacao,
         ia_referencias: referencias,
@@ -263,10 +269,16 @@ export default function Resultado() {
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Link>
           </Button>
-          {isAuthenticated && anamnese.status === 'completed' && !isEditing && (
+          {anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate('/login')
+                } else {
+                  setIsEditing(true)
+                }
+              }}
               className="text-primary border-primary hover:bg-primary/5"
             >
               <Edit className="mr-2 h-4 w-4" /> Editar
@@ -309,7 +321,7 @@ export default function Resultado() {
                 onClick={() => {
                   const url = `https://jailtonnatutopata.goskip.app/resultado/${id}`
                   const text = encodeURIComponent(
-                    `Olá! Aqui está o link para o seu Plano Terapêutico: ${url}`,
+                    `Olá, segue o link do seu Diagnóstico Naturopático: ${url}`,
                   )
                   window.open(`https://wa.me/5571999292989?text=${text}`, '_blank')
                 }}
@@ -458,13 +470,37 @@ export default function Resultado() {
                       <p style={{ margin: '0', fontSize: '14px', width: '100%' }}>
                         <strong>Motivo / Queixa Principal:</strong> {anamnese.motivo_consulta}
                       </p>
-                      <p style={{ margin: '0', fontSize: '14px', width: '100%' }}>
-                        <strong>Diagnóstico Naturopático:</strong> Avaliação baseada no histórico de{' '}
-                        {anamnese.nome_paciente}, hábitos e correlações sistêmicas relatadas na
-                        anamnese integrativa.
-                      </p>
                     </div>
                   </div>
+
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      marginBottom: '15px',
+                      color: '#1a4025',
+                      borderBottom: '1px solid #1a4025',
+                      paddingBottom: '5px',
+                    }}
+                  >
+                    Diagnóstico Naturopático
+                  </h3>
+                  {anamnese.status === 'pending' ? (
+                    <div className="flex items-center text-gray-500 mb-6 py-4">
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                      <span>Processando diagnóstico...</span>
+                    </div>
+                  ) : anamnese.status === 'error' ? (
+                    <p className="text-red-500 mb-6 text-sm">
+                      Operação falhou. Veja os detalhes do erro acima.
+                    </p>
+                  ) : (
+                    <ContentEditableField
+                      value={diagnostico}
+                      onChange={setDiagnostico}
+                      isEditing={isEditing}
+                    />
+                  )}
 
                   <h3
                     style={{
@@ -556,13 +592,9 @@ export default function Resultado() {
 
                   <div className="avoid-break" style={{ marginTop: '50px', textAlign: 'center' }}>
                     <img
-                      src="/assinatura.png"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          'https://img.usecurling.com/i?q=signature&shape=hand-drawn&color=black'
-                      }}
-                      alt="Assinatura"
-                      style={{ height: '60px', margin: '0 auto', objectFit: 'contain' }}
+                      src={assinaturaUrl}
+                      alt="Assinatura Jailton"
+                      style={{ height: '80px', margin: '0 auto', objectFit: 'contain' }}
                     />
                     <p
                       style={{
@@ -575,10 +607,10 @@ export default function Resultado() {
                       JAILTON SANTOS CONCEIÇÃO
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      CBO-3221-25
+                      CBO 3221-25
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      WhatsApp: (071) 99929-2989
+                      WhatsApp (71) 99929-2989
                     </p>
                   </div>
                 </div>
