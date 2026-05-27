@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnesis'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { ArrowLeft, Printer, Loader2, Edit, Save, X, AlertCircle } from 'lucide-react'
@@ -112,6 +113,7 @@ const ContentEditableField = ({
 
 export default function Resultado() {
   const { id } = useParams()
+  const { isAuthenticated } = useAuth()
   const [anamnese, setAnamnese] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -233,15 +235,15 @@ export default function Resultado() {
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-8 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <h1 className="text-xl font-bold text-gray-800 ml-2">Relatório Terapêutico</h1>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
-            <Link to="/painel">
+            <Link to={isAuthenticated ? '/painel' : '/'}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Link>
           </Button>
-          {anamnese.status === 'completed' && !isEditing && (
+          {isAuthenticated && anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
               onClick={() => setIsEditing(true)}
@@ -449,7 +451,7 @@ export default function Resultado() {
                       marginTop: '30px',
                     }}
                   >
-                    Protocolo de Suplementação
+                    Plano de Ação
                   </h3>
                   {anamnese.status === 'pending' ? (
                     <div className="flex items-center text-gray-500 mb-6 py-4">

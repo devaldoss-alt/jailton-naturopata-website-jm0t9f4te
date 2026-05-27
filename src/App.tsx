@@ -12,6 +12,7 @@ import Dashboard from './pages/admin/Dashboard'
 import NovaAnamnese from './pages/admin/NovaAnamnese'
 import Pacientes from './pages/admin/Pacientes'
 import Resultado from './pages/admin/Resultado'
+import ConsultarResultado from './pages/ConsultarResultado'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminLayout } from './components/AdminLayout'
 import { AuthProvider } from './hooks/use-auth'
@@ -27,6 +28,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/consultar-resultado" element={<ConsultarResultado />} />
+            <Route path="/resultado/:id" element={<Resultado />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
@@ -36,7 +39,6 @@ const App = () => (
               <Route path="/painel" element={<Dashboard />} />
               <Route path="/anamnese" element={<NovaAnamnese />} />
               <Route path="/pacientes" element={<Pacientes />} />
-              <Route path="/resultado/:id" element={<Resultado />} />
             </Route>
           </Route>
 

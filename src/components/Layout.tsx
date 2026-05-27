@@ -5,8 +5,10 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, Instagram, Mail, Phone, MapPin, Leaf, Facebook } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logoUrl from '../assets/logo-oficial_sem-fundo-420d8.png'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function Layout() {
+  const { isAuthenticated } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
@@ -91,22 +93,30 @@ export default function Layout() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6 xl:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => scrollToSection(e, link)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors cursor-pointer"
+                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors cursor-pointer whitespace-nowrap"
               >
                 {link.name}
               </a>
             ))}
-            <Button className="rounded-full" asChild>
-              <a href="https://wa.me/5571999292989" target="_blank" rel="noopener noreferrer">
-                Agendar Consulta
-              </a>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" className="text-sm font-medium hidden lg:flex" asChild>
+                <Link to="/consultar-resultado">Consultar meu Resultado</Link>
+              </Button>
+              <Button variant="outline" className="text-sm font-medium hidden xl:flex" asChild>
+                <Link to={isAuthenticated ? '/painel' : '/login'}>Área do Profissional</Link>
+              </Button>
+              <Button className="rounded-full whitespace-nowrap" asChild>
+                <a href="https://wa.me/5571999292989" target="_blank" rel="noopener noreferrer">
+                  Agendar Consulta
+                </a>
+              </Button>
+            </div>
           </nav>
 
           {/* Mobile Nav */}
@@ -135,8 +145,22 @@ export default function Layout() {
                     {link.name}
                   </a>
                 ))}
+                <Link
+                  to="/consultar-resultado"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-lg font-medium py-2 border-b border-border text-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  Consultar meu Resultado
+                </Link>
+                <Link
+                  to={isAuthenticated ? '/painel' : '/login'}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-lg font-medium py-2 border-b border-border text-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  Área do Profissional
+                </Link>
               </nav>
-              <div className="mt-auto pb-8">
+              <div className="mt-auto pb-8 space-y-4">
                 <Button className="w-full rounded-full" size="lg" asChild>
                   <a href="https://wa.me/5571999292989" target="_blank" rel="noopener noreferrer">
                     Agendar Consulta
