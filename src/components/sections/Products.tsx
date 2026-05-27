@@ -130,7 +130,7 @@ export function Products() {
                     asChild
                   >
                     <a
-                      href={`https://wa.me/5571999292989?text=Olá, gostaria de saber mais sobre o produto: ${selectedProduct.name}`}
+                      href={`https://wa.me/5571999292989?text=${encodeURIComponent('Olá, gostaria de saber mais sobre o produto: ' + selectedProduct.name)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

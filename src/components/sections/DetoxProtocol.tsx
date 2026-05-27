@@ -73,7 +73,7 @@ export function DetoxProtocol() {
               asChild
             >
               <a
-                href="https://wa.me/5571999292989?text=Olá, gostaria de saber mais sobre o Protocolo Detox Baiano"
+                href={`https://wa.me/5571999292989?text=${encodeURIComponent('Olá, gostaria de saber mais sobre o Protocolo Detox Baiano')}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

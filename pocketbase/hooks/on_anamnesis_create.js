@@ -66,12 +66,13 @@ Sintomas Principais Relatados: ${sintomasPrincipais}
 Órgãos com Sintomas Assinalados (Desequilíbrio): ${orgaosSintomasStr}
 
 INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
-- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica. O tom deve ser direto e em primeira pessoa, como se você fosse o terapeuta falando diretamente com o paciente (ex: "Eu sugiro que você...").
+- Elabore um plano de tratamento profissional, altamente personalizado, detalhado e sistemático passo a passo, seguindo os princípios da Naturopatia, Desparasitação e Biofísica. O tom deve ser em modo imperativo direto e acolhedor (ex: "Estabeleça uma rotina de sono consistente", "Reavalie a sua dieta", "Pratique atividades físicas regularmente").
+- É PROIBIDO usar expressões em primeira pessoa como "Eu sugiro", "Eu proponho" ou "Eu recomendo". Em vez disso, use comandos diretos.
 - OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se órgãos específicos como ${orgaosSintomasStr} estiverem assinalados, o protocolo DEVE focar na desintoxicação/suporte destes órgãos.
 - Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente (ex: motivo da consulta: ${motivo}).
 
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, em tom de primeira pessoa do terapeuta para o paciente, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
-- "ia_sugestoes_terapeuticas": Passo a passo claro e estruturado, direcionado para as queixas mapeadas. Fale diretamente com o paciente em primeira pessoa.
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, em tom imperativo para o paciente, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
+- "ia_sugestoes_terapeuticas": Passo a passo claro e estruturado, direcionado para as queixas mapeadas. Fale diretamente com o paciente usando o modo imperativo.
 - "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Focado nas necessidades.
 - "ia_referencias": Referências ou embasamento científico naturopático correlacionando os sintomas ao protocolo sugerido.`
 

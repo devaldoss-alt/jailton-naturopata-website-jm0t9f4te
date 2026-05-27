@@ -229,7 +229,7 @@ export function Services() {
                   asChild
                 >
                   <a
-                    href={`https://wa.me/5571999292989?text=Olá, gostaria de agendar uma sessão de ${selectedService.title}`}
+                    href={`https://wa.me/5571999292989?text=${encodeURIComponent('Olá, gostaria de agendar uma sessão de ' + selectedService.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
