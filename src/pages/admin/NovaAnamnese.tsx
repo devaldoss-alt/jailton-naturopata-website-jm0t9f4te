@@ -144,6 +144,7 @@ export default function NovaAnamnese() {
   )
 
   const [formData, setFormData] = useState<Record<string, any>>({
+    tipo_atendimento: '',
     nome_paciente: '',
     email_paciente: '',
     telefone_paciente: '',
@@ -203,8 +204,13 @@ export default function NovaAnamnese() {
     e.preventDefault()
     if (!user) return
 
-    if (!formData.nome_paciente || !formData.data_atendimento || !formData.motivo_consulta) {
-      toast.error('Preencha os campos obrigatórios (Nome, Data, Motivo).')
+    if (
+      !formData.tipo_atendimento ||
+      !formData.nome_paciente ||
+      !formData.data_atendimento ||
+      !formData.motivo_consulta
+    ) {
+      toast.error('Preencha os campos obrigatórios (Tipo de Atendimento, Nome, Data, Motivo).')
       return
     }
 
@@ -253,8 +259,23 @@ export default function NovaAnamnese() {
             1. Identificação do Paciente
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-4 space-y-2">
+              <Label htmlFor="tipo_atendimento">Tipo de Atendimento *</Label>
+              <Select
+                value={formData.tipo_atendimento}
+                onValueChange={(v) => handleSelectChange('tipo_atendimento', v)}
+              >
+                <SelectTrigger id="tipo_atendimento">
+                  <SelectValue placeholder="Selecione o tipo (Consulta ou Revisão)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="consulta">Consulta</SelectItem>
+                  <SelectItem value="revisão">Revisão</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="nome_paciente">Nome Completo *</Label>
+              <Label htmlFor="nome_paciente">Nome Completo *</Label>{' '}
               <Input
                 id="nome_paciente"
                 value={formData.nome_paciente}

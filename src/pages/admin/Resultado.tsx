@@ -213,8 +213,13 @@ export default function Resultado() {
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
           
+          * {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+
           #printable-pdf {
-            position: absolute; left: 0; top: 0; width: 100%; 
+            width: 100%; 
             margin: 0 !important; padding: 0 !important; 
             border: none !important; box-shadow: none !important;
           }
