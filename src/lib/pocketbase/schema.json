@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T09:32:35.152Z",
+  "generatedAt": "2026-05-27T10:03:39.685Z",
   "collections": [
     {
       "name": "users",
@@ -29,19 +29,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": [
@@ -95,24 +90,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_testimonials_approved ON testimonials (approved)"
-      ]
+      "indexes": ["CREATE INDEX idx_testimonials_approved ON testimonials (approved)"]
     },
     {
       "name": "blog_posts",
@@ -166,24 +154,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE UNIQUE INDEX idx_blog_posts_slug ON blog_posts (slug)"
-      ]
+      "indexes": ["CREATE UNIQUE INDEX idx_blog_posts_slug ON blog_posts (slug)"]
     },
     {
       "name": "anamnesis",
@@ -256,40 +237,28 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "pending",
-            "completed",
-            "error"
-          ]
+          "selectValues": ["pending", "completed", "error"]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "tipo_atendimento",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "consulta",
-            "revisão"
-          ]
+          "selectValues": ["consulta", "revisão"]
         },
         {
           "name": "sintomas_figado",
@@ -368,12 +337,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "ruim",
-            "regular",
-            "bom",
-            "excelente"
-          ]
+          "selectValues": ["ruim", "regular", "bom", "excelente"]
         },
         {
           "name": "ingestao_agua",

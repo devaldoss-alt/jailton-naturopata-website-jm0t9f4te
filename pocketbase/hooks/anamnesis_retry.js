@@ -14,8 +14,8 @@ routerAdd(
       throw new ForbiddenError('Not allowed')
     }
 
-    const aiUrl = $secrets.get('SKIP_AI_GATEWAY_URL')
-    const aiKey = $secrets.get('SKIP_AI_GATEWAY_API_KEY')
+    const aiUrl = $secrets.get('USER_AI_URL')
+    const aiKey = $secrets.get('USER_AI_KEY')
 
     if (!aiKey || !aiUrl) {
       record.set('status', 'error')
@@ -116,10 +116,24 @@ Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em li
           record.set('erro_detalhado', 'Resposta vazia ou inválida da IA.')
         }
       } else {
-        const bodyStr = res.body ? new TextDecoder().decode(res.body) : ''
+        let bodyStr = ''
+        if (res.json) {
+          bodyStr = JSON.stringify(res.json)
+        } else if (res.body) {
+          try {
+            bodyStr = new TextDecoder().decode(res.body)
+          } catch (decodeErr) {
+            bodyStr = 'Falha ao decodificar corpo da resposta'
+          }
+        }
+
         let errorMsg = `Erro HTTP ${res.statusCode}`
         if (res.statusCode === 401) errorMsg = 'Não autorizado: Chave de API inválida.'
         if (res.statusCode === 429) errorMsg = 'Muitas requisições: Limite de cota excedido.'
+
+        if (res.json && res.json.error && res.json.error.message) {
+          errorMsg += ` - ${res.json.error.message}`
+        }
 
         $app.logger().error('AI Error', 'status', res.statusCode, 'body', bodyStr)
         record.set('status', 'error')
