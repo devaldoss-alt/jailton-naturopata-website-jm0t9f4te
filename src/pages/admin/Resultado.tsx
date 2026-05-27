@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnesis'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { ArrowLeft, Printer, Loader2, Edit, Save, X, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Printer, Loader2, Edit, Save, X, AlertCircle, Copy } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
@@ -112,6 +113,7 @@ const ContentEditableField = ({
 
 export default function Resultado() {
   const { id } = useParams()
+  const { isAuthenticated } = useAuth()
   const [anamnese, setAnamnese] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -205,27 +207,30 @@ export default function Resultado() {
             background-color: white !important; 
             margin: 0; 
             padding: 0; 
+            display: block !important;
             -webkit-print-color-adjust: exact; 
           }
-          
+            
           .no-print { display: none !important; }
-          
+            
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
-          
+            
           * {
             overflow: visible !important;
             max-height: none !important;
           }
 
           #printable-pdf {
+            position: absolute;
+            left: 0;
+            top: 0;
             width: 100%; 
             margin: 0 !important; padding: 0 !important; 
             border: none !important; box-shadow: none !important;
           }
 
-          .content-html { page-break-inside: auto; }
-          .content-html p, .content-html li { page-break-inside: avoid; }
+          .content-html { page-break-inside: auto; }          .content-html p, .content-html li { page-break-inside: avoid; }
           h1, h2, h3, h4 { page-break-after: avoid; }
           .avoid-break { page-break-inside: avoid; }
 
@@ -233,15 +238,15 @@ export default function Resultado() {
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-8 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <h1 className="text-xl font-bold text-gray-800 ml-2">Relatório Terapêutico</h1>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
-            <Link to="/painel">
+            <Link to={isAuthenticated ? '/painel' : '/'}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Link>
           </Button>
-          {anamnese.status === 'completed' && !isEditing && (
+          {isAuthenticated && anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
               onClick={() => setIsEditing(true)}
@@ -270,12 +275,24 @@ export default function Resultado() {
             </>
           )}
           {!isEditing && anamnese.status === 'completed' && (
-            <Button
-              onClick={() => window.print()}
-              className="bg-gray-900 text-white hover:bg-gray-800"
-            >
-              <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const url = `${window.location.origin}/resultado/${id}`
+                  navigator.clipboard.writeText(url)
+                  toast.success('Link copiado para a área de transferência!')
+                }}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Copiar Link
+              </Button>
+              <Button
+                onClick={() => window.print()}
+                className="bg-gray-900 text-white hover:bg-gray-800"
+              >
+                <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -419,7 +436,7 @@ export default function Resultado() {
                       paddingBottom: '5px',
                     }}
                   >
-                    Plano de Ação e Sugestões Terapêuticas
+                    Sugestões Terapêuticas
                   </h3>
                   {anamnese.status === 'pending' ? (
                     <div className="flex items-center text-gray-500 mb-6 py-4">
@@ -449,7 +466,7 @@ export default function Resultado() {
                       marginTop: '30px',
                     }}
                   >
-                    Protocolo de Suplementação
+                    Suplementação
                   </h3>
                   {anamnese.status === 'pending' ? (
                     <div className="flex items-center text-gray-500 mb-6 py-4">

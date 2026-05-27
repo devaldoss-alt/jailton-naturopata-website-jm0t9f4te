@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { FadeIn } from '@/components/ui/fade-in'
-import { ChevronDown, MessageCircle } from 'lucide-react'
+import { ChevronDown, MessageCircle, Search } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function Hero() {
   const scrollToAbout = () => {
@@ -42,21 +43,32 @@ export function Hero() {
           </p>
         </FadeIn>
 
-        <FadeIn delay={400} className="flex flex-col sm:flex-row gap-4">
+        <FadeIn delay={400} className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
           <Button
             size="lg"
-            className="rounded-full h-14 px-8 text-lg font-semibold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg shadow-[#25D366]/30 transition-all hover:-translate-y-1"
+            className="rounded-full h-14 px-8 text-lg font-semibold bg-[#25D366] hover:bg-[#1DA851] text-white shadow-lg shadow-[#25D366]/30 transition-all hover:-translate-y-1 w-full sm:w-auto"
             asChild
           >
             <a href="https://wa.me/5571999292989" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="mr-2 h-5 w-5" />
-              Fale Conosco no WhatsApp
+              WhatsApp
             </a>
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="rounded-full h-14 px-8 text-lg font-semibold border-primary/20 hover:bg-primary/5 transition-all"
+            className="rounded-full h-14 px-8 text-lg font-semibold border-primary/20 hover:bg-primary/5 transition-all w-full sm:w-auto"
+            asChild
+          >
+            <Link to="/consultar-resultado">
+              <Search className="mr-2 h-5 w-5" />
+              Consultar meu Resultado
+            </Link>
+          </Button>
+          <Button
+            size="lg"
+            variant="ghost"
+            className="rounded-full h-14 px-8 text-lg font-semibold hover:bg-primary/5 transition-all w-full sm:w-auto"
             onClick={scrollToAbout}
           >
             Conheça os Serviços

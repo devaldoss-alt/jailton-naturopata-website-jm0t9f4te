@@ -22,7 +22,6 @@ import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 
 const HISTORY_CHECKBOXES = [
   { id: 'hiv_status', label: 'É soropositivo / Tem HIV' },
-  { id: 'hipertenso', label: 'É Hipertenso(a)' },
   { id: 'hipotenso', label: 'É Hipotenso(a)' },
   { id: 'atividade_fisica', label: 'Faz atividade Física?' },
   { id: 'marcapasso', label: 'Tem marcapasso' },
