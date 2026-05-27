@@ -14,8 +14,8 @@ routerAdd(
       throw new ForbiddenError('Not allowed')
     }
 
-    const aiUrl = $secrets.get('SKIP_AI_GATEWAY_URL')
-    const aiKey = $secrets.get('SKIP_AI_GATEWAY_API_KEY')
+    const aiUrl = $secrets.get('USER_AI_URL')
+    const aiKey = $secrets.get('USER_AI_KEY')
 
     if (!aiKey || !aiUrl) {
       record.set('status', 'error')

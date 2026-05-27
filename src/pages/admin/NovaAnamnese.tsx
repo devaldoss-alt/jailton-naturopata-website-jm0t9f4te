@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAuth } from '@/hooks/use-auth'
+import { useRealtime } from '@/hooks/use-realtime'
 import { createAnamnese } from '@/services/anamnesis'
 import { toast } from 'sonner'
 import { Loader2, Activity } from 'lucide-react'
@@ -120,6 +121,27 @@ export default function NovaAnamnese() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [processingId, setProcessingId] = useState<string | null>(null)
+
+  useRealtime(
+    'anamnesis',
+    (e) => {
+      if (e.action === 'update' && e.record.id === processingId) {
+        if (e.record.status === 'completed') {
+          toast.success('Análise IA concluída com sucesso!')
+          setProcessingId(null)
+          setLoading(false)
+          navigate(`/resultado/${e.record.id}`)
+        } else if (e.record.status === 'error') {
+          toast.error('Erro na análise IA: ' + (e.record.erro_detalhado || 'Erro desconhecido'))
+          setProcessingId(null)
+          setLoading(false)
+          navigate(`/resultado/${e.record.id}`)
+        }
+      }
+    },
+    !!processingId,
+  )
 
   const [formData, setFormData] = useState<Record<string, any>>({
     nome_paciente: '',
@@ -200,12 +222,11 @@ export default function NovaAnamnese() {
         cansaco_grau: formData.cansaco_grau ? parseInt(formData.cansaco_grau) : null,
       }
       const result = await createAnamnese(payload)
-      toast.success('Anamnese enviada para análise IA!')
-      navigate(`/resultado/${result.id}`)
+      toast.info('Anamnese enviada. Aguardando análise da IA...', { duration: 5000 })
+      setProcessingId(result.id)
     } catch (err) {
       toast.error('Erro ao processar anamnese. Verifique os dados e tente novamente.')
       console.error(err)
-    } finally {
       setLoading(false)
     }
   }

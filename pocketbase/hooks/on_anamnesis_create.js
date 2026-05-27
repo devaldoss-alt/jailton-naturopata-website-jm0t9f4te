@@ -2,8 +2,8 @@ onRecordAfterCreateSuccess((e) => {
   const record = e.record
   if (record.getString('status') !== 'pending') return e.next()
 
-  const aiUrl = $secrets.get('SKIP_AI_GATEWAY_URL')
-  const aiKey = $secrets.get('SKIP_AI_GATEWAY_API_KEY')
+  const aiUrl = $secrets.get('USER_AI_URL')
+  const aiKey = $secrets.get('USER_AI_KEY')
 
   const updatedRecord = $app.findRecordById('anamnesis', record.id)
 
