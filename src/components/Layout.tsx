@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Instagram, Mail, Phone, MapPin, Leaf, Facebook } from 'lucide-react'
+import { Menu, Instagram, Mail, Phone, MapPin, Leaf, Facebook, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logoUrl from '../assets/logo-oficial_sem-fundo-420d8.png'
 import { useAuth } from '@/hooks/use-auth'
@@ -94,6 +94,12 @@ export default function Layout() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 xl:gap-8">
+            {isAuthenticated && (
+              <div className="hidden lg:flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-medium">
+                <ShieldCheck className="w-4 h-4" />
+                Modo Profissional
+              </div>
+            )}
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -139,6 +145,12 @@ export default function Layout() {
                 />
               </div>
               <nav className="flex flex-col gap-4 flex-grow">
+                {isAuthenticated && (
+                  <div className="flex items-center gap-2 py-2 text-primary font-medium border-b border-border">
+                    <ShieldCheck className="w-5 h-5" />
+                    Modo Profissional
+                  </div>
+                )}
                 {navLinks.map((link) => (
                   <a
                     key={link.name}

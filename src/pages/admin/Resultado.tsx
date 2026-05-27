@@ -239,7 +239,14 @@ export default function Resultado() {
       `}</style>
 
       <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h1 className="text-xl font-bold text-gray-800 ml-2">Relatório Terapêutico</h1>
+        <h1 className="text-xl font-bold text-gray-800 ml-2 flex items-center gap-2">
+          Relatório Terapêutico
+          {isAuthenticated && (
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary border border-primary/20">
+              Modo Profissional
+            </span>
+          )}
+        </h1>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
             <Link to={isAuthenticated ? '/painel' : '/'}>
@@ -279,7 +286,7 @@ export default function Resultado() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const url = `${window.location.origin}/resultado/${id}`
+                  const url = `https://jailtonnatutopata.goskip.app/resultado/${id}`
                   navigator.clipboard.writeText(url)
                   toast.success('Link copiado para a área de transferência!')
                 }}
