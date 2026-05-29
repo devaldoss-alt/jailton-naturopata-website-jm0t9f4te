@@ -67,14 +67,23 @@ Sintomas Principais Relatados: ${sintomasPrincipais}
 
 INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
 - Elabore um diagnóstico naturopático e um plano de tratamento profissional, altamente personalizado, detalhado e sistemático.
-- MODO IMPERATIVO OBRIGATÓRIO: Você DEVE usar instruções diretas no modo imperativo e tom acolhedor nas seções de sugestões e suplementação. NUNCA use expressões em primeira pessoa como "Eu sugiro", "Eu proponho", "Eu recomendo" ou frases como "Você deve evitar".
-  * Exemplo Incorreto: "Eu sugiro que você estabeleça..." -> Correto: "Estabeleça..."
-  * Exemplo Incorreto: "Eu recomendo que você pratique..." -> Correto: "Pratique..."
+- MODO IMPERATIVO OBRIGATÓRIO: Você DEVE usar instruções diretas no modo imperativo e linguagem profissional direta nas seções de sugestões e suplementação. NUNCA use expressões em primeira pessoa como "Eu sugiro", "Eu proponho", "Eu recomendo" ou frases como "Você deve evitar". Use imperativo direto.
+  * Exemplo Incorreto: "Eu sugiro que você realize..." -> Correto: "Realize o consumo..."
+  * Exemplo Incorreto: "Eu recomendo que você implemente..." -> Correto: "Implemente a rotina..."
   * Exemplo Incorreto: "Você deve evitar..." -> Correto: "Evite..."
 - OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se órgãos específicos como ${orgaosSintomasStr} estiverem assinalados, o protocolo DEVE focar na desintoxicação/suporte destes órgãos.
+- PROTOCOLOS OBRIGATÓRIOS (PRIORIZE ESTAS AVALIAÇÕES E TRATAMENTOS):
+  * Disfunção Adrenal / Fadiga Crônica: Cromoterapia (Laranja-lombar/Azul-frontal), Florais (Olive, Oak, Elm), Homeopatia (Phosphoric acid, Kali phosphoricum).
+  * Disbiose Intestinal: Cromoterapia (Verde-abdome/Amarelo-plexo), Florais (Crab Apple, Walnut), Homeopatia (Nux vomica, Lycopodium), Detox Iônico (Prog 12, Prog 4).
+  * Processo Parasitário: Cromoterapia (Azul-abdome/Verde-abdome), Florais (Crab Apple, Centaury), Homeopatia (Cina, Spigelia), Detox Iônico (Prog 9, Prog 6).
+  * Somatização Emocional: Cromoterapia (Verde-peito/Azul-garganta), Florais (Star of Bethlehem, Rock Rose, Agrimony), Homeopatia (Ignatia, Staphysagria), NeuroSpa (7.83 Hz, 0.5 Hz).
+  * Permeabilidade Intestinal (Leaky Gut): Cromoterapia (Verde-abdome/Amarelo-plexo), Florais (Crab Apple, Hornbeam), Homeopatia (Arsenicum album, China), Detox Iônico (Prog 12, Prog 7).
+  * Neuroinflamação: Cromoterapia (Índigo-frontal/Azul-cervical), Florais (White Chestnut, Cherry Plum), Homeopatia (Belladonna, Gelsemium), NeuroSpa (10 Hz, 1 Hz).
+  * Desregulação Hormonal: Cromoterapia (Laranja-pélvica/Índigo-tireoide), Florais (Scleranthus, Walnut), Homeopatia (Sepia, Thyroidinum), NeuroSpa (7.83 Hz, 4 Hz).
+  * Sobrecarga Tóxica: Cromoterapia (Violeta-fígado/Verde-abdome), Florais (Crab Apple, Hornbeam), Homeopatia (Chelidonium, Phosphorus), Hidrovitalis (Prog 1, 2, 5).
 - Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente (ex: motivo da consulta: ${motivo}).
 
-Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e amigável, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
+Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e imperativa direta, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):
 - "ia_diagnostico": Diagnóstico naturopático profundo, explicando as correlações sistêmicas dos sintomas, estilo de vida e órgãos afetados, usando linguagem profissional para o paciente.
 - "ia_sugestoes_terapeuticas": Passo a passo claro e estruturado, direcionado para as queixas mapeadas. Fale diretamente com o paciente usando o modo imperativo estrito.
 - "ia_suplementacao": Protocolo de suplementação/fitoterapia/desparasitação (nome, dosagem, horário e finalidade). Modo imperativo estrito.

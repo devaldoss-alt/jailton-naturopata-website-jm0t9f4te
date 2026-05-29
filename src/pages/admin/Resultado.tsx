@@ -254,7 +254,7 @@ export default function Resultado() {
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative z-10">
         <h1 className="text-xl font-bold text-gray-800 ml-2 flex items-center gap-2">
           Relatório Terapêutico
           {isAuthenticated && (
@@ -323,7 +323,11 @@ export default function Resultado() {
                   const text = encodeURIComponent(
                     `Olá, segue o link do seu Diagnóstico Naturopático: ${url}`,
                   )
-                  window.open(`https://wa.me/5571999292989?text=${text}`, '_blank')
+                  const telefone = (anamnese.telefone_paciente || '').replace(/\D/g, '')
+                  const waUrl = telefone
+                    ? `https://wa.me/55${telefone}?text=${text}`
+                    : `https://wa.me/?text=${text}`
+                  window.open(waUrl, '_blank')
                 }}
               >
                 <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
@@ -607,7 +611,7 @@ export default function Resultado() {
                       JAILTON SANTOS CONCEIÇÃO
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      CBO 3221-25
+                      CBO 6320-10
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
                       WhatsApp (71) 99929-2989
