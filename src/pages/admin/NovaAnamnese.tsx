@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
-import { createAnamnese } from '@/services/anamnesis'
+import { createAnamnese, updateAnamnese, getAnamnese } from '@/services/anamnesis'
 import { toast } from 'sonner'
 import { Loader2, Activity } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
@@ -117,6 +117,7 @@ const PATHOGENS = [
 ]
 
 export default function NovaAnamnese() {
+  const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -167,6 +168,27 @@ export default function NovaAnamnese() {
     cansaco_grau: '',
     status: 'pending',
   })
+
+  useEffect(() => {
+    if (id) {
+      getAnamnese(id)
+        .then((data) => {
+          if (data) {
+            setFormData({
+              ...data,
+              data_atendimento: data.data_atendimento
+                ? data.data_atendimento.split(' ')[0]
+                : new Date().toISOString().split('T')[0],
+              data_nascimento: data.data_nascimento ? data.data_nascimento.split(' ')[0] : '',
+            })
+          }
+        })
+        .catch((err) => {
+          toast.error('Erro ao carregar anamnese')
+          console.error(err)
+        })
+    }
+  }, [id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }))
@@ -220,17 +242,28 @@ export default function NovaAnamnese() {
       const payload = {
         ...formData,
         user_id: user.id,
-        data_atendimento: formData.data_atendimento + ' 12:00:00.000Z',
+        data_atendimento: formData.data_atendimento.includes('12:00:00')
+          ? formData.data_atendimento
+          : formData.data_atendimento + ' 12:00:00.000Z',
         data_nascimento: formData.data_nascimento
-          ? formData.data_nascimento + ' 12:00:00.000Z'
+          ? formData.data_nascimento.includes('12:00:00')
+            ? formData.data_nascimento
+            : formData.data_nascimento + ' 12:00:00.000Z'
           : null,
         peso: formData.peso ? parseFloat(formData.peso) : null,
         altura: formData.altura ? parseFloat(formData.altura) : null,
         cansaco_grau: formData.cansaco_grau ? parseInt(formData.cansaco_grau) : null,
       }
-      const result = await createAnamnese(payload)
-      toast.info('Anamnese enviada. Aguardando análise da IA...', { duration: 5000 })
-      setProcessingId(result.id)
+
+      if (id) {
+        await updateAnamnese(id, payload)
+        toast.success('Anamnese atualizada com sucesso!')
+        navigate(`/resultado/${id}`)
+      } else {
+        const result = await createAnamnese(payload)
+        toast.info('Anamnese enviada. Aguardando análise da IA...', { duration: 5000 })
+        setProcessingId(result.id)
+      }
     } catch (err) {
       toast.error('Erro ao processar anamnese. Verifique os dados e tente novamente.')
       console.error(err)
@@ -546,8 +579,11 @@ export default function NovaAnamnese() {
         >
           {loading ? (
             <>
-              <Loader2 className="mr-3 h-6 w-6 animate-spin" /> Analisando e Gerando Protocolo...
+              <Loader2 className="mr-3 h-6 w-6 animate-spin" />{' '}
+              {id ? 'Salvando...' : 'Analisando e Gerando Protocolo...'}
             </>
+          ) : id ? (
+            'Salvar Alterações'
           ) : (
             'Gerar Análise IA e Protocolo Terapêutico'
           )}

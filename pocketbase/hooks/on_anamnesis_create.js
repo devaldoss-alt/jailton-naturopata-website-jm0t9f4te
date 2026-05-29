@@ -73,14 +73,14 @@ INSTRUÇÕES ESTRITAS E PERSONALIZADAS:
   * Exemplo Incorreto: "Você deve evitar..." -> Correto: "Evite..."
 - OBRIGATÓRIO: Aborde ESPECIFICAMENTE os sintomas, órgãos e patógenos marcados como presentes pelo paciente. Se órgãos específicos como ${orgaosSintomasStr} estiverem assinalados, o protocolo DEVE focar na desintoxicação/suporte destes órgãos.
 - PROTOCOLOS OBRIGATÓRIOS (PRIORIZE ESTAS AVALIAÇÕES E TRATAMENTOS):
-  * Disfunção Adrenal / Fadiga Crônica: Cromoterapia (Laranja-lombar/Azul-frontal), Florais (Olive, Oak, Elm), Homeopatia (Phosphoric acid, Kali phosphoricum).
-  * Disbiose Intestinal: Cromoterapia (Verde-abdome/Amarelo-plexo), Florais (Crab Apple, Walnut), Homeopatia (Nux vomica, Lycopodium), Detox Iônico (Prog 12, Prog 4).
-  * Processo Parasitário: Cromoterapia (Azul-abdome/Verde-abdome), Florais (Crab Apple, Centaury), Homeopatia (Cina, Spigelia), Detox Iônico (Prog 9, Prog 6).
-  * Somatização Emocional: Cromoterapia (Verde-peito/Azul-garganta), Florais (Star of Bethlehem, Rock Rose, Agrimony), Homeopatia (Ignatia, Staphysagria), NeuroSpa (7.83 Hz, 0.5 Hz).
-  * Permeabilidade Intestinal (Leaky Gut): Cromoterapia (Verde-abdome/Amarelo-plexo), Florais (Crab Apple, Hornbeam), Homeopatia (Arsenicum album, China), Detox Iônico (Prog 12, Prog 7).
-  * Neuroinflamação: Cromoterapia (Índigo-frontal/Azul-cervical), Florais (White Chestnut, Cherry Plum), Homeopatia (Belladonna, Gelsemium), NeuroSpa (10 Hz, 1 Hz).
-  * Desregulação Hormonal: Cromoterapia (Laranja-pélvica/Índigo-tireoide), Florais (Scleranthus, Walnut), Homeopatia (Sepia, Thyroidinum), NeuroSpa (7.83 Hz, 4 Hz).
-  * Sobrecarga Tóxica: Cromoterapia (Violeta-fígado/Verde-abdome), Florais (Crab Apple, Hornbeam), Homeopatia (Chelidonium, Phosphorus), Hidrovitalis (Prog 1, 2, 5).
+  * Disfunção Adrenal / Fadiga Crônica: Cromoterapia (Laranja lombar/adrenal, Azul frontal), Florais (Olive, Oak, Elm), Homeopatia (Phosphoric acid, Kali phosphoricum).
+  * Disbiose Intestinal: Cromoterapia (Verde abdominal, Amarelo plexo solar), Florais (Crab Apple, Walnut), Homeopatia (Nux vomica, Lycopodium), Detox Hidrovitalis (Prog 12, Prog 4).
+  * Processo Parasitário: Cromoterapia (Azul abdome, Verde abdome), Florais (Crab Apple, Centaury), Homeopatia (Cina, Spigelia), Detox Hidrovitalis (Prog 9, Prog 6).
+  * Somatização Emocional: Cromoterapia (Verde coração, Azul garganta), Florais (Star of Bethlehem, Rock Rose, Agrimony), Homeopatia (Ignatia, Staphysagria), NeuroSpa (7.83 Hz, 0.5 Hz).
+  * Permeabilidade Intestinal (Leaky Gut): Cromoterapia (Verde abdome, Amarelo plexo solar), Florais (Crab Apple, Hornbeam), Homeopatia (Arsenicum album, China), Detox Hidrovitalis (Prog 12, Prog 7).
+  * Neuroinflamação: Cromoterapia (Índigo frontal, Azul cervical), Florais (White Chestnut, Cherry Plum), Homeopatia (Belladonna, Gelsemium), NeuroSpa (10 Hz, 1 Hz).
+  * Desregulação Hormonal: Cromoterapia (Laranja pélvica, Índigo tireoide), Florais (Scleranthus, Walnut), Homeopatia (Sepia, Thyroidinum), NeuroSpa (7.83 Hz, 4 Hz).
+  * Sobrecarga Tóxica: Cromoterapia (Violeta fígado, Verde abdome), Florais (Crab Apple, Hornbeam), Homeopatia (Chelidonium, Phosphorus), Hidrovitalis (Prog 1, Prog 2, Prog 5).
 - Correlacione as informações e justifique suas escolhas terapêuticas baseadas no quadro real do paciente (ex: motivo da consulta: ${motivo}).
 
 Retorne um JSON estrito com as seguintes chaves (forneça dados detalhados em linguagem profissional e imperativa direta, formatado em HTML limpo usando <ul>, <li>, <p>, <strong>, <br>):

@@ -254,7 +254,7 @@ export default function Resultado() {
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative z-10">
+      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative z-50">
         <h1 className="text-xl font-bold text-gray-800 ml-2 flex items-center gap-2">
           Relatório Terapêutico
           {isAuthenticated && (
@@ -263,12 +263,25 @@ export default function Resultado() {
             </span>
           )}
         </h1>
-        <div className="flex gap-3">
-          <Button variant="outline" asChild>
-            <Link to={isAuthenticated ? '/painel' : '/'}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-            </Link>
+        <div className="flex gap-3 flex-wrap justify-end">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Button>
+          {anamnese.status === 'completed' && !isEditing && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate('/login')
+                } else {
+                  navigate(`/anamnese/${id}`)
+                }
+              }}
+              className="text-primary border-primary hover:bg-primary/5"
+            >
+              <Edit className="mr-2 h-4 w-4" /> Editar Ficha
+            </Button>
+          )}
           {anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
@@ -281,7 +294,7 @@ export default function Resultado() {
               }}
               className="text-primary border-primary hover:bg-primary/5"
             >
-              <Edit className="mr-2 h-4 w-4" /> Editar
+              <Edit className="mr-2 h-4 w-4" /> Editar IA
             </Button>
           )}
           {isEditing && (
@@ -308,7 +321,7 @@ export default function Resultado() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const url = `https://jailtonnatutopata.goskip.app/resultado/${id}`
+                  const url = window.location.href
                   navigator.clipboard.writeText(url)
                   toast.success('Link copiado para a área de transferência!')
                 }}
@@ -319,7 +332,7 @@ export default function Resultado() {
                 variant="outline"
                 className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
                 onClick={() => {
-                  const url = `https://jailtonnatutopata.goskip.app/resultado/${id}`
+                  const url = window.location.href
                   const text = encodeURIComponent(
                     `Olá, segue o link do seu Diagnóstico Naturopático: ${url}`,
                   )
@@ -611,7 +624,10 @@ export default function Resultado() {
                       JAILTON SANTOS CONCEIÇÃO
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      CBO 6320-10 / CBO&nbsp;3221-25
+                      CBO 6320-10
+                    </p>
+                    <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
+                      jailtonnaturopata@hotmail.com
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
                       WhatsApp (71) 99929-2989
