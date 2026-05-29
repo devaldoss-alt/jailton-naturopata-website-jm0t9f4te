@@ -254,7 +254,10 @@ export default function Resultado() {
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative z-50">
+      <div
+        className="flex justify-between items-center mb-8 mt-12 md:mt-20 no-print bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+        style={{ position: 'relative', zIndex: 999 }}
+      >
         <h1 className="text-xl font-bold text-gray-800 ml-2 flex items-center gap-2">
           Relatório Terapêutico
           {isAuthenticated && (
@@ -264,23 +267,19 @@ export default function Resultado() {
           )}
         </h1>
         <div className="flex gap-3 flex-wrap justify-end">
-          <Button variant="outline" onClick={() => navigate(-1)}>
+          <a
+            href="/painel"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </Button>
+          </a>
           {anamnese.status === 'completed' && !isEditing && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  navigate('/login')
-                } else {
-                  navigate(`/anamnese/${id}`)
-                }
-              }}
-              className="text-primary border-primary hover:bg-primary/5"
+            <a
+              href={isAuthenticated ? `/anamnese/${id}` : '/login'}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:bg-primary/5 h-10 px-4 py-2"
             >
               <Edit className="mr-2 h-4 w-4" /> Editar Ficha
-            </Button>
+            </a>
           )}
           {anamnese.status === 'completed' && !isEditing && (
             <Button
@@ -320,6 +319,7 @@ export default function Resultado() {
             <>
               <Button
                 variant="outline"
+                style={{ cursor: 'pointer', zIndex: 50, position: 'relative' }}
                 onClick={() => {
                   const url = window.location.href
                   navigator.clipboard.writeText(url)
@@ -331,18 +331,18 @@ export default function Resultado() {
               <a
                 href={
                   (anamnese.telefone_paciente || '').replace(/\D/g, '')
-                    ? `https://wa.me/55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
-                    : `https://wa.me/?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                    ? `https://api.whatsapp.com/send?phone=55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}&text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                    : `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm h-9 px-4 py-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm h-10 px-4 py-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
               >
                 <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
               </a>
               <Button
                 onClick={() => window.print()}
-                className="bg-gray-900 text-white hover:bg-gray-800"
+                className="bg-gray-900 text-white hover:bg-gray-800 h-10"
               >
                 <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
               </Button>
