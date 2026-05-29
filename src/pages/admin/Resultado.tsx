@@ -611,7 +611,7 @@ export default function Resultado() {
                       JAILTON SANTOS CONCEIÇÃO
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      CBO 6320-10
+                      CBO 6320-10 / CBO&nbsp;3221-25
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
                       WhatsApp (71) 99929-2989
