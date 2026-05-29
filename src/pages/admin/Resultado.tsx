@@ -323,28 +323,23 @@ export default function Resultado() {
                 onClick={() => {
                   const url = window.location.href
                   navigator.clipboard.writeText(url)
-                  toast.success('Link copiado para a área de transferência!')
+                  toast.success('Link copiado!')
                 }}
               >
                 <Copy className="mr-2 h-4 w-4" /> Copiar Link
               </Button>
-              <Button
-                variant="outline"
-                className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                onClick={() => {
-                  const url = window.location.href
-                  const text = encodeURIComponent(
-                    `Olá, segue o link do seu Diagnóstico Naturopático: ${url}`,
-                  )
-                  const telefone = (anamnese.telefone_paciente || '').replace(/\D/g, '')
-                  const waUrl = telefone
-                    ? `https://wa.me/55${telefone}?text=${text}`
-                    : `https://wa.me/?text=${text}`
-                  window.open(waUrl, '_blank')
-                }}
+              <a
+                href={
+                  (anamnese.telefone_paciente || '').replace(/\D/g, '')
+                    ? `https://wa.me/55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                    : `https://wa.me/?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm h-9 px-4 py-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
               >
                 <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
-              </Button>
+              </a>
               <Button
                 onClick={() => window.print()}
                 className="bg-gray-900 text-white hover:bg-gray-800"
