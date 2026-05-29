@@ -267,19 +267,16 @@ export default function Resultado() {
           )}
         </h1>
         <div className="flex gap-3 flex-wrap justify-end">
-          <a
-            href="/painel"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-          >
+          <Button variant="outline" onClick={() => navigate(-1)} className="h-10 px-4 py-2">
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </a>
+          </Button>
           {anamnese.status === 'completed' && !isEditing && (
-            <a
-              href={isAuthenticated ? `/anamnese/${id}` : '/login'}
+            <Link
+              to={isAuthenticated ? `/anamnese/${id}` : '/login'}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:bg-primary/5 h-10 px-4 py-2"
             >
               <Edit className="mr-2 h-4 w-4" /> Editar Ficha
-            </a>
+            </Link>
           )}
           {anamnese.status === 'completed' && !isEditing && (
             <Button
@@ -320,10 +317,14 @@ export default function Resultado() {
               <Button
                 variant="outline"
                 style={{ cursor: 'pointer', zIndex: 50, position: 'relative' }}
-                onClick={() => {
-                  const url = window.location.href
-                  navigator.clipboard.writeText(url)
-                  toast.success('Link copiado!')
+                onClick={async () => {
+                  try {
+                    const url = window.location.href
+                    await navigator.clipboard.writeText(url)
+                    alert('Link copiado com sucesso!')
+                  } catch (error) {
+                    toast.error('Não foi possível copiar o link')
+                  }
                 }}
               >
                 <Copy className="mr-2 h-4 w-4" /> Copiar Link
