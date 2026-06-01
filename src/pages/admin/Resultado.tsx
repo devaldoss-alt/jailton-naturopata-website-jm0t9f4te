@@ -130,6 +130,7 @@ export default function Resultado() {
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [retrying, setRetrying] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
   const handleRetry = async () => {
     setRetrying(true)
@@ -151,6 +152,7 @@ export default function Resultado() {
 
   useEffect(() => {
     if (id) {
+      setLoadError(false)
       getAnamnese(id)
         .then((data) => {
           setAnamnese(data)
@@ -161,7 +163,12 @@ export default function Resultado() {
             setReferencias(data.ia_referencias || '')
           }
         })
-        .catch(console.error)
+        .catch((error) => {
+          console.error(error)
+          setLoadError(true)
+        })
+    } else {
+      setLoadError(true)
     }
   }, [id, isEditing])
 
@@ -193,6 +200,22 @@ export default function Resultado() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-fade-in-up">
+        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Relatório não encontrado</h2>
+        <p className="text-gray-500 text-center max-w-md mb-6">
+          Não foi possível carregar o relatório solicitado. O link pode estar incorreto ou o
+          relatório foi removido.
+        </p>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+        </Button>
+      </div>
+    )
   }
 
   if (!anamnese) {
@@ -267,13 +290,19 @@ export default function Resultado() {
           )}
         </h1>
         <div className="flex gap-3 flex-wrap justify-end">
-          <Button variant="outline" onClick={() => navigate(-1)} className="h-10 px-4 py-2">
+          <Button
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="h-10 px-4 py-2"
+            style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Button>
           {anamnese.status === 'completed' && !isEditing && (
             <Link
-              to={isAuthenticated ? `/anamnese/${id}` : '/login'}
+              to={isAuthenticated ? `/editar/${id}` : '/login'}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:bg-primary/5 h-10 px-4 py-2"
+              style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
             >
               <Edit className="mr-2 h-4 w-4" /> Editar Ficha
             </Link>
@@ -289,19 +318,26 @@ export default function Resultado() {
                 }
               }}
               className="text-primary border-primary hover:bg-primary/5"
+              style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
             >
               <Edit className="mr-2 h-4 w-4" /> Editar IA
             </Button>
           )}
           {isEditing && (
             <>
-              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>
+              <Button
+                variant="ghost"
+                onClick={() => setIsEditing(false)}
+                disabled={saving}
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
+              >
                 <X className="mr-2 h-4 w-4" /> Cancelar
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={saving}
                 className="bg-primary hover:bg-primary/90 text-white"
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
               >
                 {saving ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -316,7 +352,7 @@ export default function Resultado() {
             <>
               <Button
                 variant="outline"
-                style={{ cursor: 'pointer', zIndex: 50, position: 'relative' }}
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
                 onClick={async () => {
                   try {
                     const url = window.location.href
@@ -338,12 +374,14 @@ export default function Resultado() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm h-10 px-4 py-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
               >
                 <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
               </a>
               <Button
                 onClick={() => window.print()}
                 className="bg-gray-900 text-white hover:bg-gray-800 h-10"
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
               >
                 <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
               </Button>

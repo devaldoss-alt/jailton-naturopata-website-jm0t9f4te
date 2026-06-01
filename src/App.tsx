@@ -39,6 +39,7 @@ const App = () => (
               <Route path="/painel" element={<Dashboard />} />
               <Route path="/anamnese" element={<NovaAnamnese />} />
               <Route path="/anamnese/:id" element={<NovaAnamnese />} />
+              <Route path="/editar/:id" element={<NovaAnamnese />} />
               <Route path="/pacientes" element={<Pacientes />} />
             </Route>
           </Route>
