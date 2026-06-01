@@ -289,32 +289,6 @@ export default function Resultado() {
             </span>
           )}
         </h1>
-        <div className="flex gap-3 flex-wrap justify-end">
-          {!isEditing && anamnese.status === 'completed' && (
-            <>
-              <a
-                href={
-                  (anamnese.telefone_paciente || '').replace(/\D/g, '')
-                    ? `https://api.whatsapp.com/send?phone=55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}&text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
-                    : `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm h-10 px-4 py-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
-              </a>
-              <Button
-                onClick={() => window.print()}
-                className="bg-gray-900 text-white hover:bg-gray-800 h-10"
-                style={{ cursor: 'pointer', position: 'relative', zIndex: 50 }}
-              >
-                <Printer className="mr-2 h-4 w-4" /> Imprimir / PDF
-              </Button>
-            </>
-          )}
-        </div>
       </div>
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 no-print flex flex-col sm:flex-row gap-4 justify-between items-center animate-fade-in-up">
@@ -364,6 +338,25 @@ export default function Resultado() {
                   <Save className="mr-2 h-4 w-4" />
                 )}{' '}
                 Salvar
+              </Button>
+            </>
+          )}
+          {!isEditing && anamnese.status === 'completed' && (
+            <>
+              <a
+                href={
+                  (anamnese.telefone_paciente || '').replace(/\D/g, '')
+                    ? `https://api.whatsapp.com/send?phone=55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}&text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                    : `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+              </a>
+              <Button variant="outline" onClick={() => window.print()}>
+                <Printer className="mr-2 h-4 w-4" /> Gerar Impressão/PDF
               </Button>
             </>
           )}
