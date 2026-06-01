@@ -148,6 +148,7 @@ export default function Resultado() {
   const [diagnostico, setDiagnostico] = useState('')
   const [sugestoes, setSugestoes] = useState('')
   const [suplementacao, setSuplementacao] = useState('')
+  const [aparelhos, setAparelhos] = useState('')
   const [referencias, setReferencias] = useState('')
 
   useEffect(() => {
@@ -160,6 +161,7 @@ export default function Resultado() {
             setDiagnostico(data.ia_diagnostico || '')
             setSugestoes(data.ia_sugestoes_terapeuticas || '')
             setSuplementacao(data.ia_suplementacao || '')
+            setAparelhos(data.ia_aparelhos || '')
             setReferencias(data.ia_referencias || '')
           }
         })
@@ -179,6 +181,7 @@ export default function Resultado() {
         setDiagnostico(e.record.ia_diagnostico || '')
         setSugestoes(e.record.ia_sugestoes_terapeuticas || '')
         setSuplementacao(e.record.ia_suplementacao || '')
+        setAparelhos(e.record.ia_aparelhos || '')
         setReferencias(e.record.ia_referencias || '')
       }
     }
@@ -191,6 +194,7 @@ export default function Resultado() {
         ia_diagnostico: diagnostico,
         ia_sugestoes_terapeuticas: sugestoes,
         ia_suplementacao: suplementacao,
+        ia_aparelhos: aparelhos,
         ia_referencias: referencias,
       })
       toast.success('Alterações salvas com sucesso!')
@@ -613,6 +617,40 @@ export default function Resultado() {
                       onChange={setSuplementacao}
                       isEditing={isEditing}
                     />
+                  )}
+
+                  {(isEditing || !!aparelhos) && (
+                    <div className="avoid-break">
+                      <h3
+                        style={{
+                          fontSize: '18px',
+                          fontWeight: 'bold',
+                          marginBottom: '15px',
+                          color: '#1a4025',
+                          borderBottom: '1px solid #1a4025',
+                          paddingBottom: '5px',
+                          marginTop: '30px',
+                        }}
+                      >
+                        Orientação de Aparelhos
+                      </h3>
+                      {anamnese.status === 'pending' ? (
+                        <div className="flex items-center text-gray-500 mb-6 py-4">
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                          <span>Processando orientações de aparelhos...</span>
+                        </div>
+                      ) : anamnese.status === 'error' ? (
+                        <p className="text-red-500 mb-6 text-sm">
+                          Operação falhou. Veja os detalhes do erro acima.
+                        </p>
+                      ) : (
+                        <ContentEditableField
+                          value={aparelhos}
+                          onChange={setAparelhos}
+                          isEditing={isEditing}
+                        />
+                      )}
+                    </div>
                   )}
 
                   <div className="avoid-break">

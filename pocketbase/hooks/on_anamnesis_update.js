@@ -1,6 +1,9 @@
-onRecordAfterCreateSuccess((e) => {
+onRecordAfterUpdateSuccess((e) => {
   const record = e.record
   if (record.getString('status') !== 'pending') return e.next()
+
+  const originalStatus = record.original().getString('status')
+  if (originalStatus === 'pending') return e.next()
 
   const updatedRecord = $app.findRecordById('anamnesis', record.id)
 
