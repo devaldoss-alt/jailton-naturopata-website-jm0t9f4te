@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T20:40:49.710Z",
+  "generatedAt": "2026-06-01T20:43:58.954Z",
   "collections": [
     {
       "name": "users",
@@ -377,6 +377,12 @@
         },
         {
           "name": "ia_diagnostico",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ia_aparelhos",
           "type": "editor",
           "required": false,
           "system": false
