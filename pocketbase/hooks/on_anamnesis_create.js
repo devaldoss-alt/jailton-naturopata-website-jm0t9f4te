@@ -64,19 +64,12 @@ Retorne APENAS um JSON estrito com as seguintes chaves (forneça dados detalhado
 NÃO RETORNE MAIS NADA ALÉM DO JSON VÁLIDO.`
 
   try {
-    const result = $ai.chat({
-      model: 'fast',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Você é um assistente clínico especialista em Naturopatia, Biofísica e Saúde Integrativa. Você deve priorizar e usar ESTRITAMENTE as informações, correlações e protocolos terapêuticos encontrados na sua Base de Conhecimento (documentos e planilhas fornecidos pelo terapeuta). Mantenha um tom profissional e garanta fidelidade técnica aos protocolos. Se a queixa do paciente não estiver nos protocolos, use seu conhecimento naturopático geral, mas sempre indique que é uma recomendação geral. DEVE usar o modo imperativo direto para instruções. Gere sua resposta sempre como um JSON contendo ESTRITAMENTE as seguintes chaves: ia_diagnostico, ia_sugestoes_terapeuticas, ia_suplementacao, ia_aparelhos e ia_referencias. Formate os valores das chaves em HTML limpo (<ul>, <li>, <p>, <strong>, <br>). NUNCA forneça textos adicionais fora do JSON.',
-        },
-        { role: 'user', content: prompt },
-      ],
+    const result = $ai.agent('naturopata-expert').chat({
+      user_id: record.getString('user_id'),
+      message: prompt,
     })
 
-    let contentStr = result.choices[0].message.content.trim()
+    let contentStr = result.content.trim()
     if (contentStr.startsWith('```json')) {
       contentStr = contentStr
         .replace(/^```json\n?/, '')

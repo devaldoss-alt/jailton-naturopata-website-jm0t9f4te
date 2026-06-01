@@ -295,109 +295,10 @@ export default function Resultado() {
         </h1>
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 no-print flex flex-col sm:flex-row gap-4 justify-between items-center animate-fade-in-up">
-        <div className="flex gap-2 flex-wrap">
-          <a
-            href="/anamnese"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </a>
-          {anamnese.status === 'completed' && !isEditing && (
-            <a
-              href={isAuthenticated ? `/editar/${id}` : '/login'}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-primary text-primary hover:bg-primary/5 h-10 px-4 py-2"
-            >
-              <Edit className="mr-2 h-4 w-4" /> Editar Ficha
-            </a>
-          )}
-          {anamnese.status === 'completed' && !isEditing && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  navigate('/login')
-                } else {
-                  setIsEditing(true)
-                }
-              }}
-              className="text-primary border-primary hover:bg-primary/5"
-            >
-              <Edit className="mr-2 h-4 w-4" /> Editar IA
-            </Button>
-          )}
-          {isEditing && (
-            <>
-              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>
-                <X className="mr-2 h-4 w-4" /> Cancelar
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-primary hover:bg-primary/90 text-white"
-              >
-                {saving ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}{' '}
-                Salvar
-              </Button>
-            </>
-          )}
-          {!isEditing && anamnese.status === 'completed' && (
-            <>
-              <a
-                href={
-                  (anamnese.telefone_paciente || '').replace(/\D/g, '')
-                    ? `https://api.whatsapp.com/send?phone=55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}&text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
-                    : `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá, segue o link do seu Diagnóstico Naturopático: ${window.location.href}`)}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300"
-              >
-                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
-              </a>
-              <Button variant="outline" onClick={() => window.print()}>
-                <Printer className="mr-2 h-4 w-4" /> Gerar Impressão/PDF
-              </Button>
-            </>
-          )}
-        </div>
-
-        {!isEditing && anamnese.status === 'completed' && (
-          <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-            <input
-              type="text"
-              readOnly
-              value={window.location.href}
-              id="copy-link-input"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-64"
-            />
-            <Button
-              variant="outline"
-              onClick={() => {
-                const copyText = document.getElementById('copy-link-input') as HTMLInputElement
-                if (copyText) {
-                  copyText.select()
-                  copyText.setSelectionRange(0, 99999) // For mobile devices
-                  try {
-                    document.execCommand('copy')
-                    alert('Link copiado com sucesso!')
-                  } catch (err) {
-                    toast.error('Não foi possível copiar o link')
-                  }
-                }
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" /> Copiar
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <div id="printable-pdf" className="bg-white shadow-sm border border-gray-200">
+      <div
+        id="printable-pdf"
+        className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden mb-8"
+      >
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead className="print-header">
             <tr>
@@ -735,6 +636,86 @@ export default function Resultado() {
             </tr>
           </tfoot>
         </table>
+      </div>
+
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 no-print flex flex-col sm:flex-row gap-4 justify-between items-center animate-fade-in-up mt-8 shadow-sm">
+        <div className="flex gap-2 flex-wrap">
+          <Link
+            to="/anamnese"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+          </Link>
+
+          {anamnese.status === 'completed' && !isEditing && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate('/login')
+                } else {
+                  setIsEditing(true)
+                }
+              }}
+              className="text-primary border-primary hover:bg-primary/5"
+            >
+              <Edit className="mr-2 h-4 w-4" /> Editar
+            </Button>
+          )}
+
+          {isEditing && (
+            <>
+              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>
+                <X className="mr-2 h-4 w-4" /> Cancelar
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-primary hover:bg-primary/90 text-white"
+              >
+                {saving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}{' '}
+                Salvar
+              </Button>
+            </>
+          )}
+
+          {!isEditing && anamnese.status === 'completed' && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard
+                    .writeText(window.location.href)
+                    .then(() => toast.success('Link copiado com sucesso!'))
+                    .catch(() => toast.error('Não foi possível copiar o link'))
+                }}
+              >
+                <Copy className="mr-2 h-4 w-4" /> Copiar Link
+              </Button>
+
+              <a
+                href={
+                  (anamnese.telefone_paciente || '').replace(/\D/g, '')
+                    ? `https://wa.me/55${(anamnese.telefone_paciente || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, segue o link do seu Relatório Terapêutico: ${window.location.href}`)}`
+                    : `https://wa.me/?text=${encodeURIComponent(`Olá, segue o link do seu Relatório Terapêutico: ${window.location.href}`)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-green-200 bg-background hover:bg-green-50 text-green-600 h-10 px-4 py-2"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+              </a>
+
+              <Button variant="outline" onClick={() => window.print()}>
+                <Printer className="mr-2 h-4 w-4" /> Imprimir
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
