@@ -27,6 +27,7 @@ routerAdd(
         '/' +
         record.getString('file')
 
+      // Agent memory functionality removed to comply with plan limits
       return e.json(200, { success: true, fileUrl })
     } catch (err) {
       $app.logger().error('Upload protocol error', 'error', err.message)

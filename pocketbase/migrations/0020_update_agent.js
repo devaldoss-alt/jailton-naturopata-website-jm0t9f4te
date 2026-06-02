@@ -12,6 +12,6 @@ migrate(
     })
   },
   (app) => {
-    // Reverter para prompt anterior se necessário
+    $ai.agents.delete(app, 'especialista-naturopata')
   },
 )

@@ -63,13 +63,26 @@ Retorne APENAS um JSON estrito com as seguintes chaves (forneça dados detalhado
 - "ia_referencias": Referências ou embasamento científico correlacionando os sintomas ao protocolo sugerido.
 NÃO RETORNE MAIS NADA ALÉM DO JSON VÁLIDO.`
 
+  const systemPrompt = `Você é um assistente clínico especialista em Naturopatia, Biofísica e Saúde Integrativa. Mantenha fidelidade estrita aos protocolos clínicos e utilize terminologia adequada.
+Você DEVE usar o modo imperativo direto nas instruções.
+Retorne ESTRITAMENTE um JSON com as seguintes chaves (use HTML limpo: <ul>, <li>, <p>, <strong>, <br>):
+- ia_diagnostico
+- ia_sugestoes_terapeuticas
+- ia_suplementacao
+- ia_aparelhos
+- ia_referencias
+NÃO forneça textos adicionais fora do JSON.`
+
   try {
-    const result = $ai.agent('naturopata-expert').chat({
-      user_id: record.getString('user_id'),
-      message: prompt,
+    const result = $ai.chat({
+      model: 'fast',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
     })
 
-    let contentStr = result.content.trim()
+    let contentStr = result.choices[0].message.content.trim()
     if (contentStr.startsWith('```json')) {
       contentStr = contentStr
         .replace(/^```json\n?/, '')
