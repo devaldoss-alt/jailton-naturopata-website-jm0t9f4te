@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T05:48:31.986Z",
+  "generatedAt": "2026-06-02T06:23:02.624Z",
   "collections": [
     {
       "name": "users",
@@ -393,6 +393,40 @@
         "CREATE INDEX `idx_anamnesis_nome` ON `anamnesis` (nome_paciente)",
         "CREATE INDEX `idx_anamnesis_data` ON `anamnesis` (data_atendimento)"
       ]
+    },
+    {
+      "name": "protocols",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
     }
   ]
 }

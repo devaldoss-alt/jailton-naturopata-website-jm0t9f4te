@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import pb from '@/lib/pocketbase/client'
+import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 const schema = z.object({
   file: z
@@ -35,38 +36,20 @@ export default function UploadProtocolos() {
     setLoading(true)
     try {
       const file = data.file[0]
-      const reader = new FileReader()
+      const formData = new FormData()
+      formData.append('file', file)
 
-      reader.onload = async () => {
-        try {
-          const base64 = (reader.result as string).split(',')[1]
+      await pb.send('/backend/v1/upload-protocols', {
+        method: 'POST',
+        body: formData,
+      })
 
-          await pb.send('/backend/v1/upload-protocols', {
-            method: 'POST',
-            body: JSON.stringify({
-              filename: file.name,
-              content: base64,
-            }),
-            headers: { 'Content-Type': 'application/json' },
-          })
-
-          toast.success('Protocolo adicionado à memória do agente com sucesso!')
-          reset()
-        } catch (err: any) {
-          toast.error(err.message || 'Erro ao enviar arquivo para a IA')
-        } finally {
-          setLoading(false)
-        }
-      }
-
-      reader.onerror = () => {
-        toast.error('Erro ao processar o arquivo localmente')
-        setLoading(false)
-      }
-
-      reader.readAsDataURL(file)
-    } catch (error: any) {
-      toast.error(error.message || 'Erro inesperado')
+      toast.success('Protocolo enviado com sucesso!')
+      reset()
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err)
+      toast.error(msg || 'Erro ao enviar arquivo')
+    } finally {
       setLoading(false)
     }
   }
@@ -76,7 +59,7 @@ export default function UploadProtocolos() {
       <CardHeader>
         <CardTitle>Upload de Protocolos</CardTitle>
         <CardDescription>
-          Envie documentos para atualizar a base de conhecimento do agente de IA.
+          Envie arquivos nos formatos suportados para armazenar na base de protocolos.
           <br />
           Formatos suportados: .xlsx, .pdf, .doc, .docx
         </CardDescription>
@@ -90,7 +73,7 @@ export default function UploadProtocolos() {
             )}
           </div>
           <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-            {loading ? 'Processando Ingestão...' : 'Atualizar Base de Conhecimento'}
+            {loading ? 'Enviando...' : 'Enviar Protocolo'}
           </Button>
         </form>
       </CardContent>

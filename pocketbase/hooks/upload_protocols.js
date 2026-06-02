@@ -1,66 +1,35 @@
-// @deps xlsx@0.18.5, pdf-parse@1.1.1, mammoth@1.6.0, buffer@6.0.3
 routerAdd(
   'POST',
   '/backend/v1/upload-protocols',
-  async (e) => {
-    const body = e.requestInfo().body || {}
-    const filename = body.filename || ''
-    const b64 = body.content || ''
-
-    if (!filename || !b64) {
-      return e.badRequestError('Arquivo não fornecido')
-    }
-
-    let buf
+  (e) => {
     try {
-      const { Buffer } = require('buffer')
-      buf = Buffer.from(b64, 'base64')
-    } catch (err) {
-      return e.internalServerError('Falha interna ao carregar buffer do arquivo')
-    }
-
-    const ext = filename.split('.').pop().toLowerCase()
-    let text = ''
-
-    try {
-      if (ext === 'xlsx') {
-        const xlsx = require('xlsx')
-        const workbook = xlsx.read(buf, { type: 'buffer' })
-        workbook.SheetNames.forEach((sheetName) => {
-          text += `\n--- Aba: ${sheetName} ---\n`
-          const sheet = workbook.Sheets[sheetName]
-          text += xlsx.utils.sheet_to_csv(sheet)
-        })
-      } else if (ext === 'pdf') {
-        const pdfParse = require('pdf-parse')
-        const data = await pdfParse(buf)
-        text = data.text
-      } else if (ext === 'doc' || ext === 'docx') {
-        const mammoth = require('mammoth')
-        const data = await mammoth.extractRawText({ buffer: buf })
-        text = data.value
-      } else {
-        return e.badRequestError('Formato não suportado')
+      const files = e.findUploadedFiles('file')
+      if (!files || files.length === 0) {
+        return e.badRequestError('Arquivo não fornecido ou vazio')
       }
 
-      if (!text || !text.trim()) {
-        return e.badRequestError('O arquivo está vazio ou não pôde ser lido.')
-      }
+      const file = files[0]
 
-      const slug = 'especialista-naturopata'
+      // Store the file permanently in pocketbase to be able to fetch its content via URL
+      const protocolsCol = $app.findCollectionByNameOrId('protocols')
+      const record = new Record(protocolsCol)
+      record.set('file', file)
+      $app.save(record)
 
-      $ai.agents.putMemories($app, slug, [
-        { type: 'text', payload: { text: `Fonte: ${filename}\n\n${text}` } },
-      ])
+      // Compute the public URL for the newly stored document
+      const fileUrl =
+        'https://' +
+        e.request.host +
+        '/api/files/' +
+        protocolsCol.id +
+        '/' +
+        record.id +
+        '/' +
+        record.getString('file')
 
-      return e.json(200, { success: true })
+      return e.json(200, { success: true, fileUrl })
     } catch (err) {
       $app.logger().error('Upload protocol error', 'error', err.message)
-      if (err.message && err.message.includes('not found')) {
-        return e.badRequestError(
-          `Agente ${slug} não encontrado. Certifique-se de que a migração foi aplicada.`,
-        )
-      }
       return e.badRequestError('Falha ao processar arquivo: ' + err.message)
     }
   },
