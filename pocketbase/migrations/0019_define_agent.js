@@ -2,7 +2,7 @@
 migrate(
   (app) => {
     $ai.agents.define(app, {
-      slug: 'naturopata-expert',
+      slug: 'especialista-naturopata',
       name: 'Especialista Naturopata',
       description:
         'Assistente clínico que analisa dados de pacientes com base em protocolos clínicos específicos armazenados na base de conhecimento (planilhas e documentos).',

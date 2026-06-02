@@ -1,136 +1,99 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
 import pb from '@/lib/pocketbase/client'
-import { getErrorMessage } from '@/lib/pocketbase/errors'
-import { Upload, FileSpreadsheet, Loader2, File, FileText } from 'lucide-react'
+
+const schema = z.object({
+  file: z
+    .any()
+    .refine((files) => files?.length === 1, 'Selecione um arquivo.')
+    .refine((files) => {
+      const file = files?.[0]
+      if (!file) return false
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      return ['xlsx', 'pdf', 'doc', 'docx'].includes(ext || '')
+    }, 'Formato inválido. Use .xlsx, .pdf, .doc ou .docx'),
+})
 
 export default function UploadProtocolos() {
-  const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
+  })
 
-  const supportedExts = ['.txt', '.csv', '.md']
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0]
-      const ext = selected.name.slice(selected.name.lastIndexOf('.')).toLowerCase()
-      if (supportedExts.includes(ext)) {
-        setFile(selected)
-      } else {
-        setFile(null)
-        toast.error('Formato não suportado. Use arquivos .txt, .csv ou .md.')
-      }
-    }
-  }
-
-  const handleUpload = async () => {
-    if (!file) return
-
+  const onSubmit = async (data: any) => {
     setLoading(true)
     try {
-      const textContent = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          resolve(e.target?.result as string)
+      const file = data.file[0]
+      const reader = new FileReader()
+
+      reader.onload = async () => {
+        try {
+          const base64 = (reader.result as string).split(',')[1]
+
+          await pb.send('/backend/v1/upload-protocols', {
+            method: 'POST',
+            body: JSON.stringify({
+              filename: file.name,
+              content: base64,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+          })
+
+          toast.success('Protocolo adicionado à memória do agente com sucesso!')
+          reset()
+        } catch (err: any) {
+          toast.error(err.message || 'Erro ao enviar arquivo para a IA')
+        } finally {
+          setLoading(false)
         }
-        reader.onerror = reject
-        reader.readAsText(file)
-      })
+      }
 
-      await pb.send('/backend/v1/upload-protocols', {
-        method: 'POST',
-        body: JSON.stringify({ text: textContent, filename: file.name }),
-        headers: { 'Content-Type': 'application/json' },
-      })
+      reader.onerror = () => {
+        toast.error('Erro ao processar o arquivo localmente')
+        setLoading(false)
+      }
 
-      toast.success('Protocolo enviado e injetado com sucesso!')
-      setFile(null)
-      const fileInput = document.getElementById('protocol-upload') as HTMLInputElement
-      if (fileInput) fileInput.value = ''
-    } catch (err: unknown) {
-      console.error(err)
-      toast.error(getErrorMessage(err))
-    } finally {
+      reader.readAsDataURL(file)
+    } catch (error: any) {
+      toast.error(error.message || 'Erro inesperado')
       setLoading(false)
     }
   }
 
-  const getFileIcon = () => {
-    if (!file) return <Upload className="w-8 h-8 text-primary" />
-    const name = file.name.toLowerCase()
-    if (name.endsWith('.csv')) return <FileSpreadsheet className="w-8 h-8 text-primary" />
-    return <FileText className="w-8 h-8 text-primary" />
-  }
-
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-primary">Upload de Protocolos</h1>
-        <p className="text-muted-foreground mt-2">
-          Faça o upload de textos e protocolos técnicos para alimentar a base de conhecimento do
-          agente especialista.
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload de Documento</CardTitle>
-          <CardDescription>
-            Envie arquivos nos formatos .txt, .csv ou .md para atualizar as referências da IA.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12 bg-gray-50/50 transition-colors hover:bg-gray-50">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-              {getFileIcon()}
-            </div>
-
-            <Input
-              id="protocol-upload"
-              type="file"
-              accept=".txt,.csv,.md"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <label
-              htmlFor="protocol-upload"
-              className="cursor-pointer bg-white border shadow-sm hover:bg-gray-50 font-medium text-sm px-4 py-2 rounded-md transition-colors"
-            >
-              Selecionar arquivo
-            </label>
-
-            {file && (
-              <p className="mt-4 text-sm font-medium text-primary flex items-center gap-2">
-                {file.name}
-              </p>
-            )}
-            {!file && (
-              <p className="mt-4 text-xs text-muted-foreground text-center">
-                Suportado: .txt, .csv e .md.
-              </p>
+    <Card className="max-w-2xl mx-auto mt-8">
+      <CardHeader>
+        <CardTitle>Upload de Protocolos</CardTitle>
+        <CardDescription>
+          Envie documentos para atualizar a base de conhecimento do agente de IA.
+          <br />
+          Formatos suportados: .xlsx, .pdf, .doc, .docx
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Input type="file" accept=".xlsx, .pdf, .doc, .docx" {...register('file')} />
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-1">{errors.file.message as string}</p>
             )}
           </div>
-
-          <div className="flex justify-end">
-            <Button onClick={handleUpload} disabled={!file || loading} className="min-w-[150px]">
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload de Arquivo
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+            {loading ? 'Processando Ingestão...' : 'Atualizar Base de Conhecimento'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
