@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, FileText, Users, LogOut, BookOpen } from 'lucide-react'
+import { LayoutDashboard, FileText, Users, LogOut, BookOpen, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function AdminLayout() {
@@ -65,6 +65,17 @@ export function AdminLayout() {
             )}
           >
             <BookOpen className="w-5 h-5" /> Protocolos
+          </Link>
+          <Link
+            to="/admin/depoimentos"
+            className={cn(
+              'flex items-center gap-3 p-3 rounded-md transition-colors',
+              location.pathname === '/admin/depoimentos'
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-gray-600 hover:bg-gray-100',
+            )}
+          >
+            <MessageSquare className="w-5 h-5" /> Depoimentos
           </Link>
         </nav>
         <div className="p-4 border-t">

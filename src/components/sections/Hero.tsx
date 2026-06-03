@@ -25,7 +25,7 @@ export function Hero() {
       <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
         <FadeIn delay={100} className="mb-6">
           <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm border border-primary/20 mb-4">
-            Especialista Integrativo
+            Especialista Integrativ
           </span>
         </FadeIn>
 

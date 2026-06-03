@@ -16,10 +16,24 @@ export const getApprovedTestimonials = async () => {
   })
 }
 
+export const getAllTestimonials = async () => {
+  return await pb.collection('testimonials').getFullList<Testimonial>({
+    sort: '-created',
+  })
+}
+
 export const createTestimonial = async (data: {
   name: string
   message: string
   rating: number
 }) => {
   return await pb.collection('testimonials').create<Testimonial>({ ...data, approved: false })
+}
+
+export const updateTestimonial = async (id: string, data: Partial<Testimonial>) => {
+  return await pb.collection('testimonials').update<Testimonial>(id, data)
+}
+
+export const deleteTestimonial = async (id: string) => {
+  return await pb.collection('testimonials').delete(id)
 }

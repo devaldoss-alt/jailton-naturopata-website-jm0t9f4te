@@ -33,10 +33,10 @@ const ContentEditableField = ({
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (ref.current && !isEditing) {
-      ref.current.innerHTML = value
+    if (isEditing && ref.current) {
+      ref.current.innerHTML = value || ''
     }
-  }, [isEditing, value])
+  }, [isEditing])
 
   const handleInput = () => {
     if (ref.current) {
@@ -116,7 +116,6 @@ const ContentEditableField = ({
         onInput={handleInput}
         className="content-html min-h-[200px] p-5 focus:outline-none bg-white"
         style={{ fontSize: '14px', color: '#111' }}
-        dangerouslySetInnerHTML={{ __html: value }}
       />
     </div>
   )
@@ -315,7 +314,7 @@ export default function Resultado() {
                   <img
                     src={logoUrl}
                     alt="Green Life Biofísica"
-                    style={{ height: '70px', objectFit: 'contain' }}
+                    style={{ height: '120px', objectFit: 'contain' }}
                   />
                   <div style={{ textAlign: 'right', color: '#1a4025' }}>
                     <h2
@@ -600,7 +599,7 @@ export default function Resultado() {
                       JAILTON SANTOS CONCEIÇÃO
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
-                      CBO 6320-10
+                      CBO 6320-10 | CBO 3221-25
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#4a5568' }}>
                       jailtonnaturopata@hotmail.com

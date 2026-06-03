@@ -13,6 +13,7 @@ import NovaAnamnese from './pages/admin/NovaAnamnese'
 import Pacientes from './pages/admin/Pacientes'
 import Resultado from './pages/admin/Resultado'
 import UploadProtocolos from './pages/admin/UploadProtocolos'
+import Depoimentos from './pages/admin/Depoimentos'
 import ConsultarResultado from './pages/ConsultarResultado'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminLayout } from './components/AdminLayout'
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/editar/:id" element={<NovaAnamnese />} />
               <Route path="/pacientes" element={<Pacientes />} />
               <Route path="/admin/upload-protocolos" element={<UploadProtocolos />} />
+              <Route path="/admin/depoimentos" element={<Depoimentos />} />
             </Route>
           </Route>
 
