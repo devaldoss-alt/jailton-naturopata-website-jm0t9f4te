@@ -47,7 +47,7 @@ export default function Layout() {
 
     const targetId = link.href.replace('/', '')
     // Dynamic offset based on the new, taller header height
-    const scrollOffset = window.innerWidth >= 768 ? 144 : 112
+    const scrollOffset = window.innerWidth >= 768 ? 96 : 112
 
     if (location.pathname !== '/') {
       navigate(`/${targetId}`)
@@ -79,7 +79,7 @@ export default function Layout() {
             : 'bg-transparent',
         )}
       >
-        <div className="container px-4 h-28 md:h-36 flex items-center justify-between transition-all duration-300">
+        <div className="container px-4 h-28 md:h-24 flex items-center justify-between transition-all duration-300">
           <Link
             to="/"
             onClick={(e) => scrollToSection(e, { name: 'Home', href: '/#home', isHash: true })}
@@ -88,7 +88,7 @@ export default function Layout() {
             <img
               src={logoUrl}
               alt="Jailton Naturopata Logo"
-              className="h-24 md:h-32 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-md"
+              className="h-24 md:h-20 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-md"
             />
           </Link>
 
@@ -105,7 +105,10 @@ export default function Layout() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => scrollToSection(e, link)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors cursor-pointer whitespace-nowrap"
+                className={cn(
+                  'text-sm font-medium text-foreground/80 hover:text-primary transition-colors cursor-pointer whitespace-nowrap',
+                  (link.name === 'Blog' || link.name === 'Produtos') && 'hidden xl:inline',
+                )}
               >
                 {link.name}
               </a>
@@ -114,7 +117,7 @@ export default function Layout() {
               <Button variant="ghost" className="text-sm font-medium hidden lg:flex" asChild>
                 <Link to="/consultar-resultado">Consultar meu Resultado</Link>
               </Button>
-              <Button variant="outline" className="text-sm font-medium hidden xl:flex" asChild>
+              <Button variant="outline" className="text-sm font-medium hidden lg:flex" asChild>
                 <Link to={isAuthenticated ? '/painel' : '/login'}>Área do Profissional</Link>
               </Button>
               <Button className="rounded-full whitespace-nowrap" asChild>
