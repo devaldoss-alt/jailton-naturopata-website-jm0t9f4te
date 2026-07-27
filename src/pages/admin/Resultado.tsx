@@ -54,11 +54,12 @@ export default function Resultado() {
   const [aparelhos, setAparelhos] = useState('')
   const [referencias, setReferencias] = useState('')
   const [outrasRecomendacoes, setOutrasRecomendacoes] = useState('')
+  const [observacoesGerais, setObservacoesGerais] = useState('')
 
   const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
   const [products, setProducts] = useState<Product[]>([])
 
-  const isProfessional = isAuthenticated && !!anamnese && anamnese.user_id === user?.id
+  const isProfessional = isAuthenticated && !!user
 
   const handleRetry = async () => {
     setRetrying(true)
@@ -112,11 +113,9 @@ export default function Resultado() {
       })
       .catch(() => setSupplements([]))
 
-    if (isAuthenticated) {
-      getProducts()
-        .then(setProducts)
-        .catch(() => setProducts([]))
-    }
+    getProducts()
+      .then(setProducts)
+      .catch(() => setProducts([]))
   }, [id, isEditing, isAuthenticated])
 
   useRealtime('anamnesis', (e) => {
@@ -514,31 +513,27 @@ export default function Resultado() {
                     )}
                   </div>
 
-                  {isProfessional ? (
+                  {renderEditorSection(
+                    'Outras Recomendações',
+                    outrasRecomendacoes,
+                    setOutrasRecomendacoes,
+                    !!outrasRecomendacoes,
+                  )}
+
+                  {observacoesGerais && (
                     <div className="avoid-break">
-                      {renderEditorSection(
-                        'Outras Recomendações',
-                        outrasRecomendacoes,
-                        setOutrasRecomendacoes,
-                        !!outrasRecomendacoes,
-                      )}
+                      <h3 style={sectionTitle('Observações Gerais')}>Observações Gerais</h3>
+                      <p
+                        style={{
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          color: '#111',
+                          whiteSpace: 'pre-wrap',
+                        }}
+                      >
+                        {observacoesGerais}
+                      </p>
                     </div>
-                  ) : (
-                    observacoesGerais && (
-                      <div className="avoid-break">
-                        <h3 style={sectionTitle('Outras Recomendações')}>Outras Recomendações</h3>
-                        <p
-                          style={{
-                            fontSize: '14px',
-                            lineHeight: '1.6',
-                            color: '#111',
-                            whiteSpace: 'pre-wrap',
-                          }}
-                        >
-                          {observacoesGerais}
-                        </p>
-                      </div>
-                    )
                   )}
 
                   {renderEditorSection(

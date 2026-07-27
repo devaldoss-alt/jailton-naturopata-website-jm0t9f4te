@@ -1,91 +1,70 @@
-onRecordUpdate((e) => {
-  const record = e.record
-  const original = record.original()
-
-  const newStatus = record.getString('status')
-  if (newStatus !== 'completed') {
-    e.next()
-    return
-  }
-
-  const reason = record.getString('version_reason') || ''
-  record.set('version_reason', '')
-
-  var trackedFields = [
-    'ia_diagnostico',
-    'ia_sugestoes_terapeuticas',
-    'ia_suplementacao',
-    'ia_aparelhos',
-    'ia_referencias',
-    'suplementacao_outras_recomendacoes',
-  ]
-
-  var snapshot = {}
-  trackedFields.forEach(function (f) {
-    snapshot[f] = record.getString(f)
-  })
-
+onRecordAfterUpdateSuccess((e) => {
   try {
-    var suplementos = $app.findRecordsByFilter(
+    const record = e.record
+    const anamnesisId = record.id
+
+    if (record.getString('status') !== 'completed') {
+      return e.next()
+    }
+
+    const existing = $app.findRecordsByFilter(
+      'report_revisions',
+      `anamnesis = "${anamnesisId}"`,
+      '-version_number',
+      100,
+      0,
+    )
+
+    const nextVersion = existing.length > 0 ? existing[0].getInt('version_number') + 1 : 1
+
+    const sups = $app.findRecordsByFilter(
       'report_suplementos',
-      'anamnesis = {:anamId}',
+      `anamnesis = "${anamnesisId}"`,
       'created',
       100,
       0,
-      { anamId: record.id },
     )
-    snapshot.suplementos = suplementos.map(function (s) {
-      return {
-        product: s.getString('product'),
-        posology: s.getString('posology'),
-      }
-    })
-  } catch (err) {
-    snapshot.suplementos = []
-  }
 
-  var maxVersion = 0
-  try {
-    var revisions = $app.findRecordsByFilter(
-      'report_revisions',
-      'anamnesis = {:anamId}',
-      '-version_number',
-      1,
-      0,
-      { anamId: record.id },
-    )
-    if (revisions.length > 0) {
-      maxVersion = revisions[0].getInt('version_number')
+    const suplementosList = sups.map((s) => ({
+      product: s.getString('product'),
+      posology: s.getString('posology'),
+    }))
+
+    const snapshotData = {
+      ia_diagnostico: record.getString('ia_diagnostico'),
+      ia_sugestoes_terapeuticas: record.getString('ia_sugestoes_terapeuticas'),
+      ia_suplementacao: record.getString('ia_suplementacao'),
+      ia_aparelhos: record.getString('ia_aparelhos'),
+      ia_referencias: record.getString('ia_referencias'),
+      suplementacao_outras_recomendacoes: record.getString('suplementacao_outras_recomendacoes'),
+      suplementos: suplementosList,
     }
-  } catch (err) {
-    $app.logger().error('Version hook: failed to query revisions', 'error', err.message)
-  }
 
-  try {
-    var revCol = $app.findCollectionByNameOrId('report_revisions')
-    var revRecord = new Record(revCol)
-    revRecord.set('anamnesis', record.id)
-    revRecord.set('version_number', maxVersion + 1)
-    revRecord.set('snapshot', JSON.stringify(snapshot))
-    revRecord.set('reason', reason)
-    $app.saveNoValidate(revRecord)
+    const col = $app.findCollectionByNameOrId('report_revisions')
+    const rev = new Record(col)
+    rev.set('anamnesis', anamnesisId)
+    rev.set('version_number', nextVersion)
+    rev.set('snapshot', JSON.stringify(snapshotData))
+    rev.set('reason', record.getString('version_reason') || '')
+    $app.save(rev)
 
-    var allRevisions = $app.findRecordsByFilter(
+    const allRevs = $app.findRecordsByFilter(
       'report_revisions',
-      'anamnesis = {:anamId}',
-      '-version_number',
+      `anamnesis = "${anamnesisId}"`,
+      'version_number',
       100,
       0,
-      { anamId: record.id },
     )
-    if (allRevisions.length > 20) {
-      for (var i = 20; i < allRevisions.length; i++) {
-        $app.delete(allRevisions[i])
+
+    if (allRevs.length > 20) {
+      const deleteCount = allRevs.length - 20
+      for (let i = 0; i < deleteCount; i++) {
+        $app.delete(allRevs[i])
       }
     }
   } catch (err) {
-    $app.logger().error('Version hook: failed to create revision', 'error', err.message)
+    $app.logger().error('Error creating revision', 'error', err.message)
   }
 
-  e.next()
+  return e.next()
 }, 'anamnesis')
