@@ -14,8 +14,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ContentEditor } from '@/components/content-editor'
 import { SupplementManager } from '@/components/supplement-manager'
-import { VersionHistory } from '@/components/version-history'
 import { PatientSupplementTable } from '@/components/patient-supplement-table'
+import { VersionHistory } from '@/components/version-history'
+
 import { format } from 'date-fns'
 import {
   ArrowLeft,
@@ -89,6 +90,7 @@ export default function Resultado() {
           setAparelhos(data.ia_aparelhos || '')
           setReferencias(data.ia_referencias || '')
           setOutrasRecomendacoes(data.suplementacao_outras_recomendacoes || '')
+          setObservacoesGerais(data.observacoes_gerais || '')
         }
       })
       .catch((error) => {
@@ -127,6 +129,7 @@ export default function Resultado() {
       setAparelhos(e.record.ia_aparelhos || '')
       setReferencias(e.record.ia_referencias || '')
       setOutrasRecomendacoes(e.record.suplementacao_outras_recomendacoes || '')
+      setObservacoesGerais(e.record.observacoes_gerais || '')
     }
   })
 
@@ -473,7 +476,16 @@ export default function Resultado() {
                     true,
                   )}
                   {renderEditorSection('Sugestões Terapêuticas', sugestoes, setSugestoes, true)}
-                  {renderEditorSection('Suplementação (IA)', suplementacao, setSuplementacao, true)}
+                  {isProfessional && (
+                    <div className="avoid-break">
+                      {renderEditorSection(
+                        'Suplementação (IA)',
+                        suplementacao,
+                        setSuplementacao,
+                        true,
+                      )}
+                    </div>
+                  )}
 
                   <div className="avoid-break" style={{ marginTop: '30px' }}>
                     <h3 style={sectionTitle('Suplementos Recomendados')}>
@@ -485,7 +497,9 @@ export default function Resultado() {
                         <span>Processando suplementos...</span>
                       </div>
                     ) : anamnese.status === 'error' ? (
-                      <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
+                      isProfessional ? (
+                        <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
+                      ) : null
                     ) : isProfessional ? (
                       <SupplementManager
                         supplements={supplements}
@@ -500,13 +514,32 @@ export default function Resultado() {
                     )}
                   </div>
 
-                  {isProfessional &&
-                    renderEditorSection(
-                      'Outras Recomendações',
-                      outrasRecomendacoes,
-                      setOutrasRecomendacoes,
-                      !!outrasRecomendacoes,
-                    )}
+                  {isProfessional ? (
+                    <div className="avoid-break">
+                      {renderEditorSection(
+                        'Outras Recomendações',
+                        outrasRecomendacoes,
+                        setOutrasRecomendacoes,
+                        !!outrasRecomendacoes,
+                      )}
+                    </div>
+                  ) : (
+                    observacoesGerais && (
+                      <div className="avoid-break">
+                        <h3 style={sectionTitle('Outras Recomendações')}>Outras Recomendações</h3>
+                        <p
+                          style={{
+                            fontSize: '14px',
+                            lineHeight: '1.6',
+                            color: '#111',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
+                          {observacoesGerais}
+                        </p>
+                      </div>
+                    )
+                  )}
 
                   {renderEditorSection(
                     'Orientação de Aparelhos',
