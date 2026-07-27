@@ -76,6 +76,12 @@
   }
 }
 
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
 @layer utilities {
   @keyframes fade-in-up {
     from {
