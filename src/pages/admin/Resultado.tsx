@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { ContentEditor } from '@/components/content-editor'
 import { SupplementManager } from '@/components/supplement-manager'
 import { VersionHistory } from '@/components/version-history'
-import { PatientSupplementTable } from '@/components/patient-supplement-table'
+
 import { format } from 'date-fns'
 import {
   ArrowLeft,
@@ -473,40 +473,52 @@ export default function Resultado() {
                     true,
                   )}
                   {renderEditorSection('Sugestões Terapêuticas', sugestoes, setSugestoes, true)}
-                  {renderEditorSection('Suplementação (IA)', suplementacao, setSuplementacao, true)}
+                  {isProfessional && (
+                    <div className="no-print">
+                      {renderEditorSection(
+                        'Suplementação (IA)',
+                        suplementacao,
+                        setSuplementacao,
+                        true,
+                      )}
+                    </div>
+                  )}
 
-                  <div className="avoid-break" style={{ marginTop: '30px' }}>
-                    <h3 style={sectionTitle('Suplementos Recomendados')}>
-                      Suplementos Recomendados
-                    </h3>
-                    {anamnese.status === 'pending' ? (
-                      <div className="flex items-center text-gray-500 mb-6 py-4">
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                        <span>Processando suplementos...</span>
-                      </div>
-                    ) : anamnese.status === 'error' ? (
-                      <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
-                    ) : isProfessional ? (
-                      <SupplementManager
-                        supplements={supplements}
-                        products={products}
-                        isEditing={isEditing}
-                        onAdd={handleAddSupplement}
-                        onRemove={handleRemoveSupplement}
-                        onPosologyChange={handlePosologyChange}
-                      />
-                    ) : (
-                      <PatientSupplementTable supplements={supplements} />
-                    )}
-                  </div>
+                  {isProfessional && (
+                    <div className="avoid-break no-print" style={{ marginTop: '30px' }}>
+                      <h3 style={sectionTitle('Suplementos Recomendados')}>
+                        Suplementos Recomendados
+                      </h3>
+                      {anamnese.status === 'pending' ? (
+                        <div className="flex items-center text-gray-500 mb-6 py-4">
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                          <span>Processando suplementos...</span>
+                        </div>
+                      ) : anamnese.status === 'error' ? (
+                        <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
+                      ) : (
+                        <SupplementManager
+                          supplements={supplements}
+                          products={products}
+                          isEditing={isEditing}
+                          onAdd={handleAddSupplement}
+                          onRemove={handleRemoveSupplement}
+                          onPosologyChange={handlePosologyChange}
+                        />
+                      )}
+                    </div>
+                  )}
 
-                  {isProfessional &&
-                    renderEditorSection(
-                      'Outras Recomendações',
-                      outrasRecomendacoes,
-                      setOutrasRecomendacoes,
-                      !!outrasRecomendacoes,
-                    )}
+                  {isProfessional && (
+                    <div className="no-print">
+                      {renderEditorSection(
+                        'Outras Recomendações',
+                        outrasRecomendacoes,
+                        setOutrasRecomendacoes,
+                        !!outrasRecomendacoes,
+                      )}
+                    </div>
+                  )}
 
                   {renderEditorSection(
                     'Orientação de Aparelhos',
