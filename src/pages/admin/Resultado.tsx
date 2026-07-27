@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ContentEditor } from '@/components/content-editor'
 import { SupplementManager } from '@/components/supplement-manager'
+import { PatientSupplementTable } from '@/components/patient-supplement-table'
 import { VersionHistory } from '@/components/version-history'
 
 import { format } from 'date-fns'
@@ -53,11 +54,12 @@ export default function Resultado() {
   const [aparelhos, setAparelhos] = useState('')
   const [referencias, setReferencias] = useState('')
   const [outrasRecomendacoes, setOutrasRecomendacoes] = useState('')
+  const [observacoesGerais, setObservacoesGerais] = useState('')
 
   const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
   const [products, setProducts] = useState<Product[]>([])
 
-  const isProfessional = isAuthenticated && !!anamnese && anamnese.user_id === user?.id
+  const isProfessional = isAuthenticated && !!user
 
   const handleRetry = async () => {
     setRetrying(true)
@@ -89,6 +91,7 @@ export default function Resultado() {
           setAparelhos(data.ia_aparelhos || '')
           setReferencias(data.ia_referencias || '')
           setOutrasRecomendacoes(data.suplementacao_outras_recomendacoes || '')
+          setObservacoesGerais(data.observacoes_gerais || '')
         }
       })
       .catch((error) => {
@@ -110,11 +113,9 @@ export default function Resultado() {
       })
       .catch(() => setSupplements([]))
 
-    if (isAuthenticated) {
-      getProducts()
-        .then(setProducts)
-        .catch(() => setProducts([]))
-    }
+    getProducts()
+      .then(setProducts)
+      .catch(() => setProducts([]))
   }, [id, isEditing, isAuthenticated])
 
   useRealtime('anamnesis', (e) => {
@@ -127,6 +128,7 @@ export default function Resultado() {
       setAparelhos(e.record.ia_aparelhos || '')
       setReferencias(e.record.ia_referencias || '')
       setOutrasRecomendacoes(e.record.suplementacao_outras_recomendacoes || '')
+      setObservacoesGerais(e.record.observacoes_gerais || '')
     }
   })
 
@@ -474,7 +476,7 @@ export default function Resultado() {
                   )}
                   {renderEditorSection('Sugestões Terapêuticas', sugestoes, setSugestoes, true)}
                   {isProfessional && (
-                    <div className="no-print">
+                    <div className="avoid-break">
                       {renderEditorSection(
                         'Suplementação (IA)',
                         suplementacao,
@@ -484,39 +486,53 @@ export default function Resultado() {
                     </div>
                   )}
 
-                  {isProfessional && (
-                    <div className="avoid-break no-print" style={{ marginTop: '30px' }}>
-                      <h3 style={sectionTitle('Suplementos Recomendados')}>
-                        Suplementos Recomendados
-                      </h3>
-                      {anamnese.status === 'pending' ? (
-                        <div className="flex items-center text-gray-500 mb-6 py-4">
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                          <span>Processando suplementos...</span>
-                        </div>
-                      ) : anamnese.status === 'error' ? (
+                  <div className="avoid-break" style={{ marginTop: '30px' }}>
+                    <h3 style={sectionTitle('Suplementos Recomendados')}>
+                      Suplementos Recomendados
+                    </h3>
+                    {anamnese.status === 'pending' ? (
+                      <div className="flex items-center text-gray-500 mb-6 py-4">
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                        <span>Processando suplementos...</span>
+                      </div>
+                    ) : anamnese.status === 'error' ? (
+                      isProfessional ? (
                         <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
-                      ) : (
-                        <SupplementManager
-                          supplements={supplements}
-                          products={products}
-                          isEditing={isEditing}
-                          onAdd={handleAddSupplement}
-                          onRemove={handleRemoveSupplement}
-                          onPosologyChange={handlePosologyChange}
-                        />
-                      )}
-                    </div>
+                      ) : null
+                    ) : isProfessional ? (
+                      <SupplementManager
+                        supplements={supplements}
+                        products={products}
+                        isEditing={isEditing}
+                        onAdd={handleAddSupplement}
+                        onRemove={handleRemoveSupplement}
+                        onPosologyChange={handlePosologyChange}
+                      />
+                    ) : (
+                      <PatientSupplementTable supplements={supplements} />
+                    )}
+                  </div>
+
+                  {renderEditorSection(
+                    'Outras Recomendações',
+                    outrasRecomendacoes,
+                    setOutrasRecomendacoes,
+                    !!outrasRecomendacoes,
                   )}
 
-                  {isProfessional && (
-                    <div className="no-print">
-                      {renderEditorSection(
-                        'Outras Recomendações',
-                        outrasRecomendacoes,
-                        setOutrasRecomendacoes,
-                        !!outrasRecomendacoes,
-                      )}
+                  {observacoesGerais && (
+                    <div className="avoid-break">
+                      <h3 style={sectionTitle('Observações Gerais')}>Observações Gerais</h3>
+                      <p
+                        style={{
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          color: '#111',
+                          whiteSpace: 'pre-wrap',
+                        }}
+                      >
+                        {observacoesGerais}
+                      </p>
                     </div>
                   )}
 
