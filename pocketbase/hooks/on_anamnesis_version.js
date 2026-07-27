@@ -2,7 +2,8 @@ onRecordUpdate((e) => {
   const record = e.record
   const original = record.original()
 
-  if (original.getString('status') !== 'completed' || record.getString('status') !== 'completed') {
+  const newStatus = record.getString('status')
+  if (newStatus !== 'completed') {
     e.next()
     return
   }
@@ -21,7 +22,7 @@ onRecordUpdate((e) => {
 
   var snapshot = {}
   trackedFields.forEach(function (f) {
-    snapshot[f] = original.getString(f)
+    snapshot[f] = record.getString(f)
   })
 
   try {
@@ -72,7 +73,7 @@ onRecordUpdate((e) => {
     var allRevisions = $app.findRecordsByFilter(
       'report_revisions',
       'anamnesis = {:anamId}',
-      'version_number',
+      '-version_number',
       100,
       0,
       { anamId: record.id },

@@ -18,7 +18,7 @@ interface VersionHistoryProps {
   anamnesisId: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  onRestore: (snapshot: any) => void
+  onRestore: (snapshot: any, versionNumber: number) => void
 }
 
 export function VersionHistory({
@@ -51,8 +51,8 @@ export function VersionHistory({
   }
 
   const handleRestore = () => {
-    if (snapshot) {
-      onRestore(snapshot)
+    if (snapshot && selectedRevision) {
+      onRestore(snapshot, selectedRevision.version_number)
       onOpenChange(false)
     }
   }

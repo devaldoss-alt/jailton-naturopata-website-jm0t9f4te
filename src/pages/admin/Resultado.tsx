@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { ContentEditor } from '@/components/content-editor'
 import { SupplementManager } from '@/components/supplement-manager'
 import { VersionHistory } from '@/components/version-history'
+import { PatientSupplementTable } from '@/components/patient-supplement-table'
 import { format } from 'date-fns'
 import {
   ArrowLeft,
@@ -35,12 +36,13 @@ import { getErrorMessage } from '@/lib/pocketbase/errors'
 
 export default function Resultado() {
   const { id } = useParams()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
   const [anamnese, setAnamnese] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [retrying, setRetrying] = useState(false)
+  const [restoring, setRestoring] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [versionReason, setVersionReason] = useState('')
@@ -54,6 +56,8 @@ export default function Resultado() {
 
   const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
   const [products, setProducts] = useState<Product[]>([])
+
+  const isProfessional = isAuthenticated && !!anamnese && anamnese.user_id === user?.id
 
   const handleRetry = async () => {
     setRetrying(true)
@@ -146,33 +150,54 @@ export default function Resultado() {
     setSupplements((prev) => prev.map((s, i) => (i === index ? { ...s, posology } : s)))
   }
 
-  const handleRestore = (snapshot: any) => {
+  const handleRestore = async (snapshot: any, versionNumber: number) => {
+    setRestoring(true)
+    const restoredSupplements =
+      snapshot.suplementos && products.length > 0
+        ? snapshot.suplementos.map((s: any) => {
+            const product = products.find((p) => p.id === s.product)
+            return {
+              product: s.product,
+              productName: product?.name || 'Produto',
+              productType: product?.type || '',
+              posology: s.posology,
+            }
+          })
+        : []
+
     setDiagnostico(snapshot.ia_diagnostico || '')
     setSugestoes(snapshot.ia_sugestoes_terapeuticas || '')
     setSuplementacao(snapshot.ia_suplementacao || '')
     setAparelhos(snapshot.ia_aparelhos || '')
     setReferencias(snapshot.ia_referencias || '')
     setOutrasRecomendacoes(snapshot.suplementacao_outras_recomendacoes || '')
-    if (snapshot.suplementos && products.length > 0) {
-      setSupplements(
-        snapshot.suplementos.map((s: any) => {
-          const product = products.find((p) => p.id === s.product)
-          return {
-            product: s.product,
-            productName: product?.name || 'Produto',
-            productType: product?.type || '',
-            posology: s.posology,
-          }
-        }),
-      )
+    setSupplements(restoredSupplements)
+
+    try {
+      await syncSuplementos(id as string, restoredSupplements)
+      await updateAnamnese(id as string, {
+        ia_diagnostico: snapshot.ia_diagnostico || '',
+        ia_sugestoes_terapeuticas: snapshot.ia_sugestoes_terapeuticas || '',
+        ia_suplementacao: snapshot.ia_suplementacao || '',
+        ia_aparelhos: snapshot.ia_aparelhos || '',
+        ia_referencias: snapshot.ia_referencias || '',
+        suplementacao_outras_recomendacoes: snapshot.suplementacao_outras_recomendacoes || '',
+        version_reason: `Restaurado da versão ${versionNumber}`,
+      })
+      toast.success('Versão restaurada com sucesso!')
+      setVersionReason('')
+      setIsEditing(false)
+    } catch (error) {
+      toast.error(`Erro ao restaurar: ${getErrorMessage(error)}`)
+    } finally {
+      setRestoring(false)
     }
-    setIsEditing(true)
-    toast.info('Versão restaurada. Revise e salve para confirmar.')
   }
 
   const handleSave = async () => {
     setSaving(true)
     try {
+      await syncSuplementos(id as string, supplements)
       await updateAnamnese(id as string, {
         ia_diagnostico: diagnostico,
         ia_sugestoes_terapeuticas: sugestoes,
@@ -182,7 +207,6 @@ export default function Resultado() {
         suplementacao_outras_recomendacoes: outrasRecomendacoes,
         version_reason: versionReason || '',
       })
-      await syncSuplementos(id as string, supplements)
       toast.success('Alterações salvas com sucesso!')
       setVersionReason('')
       setIsEditing(false)
@@ -285,13 +309,13 @@ export default function Resultado() {
       >
         <h1 className="text-xl font-bold text-gray-800 ml-2 flex items-center gap-2">
           Relatório Terapêutico
-          {isAuthenticated && (
+          {isProfessional && (
             <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary border border-primary/20">
               Modo Profissional Ativo
             </span>
           )}
         </h1>
-        {isAuthenticated && anamnese.status === 'completed' && (
+        {isProfessional && anamnese.status === 'completed' && (
           <Button
             variant="outline"
             size="sm"
@@ -391,22 +415,24 @@ export default function Resultado() {
                               </div>
                             )}
                           </div>
-                          <div className="mt-4">
-                            <Button
-                              variant="outline"
-                              onClick={handleRetry}
-                              disabled={retrying || anamnese.status === 'pending'}
-                              className="bg-white border-red-200 text-red-700 hover:bg-red-50"
-                              size="sm"
-                            >
-                              {anamnese.status === 'pending' || retrying ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : null}
-                              {anamnese.status === 'pending' || retrying
-                                ? 'Processando...'
-                                : 'Tentar Novamente'}
-                            </Button>
-                          </div>
+                          {isProfessional && (
+                            <div className="mt-4">
+                              <Button
+                                variant="outline"
+                                onClick={handleRetry}
+                                disabled={retrying || anamnese.status === 'pending'}
+                                className="bg-white border-red-200 text-red-700 hover:bg-red-50"
+                                size="sm"
+                              >
+                                {anamnese.status === 'pending' || retrying ? (
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : null}
+                                {anamnese.status === 'pending' || retrying
+                                  ? 'Processando...'
+                                  : 'Tentar Novamente'}
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -460,7 +486,7 @@ export default function Resultado() {
                       </div>
                     ) : anamnese.status === 'error' ? (
                       <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
-                    ) : (
+                    ) : isProfessional ? (
                       <SupplementManager
                         supplements={supplements}
                         products={products}
@@ -469,15 +495,18 @@ export default function Resultado() {
                         onRemove={handleRemoveSupplement}
                         onPosologyChange={handlePosologyChange}
                       />
+                    ) : (
+                      <PatientSupplementTable supplements={supplements} />
                     )}
                   </div>
 
-                  {renderEditorSection(
-                    'Outras Recomendações',
-                    outrasRecomendacoes,
-                    setOutrasRecomendacoes,
-                    !!outrasRecomendacoes,
-                  )}
+                  {isProfessional &&
+                    renderEditorSection(
+                      'Outras Recomendações',
+                      outrasRecomendacoes,
+                      setOutrasRecomendacoes,
+                      !!outrasRecomendacoes,
+                    )}
 
                   {renderEditorSection(
                     'Orientação de Aparelhos',
@@ -580,16 +609,10 @@ export default function Resultado() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Link>
 
-          {anamnese.status === 'completed' && !isEditing && (
+          {isProfessional && anamnese.status === 'completed' && !isEditing && (
             <Button
               variant="outline"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  navigate('/login')
-                } else {
-                  setIsEditing(true)
-                }
-              }}
+              onClick={() => setIsEditing(true)}
               className="text-primary border-primary hover:bg-primary/5"
             >
               <Edit className="mr-2 h-4 w-4" /> Editar
@@ -598,12 +621,16 @@ export default function Resultado() {
 
           {isEditing && (
             <>
-              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>
+              <Button
+                variant="ghost"
+                onClick={() => setIsEditing(false)}
+                disabled={saving || restoring}
+              >
                 <X className="mr-2 h-4 w-4" /> Cancelar
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || restoring}
                 className="bg-primary hover:bg-primary/90 text-white"
               >
                 {saving ? (
