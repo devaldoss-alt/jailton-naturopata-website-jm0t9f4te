@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T18:22:57.588Z",
+  "generatedAt": "2026-07-27T18:35:10.187Z",
   "collections": [
     {
       "name": "users",
@@ -29,19 +29,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": [
@@ -95,24 +90,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE INDEX idx_testimonials_approved ON testimonials (approved)"
-      ]
+      "indexes": ["CREATE INDEX idx_testimonials_approved ON testimonials (approved)"]
     },
     {
       "name": "blog_posts",
@@ -166,24 +154,17 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
-      "indexes": [
-        "CREATE UNIQUE INDEX idx_blog_posts_slug ON blog_posts (slug)"
-      ]
+      "indexes": ["CREATE UNIQUE INDEX idx_blog_posts_slug ON blog_posts (slug)"]
     },
     {
       "name": "anamnesis",
@@ -256,40 +237,28 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "pending",
-            "completed",
-            "error"
-          ]
+          "selectValues": ["pending", "completed", "error"]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "tipo_atendimento",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "consulta",
-            "revisão"
-          ]
+          "selectValues": ["consulta", "revisão"]
         },
         {
           "name": "sintomas_figado",
@@ -368,12 +337,7 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "ruim",
-            "regular",
-            "bom",
-            "excelente"
-          ]
+          "selectValues": ["ruim", "regular", "bom", "excelente"]
         },
         {
           "name": "ingestao_agua",
@@ -422,6 +386,18 @@
           "type": "editor",
           "required": false,
           "system": false
+        },
+        {
+          "name": "suplementacao_outras_recomendacoes",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "version_reason",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -452,22 +428,167 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": []
+    },
+    {
+      "name": "products",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["cápsula", "líquido", "outro"]
+        },
+        {
+          "name": "description",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_products_name ON products (name)"]
+    },
+    {
+      "name": "report_suplementos",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "anamnesis",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "anamnesis"
+        },
+        {
+          "name": "product",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "products"
+        },
+        {
+          "name": "posology",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_report_suplementos_anamnesis ON report_suplementos (anamnesis)"]
+    },
+    {
+      "name": "report_revisions",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "anamnesis",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "anamnesis"
+        },
+        {
+          "name": "version_number",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "snapshot",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_report_revisions_anamnesis ON report_revisions (anamnesis, version_number)"
+      ]
     }
   ]
 }
