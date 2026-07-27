@@ -143,6 +143,29 @@ export default function NovaAnamnese() {
     !!processingId,
   )
 
+  useEffect(() => {
+    if (!processingId) return
+    const interval = setInterval(async () => {
+      try {
+        const data = await getAnamnese(processingId)
+        if (data.status === 'completed') {
+          toast.success('Análise IA concluída com sucesso!')
+          setProcessingId(null)
+          setLoading(false)
+          navigate(`/resultado/${processingId}`)
+        } else if (data.status === 'error') {
+          toast.error('Erro na análise IA: ' + (data.erro_detalhado || 'Erro desconhecido'))
+          setProcessingId(null)
+          setLoading(false)
+          navigate(`/resultado/${processingId}`)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [processingId, navigate])
+
   const [formData, setFormData] = useState<Record<string, any>>({
     tipo_atendimento: '',
     nome_paciente: '',
@@ -272,7 +295,10 @@ export default function NovaAnamnese() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 animate-fade-in-up mb-12">
+    <div
+      className="max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 animate-fade-in-up mb-12"
+      translate="no"
+    >
       <div className="mb-8 border-b border-gray-200 pb-6 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-primary flex items-center justify-center md:justify-start gap-3 uppercase tracking-wide">
@@ -286,7 +312,7 @@ export default function NovaAnamnese() {
         <img src={logoUrl} alt="Logo" className="w-48 object-contain" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-12">
+      <form onSubmit={handleSubmit} className="space-y-12" translate="no">
         {/* SEÇÃO 1: Identificação do Paciente */}
         <section className="space-y-6">
           <h2 className="text-xl font-bold text-gray-800 border-b pb-2">

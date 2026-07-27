@@ -1,9 +1,20 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getAnamnese, updateAnamnese, retryAnamneseAi } from '@/services/anamnesis'
+import {
+  getSuplementos,
+  syncSuplementos,
+  type SelectedSupplement,
+} from '@/services/report-suplementos'
+import { getProducts, type Product } from '@/services/products'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ContentEditor } from '@/components/content-editor'
+import { SupplementManager } from '@/components/supplement-manager'
+import { VersionHistory } from '@/components/version-history'
 import { format } from 'date-fns'
 import {
   ArrowLeft,
@@ -15,111 +26,12 @@ import {
   AlertCircle,
   Copy,
   MessageCircle,
+  History,
 } from 'lucide-react'
 import logoUrl from '@/assets/logoanaminese-removebg-preview-31311.png'
 import assinaturaUrl from '@/assets/assinaturajailton-removebg-preview-82f7a.png'
 import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/pocketbase/errors'
-
-const ContentEditableField = ({
-  value,
-  onChange,
-  isEditing,
-}: {
-  value: string
-  onChange: (val: string) => void
-  isEditing: boolean
-}) => {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (isEditing && ref.current) {
-      ref.current.innerHTML = value || ''
-    }
-  }, [isEditing])
-
-  const handleInput = () => {
-    if (ref.current) {
-      onChange(ref.current.innerHTML)
-    }
-  }
-
-  const execCommand = (command: string, arg?: string) => {
-    document.execCommand(command, false, arg)
-    ref.current?.focus()
-    handleInput()
-  }
-
-  if (!isEditing) {
-    return (
-      <div
-        className="content-html"
-        dangerouslySetInnerHTML={{ __html: value || '<p>Nenhum dado informado.</p>' }}
-        style={{ fontSize: '14px', marginBottom: '25px', color: '#111' }}
-      />
-    )
-  }
-
-  return (
-    <div className="mb-6 border-2 border-primary/30 rounded-md bg-white shadow-sm overflow-hidden transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-      <div className="bg-gray-50 border-b border-gray-200 p-2 flex gap-1 flex-wrap">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 font-bold"
-          onClick={() => execCommand('bold')}
-        >
-          B
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 italic"
-          onClick={() => execCommand('italic')}
-        >
-          I
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 underline"
-          onClick={() => execCommand('underline')}
-        >
-          U
-        </Button>
-        <div className="w-px h-5 bg-gray-300 mx-1 self-center"></div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2"
-          onClick={() => execCommand('insertUnorderedList')}
-        >
-          • Lista
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2"
-          onClick={() => execCommand('insertOrderedList')}
-        >
-          1. Lista
-        </Button>
-      </div>
-      <div
-        ref={ref}
-        contentEditable
-        onInput={handleInput}
-        className="content-html min-h-[200px] p-5 focus:outline-none bg-white"
-        style={{ fontSize: '14px', color: '#111' }}
-      />
-    </div>
-  )
-}
 
 export default function Resultado() {
   const { id } = useParams()
@@ -130,6 +42,18 @@ export default function Resultado() {
   const [saving, setSaving] = useState(false)
   const [retrying, setRetrying] = useState(false)
   const [loadError, setLoadError] = useState(false)
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [versionReason, setVersionReason] = useState('')
+
+  const [diagnostico, setDiagnostico] = useState('')
+  const [sugestoes, setSugestoes] = useState('')
+  const [suplementacao, setSuplementacao] = useState('')
+  const [aparelhos, setAparelhos] = useState('')
+  const [referencias, setReferencias] = useState('')
+  const [outrasRecomendacoes, setOutrasRecomendacoes] = useState('')
+
+  const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
+  const [products, setProducts] = useState<Product[]>([])
 
   const handleRetry = async () => {
     setRetrying(true)
@@ -144,47 +68,107 @@ export default function Resultado() {
       setRetrying(false)
     }
   }
-  const [diagnostico, setDiagnostico] = useState('')
-  const [sugestoes, setSugestoes] = useState('')
-  const [suplementacao, setSuplementacao] = useState('')
-  const [aparelhos, setAparelhos] = useState('')
-  const [referencias, setReferencias] = useState('')
 
   useEffect(() => {
-    if (id) {
-      setLoadError(false)
-      getAnamnese(id)
-        .then((data) => {
-          setAnamnese(data)
-          if (!isEditing) {
-            setDiagnostico(data.ia_diagnostico || '')
-            setSugestoes(data.ia_sugestoes_terapeuticas || '')
-            setSuplementacao(data.ia_suplementacao || '')
-            setAparelhos(data.ia_aparelhos || '')
-            setReferencias(data.ia_referencias || '')
-          }
-        })
-        .catch((error) => {
-          console.error(error)
-          setLoadError(true)
-        })
-    } else {
+    if (!id) {
       setLoadError(true)
+      return
     }
-  }, [id, isEditing])
+    setLoadError(false)
+    getAnamnese(id)
+      .then((data) => {
+        setAnamnese(data)
+        if (!isEditing) {
+          setDiagnostico(data.ia_diagnostico || '')
+          setSugestoes(data.ia_sugestoes_terapeuticas || '')
+          setSuplementacao(data.ia_suplementacao || '')
+          setAparelhos(data.ia_aparelhos || '')
+          setReferencias(data.ia_referencias || '')
+          setOutrasRecomendacoes(data.suplementacao_outras_recomendacoes || '')
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+        setLoadError(true)
+      })
+
+    getSuplementos(id)
+      .then((items) => {
+        setSupplements(
+          items.map((item) => ({
+            id: item.id,
+            product: item.product,
+            productName: item.expand?.product?.name || 'Produto',
+            productType: item.expand?.product?.type || '',
+            posology: item.posology,
+          })),
+        )
+      })
+      .catch(() => setSupplements([]))
+
+    if (isAuthenticated) {
+      getProducts()
+        .then(setProducts)
+        .catch(() => setProducts([]))
+    }
+  }, [id, isEditing, isAuthenticated])
 
   useRealtime('anamnesis', (e) => {
-    if (e.record.id === id) {
-      setAnamnese(e.record)
-      if (!isEditing) {
-        setDiagnostico(e.record.ia_diagnostico || '')
-        setSugestoes(e.record.ia_sugestoes_terapeuticas || '')
-        setSuplementacao(e.record.ia_suplementacao || '')
-        setAparelhos(e.record.ia_aparelhos || '')
-        setReferencias(e.record.ia_referencias || '')
-      }
+    if (e.record.id !== id) return
+    setAnamnese(e.record)
+    if (!isEditing) {
+      setDiagnostico(e.record.ia_diagnostico || '')
+      setSugestoes(e.record.ia_sugestoes_terapeuticas || '')
+      setSuplementacao(e.record.ia_suplementacao || '')
+      setAparelhos(e.record.ia_aparelhos || '')
+      setReferencias(e.record.ia_referencias || '')
+      setOutrasRecomendacoes(e.record.suplementacao_outras_recomendacoes || '')
     }
   })
+
+  const handleAddSupplement = (product: Product) => {
+    setSupplements((prev) => [
+      ...prev,
+      {
+        product: product.id,
+        productName: product.name,
+        productType: product.type || '',
+        posology: '',
+      },
+    ])
+  }
+
+  const handleRemoveSupplement = (index: number) => {
+    setSupplements((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handlePosologyChange = (index: number, posology: string) => {
+    setSupplements((prev) => prev.map((s, i) => (i === index ? { ...s, posology } : s)))
+  }
+
+  const handleRestore = (snapshot: any) => {
+    setDiagnostico(snapshot.ia_diagnostico || '')
+    setSugestoes(snapshot.ia_sugestoes_terapeuticas || '')
+    setSuplementacao(snapshot.ia_suplementacao || '')
+    setAparelhos(snapshot.ia_aparelhos || '')
+    setReferencias(snapshot.ia_referencias || '')
+    setOutrasRecomendacoes(snapshot.suplementacao_outras_recomendacoes || '')
+    if (snapshot.suplementos && products.length > 0) {
+      setSupplements(
+        snapshot.suplementos.map((s: any) => {
+          const product = products.find((p) => p.id === s.product)
+          return {
+            product: s.product,
+            productName: product?.name || 'Produto',
+            productType: product?.type || '',
+            posology: s.posology,
+          }
+        }),
+      )
+    }
+    setIsEditing(true)
+    toast.info('Versão restaurada. Revise e salve para confirmar.')
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -195,8 +179,12 @@ export default function Resultado() {
         ia_suplementacao: suplementacao,
         ia_aparelhos: aparelhos,
         ia_referencias: referencias,
+        suplementacao_outras_recomendacoes: outrasRecomendacoes,
+        version_reason: versionReason || '',
       })
+      await syncSuplementos(id as string, supplements)
       toast.success('Alterações salvas com sucesso!')
+      setVersionReason('')
       setIsEditing(false)
     } catch (error) {
       toast.error(`Erro ao salvar: ${getErrorMessage(error)}`)
@@ -232,6 +220,42 @@ export default function Resultado() {
     )
   }
 
+  const sectionTitle = (title: string, small = false) => ({
+    fontSize: small ? '14px' : '18px',
+    fontWeight: 'bold',
+    marginBottom: '15px',
+    color: small ? '#4a5568' : '#1a4025',
+    borderBottom: small ? '1px solid #e2e8f0' : '1px solid #1a4025',
+    paddingBottom: '5px',
+    marginTop: small ? '40px' : '30px',
+  })
+
+  const renderEditorSection = (
+    title: string,
+    value: string,
+    setter: (v: string) => void,
+    showWhenNotEditing = true,
+  ) => {
+    if (!showWhenNotEditing && !isEditing) return null
+    return (
+      <div className="avoid-break">
+        <h3 style={sectionTitle(title)}>{title}</h3>
+        {anamnese.status === 'pending' ? (
+          <div className="flex items-center text-gray-500 mb-6 py-4">
+            <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+            <span>Processando...</span>
+          </div>
+        ) : anamnese.status === 'error' ? (
+          <p className="text-red-500 mb-6 text-sm">
+            Operação falhou. Veja os detalhes do erro acima.
+          </p>
+        ) : (
+          <ContentEditor value={value} onChange={setter} isEditing={isEditing} />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-4xl mx-auto pb-12 animate-fade-in-up">
       <style>{`
@@ -240,42 +264,17 @@ export default function Resultado() {
         .content-html li { margin-bottom: 8px; line-height: 1.6; }
         .content-html p { margin-bottom: 12px; line-height: 1.6; }
         .content-html strong { font-weight: bold; color: #1a4025; }
-        
         @media print {
-          html, body, #root { 
-            height: auto !important; 
-            min-height: auto !important; 
-            overflow: visible !important; 
-            background-color: white !important; 
-            margin: 0; 
-            padding: 0; 
-            display: block !important;
-            -webkit-print-color-adjust: exact; 
-          }
-            
+          html, body, #root { height: auto !important; min-height: auto !important; overflow: visible !important; background-color: white !important; margin: 0; padding: 0; display: block !important; -webkit-print-color-adjust: exact; }
           .no-print { display: none !important; }
-            
           body * { visibility: hidden; }
           #printable-pdf, #printable-pdf * { visibility: visible; }
-            
-          * {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-
-          #printable-pdf {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%; 
-            margin: 0 !important; padding: 0 !important; 
-            border: none !important; box-shadow: none !important;
-          }
-
-          .content-html { page-break-inside: auto; }          .content-html p, .content-html li { page-break-inside: avoid; }
+          * { overflow: visible !important; max-height: none !important; }
+          #printable-pdf { position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+          .content-html { page-break-inside: auto; }
+          .content-html p, .content-html li { page-break-inside: avoid; }
           h1, h2, h3, h4 { page-break-after: avoid; }
           .avoid-break { page-break-inside: avoid; }
-
           @page { margin: 15mm; }
         }
       `}</style>
@@ -292,6 +291,16 @@ export default function Resultado() {
             </span>
           )}
         </h1>
+        {isAuthenticated && anamnese.status === 'completed' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowVersionHistory(true)}
+            className="text-primary border-primary hover:bg-primary/5"
+          >
+            <History className="mr-2 h-4 w-4" /> Histórico de Revisões
+          </Button>
+        )}
       </div>
 
       <div
@@ -431,150 +440,60 @@ export default function Resultado() {
                     </div>
                   </div>
 
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      marginBottom: '15px',
-                      color: '#1a4025',
-                      borderBottom: '1px solid #1a4025',
-                      paddingBottom: '5px',
-                    }}
-                  >
-                    Diagnóstico Naturopático
-                  </h3>
-                  {anamnese.status === 'pending' ? (
-                    <div className="flex items-center text-gray-500 mb-6 py-4">
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                      <span>Processando diagnóstico...</span>
-                    </div>
-                  ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6 text-sm">
-                      Operação falhou. Veja os detalhes do erro acima.
-                    </p>
-                  ) : (
-                    <ContentEditableField
-                      value={diagnostico}
-                      onChange={setDiagnostico}
-                      isEditing={isEditing}
-                    />
+                  {renderEditorSection(
+                    'Diagnóstico Naturopático',
+                    diagnostico,
+                    setDiagnostico,
+                    true,
+                  )}
+                  {renderEditorSection('Sugestões Terapêuticas', sugestoes, setSugestoes, true)}
+                  {renderEditorSection('Suplementação (IA)', suplementacao, setSuplementacao, true)}
+
+                  <div className="avoid-break" style={{ marginTop: '30px' }}>
+                    <h3 style={sectionTitle('Suplementos Recomendados')}>
+                      Suplementos Recomendados
+                    </h3>
+                    {anamnese.status === 'pending' ? (
+                      <div className="flex items-center text-gray-500 mb-6 py-4">
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
+                        <span>Processando suplementos...</span>
+                      </div>
+                    ) : anamnese.status === 'error' ? (
+                      <p className="text-red-500 mb-6 text-sm">Operação falhou.</p>
+                    ) : (
+                      <SupplementManager
+                        supplements={supplements}
+                        products={products}
+                        isEditing={isEditing}
+                        onAdd={handleAddSupplement}
+                        onRemove={handleRemoveSupplement}
+                        onPosologyChange={handlePosologyChange}
+                      />
+                    )}
+                  </div>
+
+                  {renderEditorSection(
+                    'Outras Recomendações',
+                    outrasRecomendacoes,
+                    setOutrasRecomendacoes,
+                    !!outrasRecomendacoes,
                   )}
 
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      marginBottom: '15px',
-                      color: '#1a4025',
-                      borderBottom: '1px solid #1a4025',
-                      paddingBottom: '5px',
-                    }}
-                  >
-                    Sugestões Terapêuticas
-                  </h3>
-                  {anamnese.status === 'pending' ? (
-                    <div className="flex items-center text-gray-500 mb-6 py-4">
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                      <span>Processando análise clínica...</span>
-                    </div>
-                  ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6 text-sm">
-                      Operação falhou. Veja os detalhes do erro acima.
-                    </p>
-                  ) : (
-                    <ContentEditableField
-                      value={sugestoes}
-                      onChange={setSugestoes}
-                      isEditing={isEditing}
-                    />
-                  )}
-
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      marginBottom: '15px',
-                      color: '#1a4025',
-                      borderBottom: '1px solid #1a4025',
-                      paddingBottom: '5px',
-                      marginTop: '30px',
-                    }}
-                  >
-                    Suplementação
-                  </h3>
-                  {anamnese.status === 'pending' ? (
-                    <div className="flex items-center text-gray-500 mb-6 py-4">
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                      <span>Processando suplementação...</span>
-                    </div>
-                  ) : anamnese.status === 'error' ? (
-                    <p className="text-red-500 mb-6 text-sm">
-                      Operação falhou. Veja os detalhes do erro acima.
-                    </p>
-                  ) : (
-                    <ContentEditableField
-                      value={suplementacao}
-                      onChange={setSuplementacao}
-                      isEditing={isEditing}
-                    />
-                  )}
-
-                  {(isEditing || !!aparelhos) && (
-                    <div className="avoid-break">
-                      <h3
-                        style={{
-                          fontSize: '18px',
-                          fontWeight: 'bold',
-                          marginBottom: '15px',
-                          color: '#1a4025',
-                          borderBottom: '1px solid #1a4025',
-                          paddingBottom: '5px',
-                          marginTop: '30px',
-                        }}
-                      >
-                        Orientação de Aparelhos
-                      </h3>
-                      {anamnese.status === 'pending' ? (
-                        <div className="flex items-center text-gray-500 mb-6 py-4">
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin text-primary" />
-                          <span>Processando orientações de aparelhos...</span>
-                        </div>
-                      ) : anamnese.status === 'error' ? (
-                        <p className="text-red-500 mb-6 text-sm">
-                          Operação falhou. Veja os detalhes do erro acima.
-                        </p>
-                      ) : (
-                        <ContentEditableField
-                          value={aparelhos}
-                          onChange={setAparelhos}
-                          isEditing={isEditing}
-                        />
-                      )}
-                    </div>
+                  {renderEditorSection(
+                    'Orientação de Aparelhos',
+                    aparelhos,
+                    setAparelhos,
+                    !!aparelhos,
                   )}
 
                   <div className="avoid-break">
-                    <h3
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        marginTop: '40px',
-                        marginBottom: '10px',
-                        color: '#4a5568',
-                        borderBottom: '1px solid #e2e8f0',
-                        paddingBottom: '5px',
-                      }}
-                    >
-                      Referências
-                    </h3>
+                    <h3 style={sectionTitle('Referências', true)}>Referências</h3>
                     {anamnese.status === 'pending' ? (
                       <p className="text-gray-500 text-sm">Aguardando elaboração...</p>
                     ) : anamnese.status === 'error' ? (
-                      <p className="text-red-500 text-sm mb-6">
-                        Operação falhou. Veja os detalhes do erro acima.
-                      </p>
+                      <p className="text-red-500 text-sm mb-6">Operação falhou.</p>
                     ) : (
-                      <ContentEditableField
+                      <ContentEditor
                         value={referencias}
                         onChange={setReferencias}
                         isEditing={isEditing}
@@ -636,6 +555,21 @@ export default function Resultado() {
           </tfoot>
         </table>
       </div>
+
+      {isEditing && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 no-print">
+          <Label htmlFor="version_reason" className="text-sm font-semibold text-gray-700">
+            Motivo da Revisão (opcional)
+          </Label>
+          <Input
+            id="version_reason"
+            value={versionReason}
+            onChange={(e) => setVersionReason(e.target.value)}
+            placeholder="Ex: Ajuste de dosagem, correção de protocolo..."
+            className="mt-2"
+          />
+        </div>
+      )}
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 no-print flex flex-col sm:flex-row gap-4 justify-between items-center animate-fade-in-up mt-8 shadow-sm">
         <div className="flex gap-2 flex-wrap">
@@ -716,6 +650,13 @@ export default function Resultado() {
           )}
         </div>
       </div>
+
+      <VersionHistory
+        anamnesisId={id || ''}
+        open={showVersionHistory}
+        onOpenChange={setShowVersionHistory}
+        onRestore={handleRestore}
+      />
     </div>
   )
 }
