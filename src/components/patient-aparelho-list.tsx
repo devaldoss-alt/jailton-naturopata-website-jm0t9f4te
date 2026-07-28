@@ -41,14 +41,10 @@ export function PatientAparelhoList({ aparelhos }: PatientAparelhoListProps) {
               <strong>Benefícios:</strong> {item.aparelhoBeneficios}
             </p>
           )}
-          {item.aparelhoComoUsar && (
-            <div style={{ margin: '5px 0', fontSize: '14px', color: '#111' }}>
-              <strong>Como Usar:</strong>{' '}
-              <div
-                className="content-html"
-                dangerouslySetInnerHTML={{ __html: item.aparelhoComoUsar }}
-              />
-            </div>
+          {item.como_usar && (
+            <p style={{ margin: '5px 0', fontSize: '14px', color: '#111' }}>
+              <strong>Como Usar:</strong> {item.como_usar}
+            </p>
           )}
           {item.aparelhoContraindicacoes && (
             <div style={{ margin: '5px 0', fontSize: '14px', color: '#111' }}>

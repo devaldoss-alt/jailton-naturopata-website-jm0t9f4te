@@ -33,7 +33,6 @@ export default function Aparelhos() {
   const [formFuncao, setFormFuncao] = useState('')
   const [formBeneficios, setFormBeneficios] = useState('')
   const [formOrder, setFormOrder] = useState(0)
-  const [formComoUsar, setFormComoUsar] = useState('')
   const [formContraindicacoes, setFormContraindicacoes] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -68,7 +67,6 @@ export default function Aparelhos() {
     setFormFuncao('')
     setFormBeneficios('')
     setFormOrder(0)
-    setFormComoUsar('')
     setFormContraindicacoes('')
     setIsDialogOpen(true)
   }
@@ -79,7 +77,6 @@ export default function Aparelhos() {
     setFormFuncao(item.funcao)
     setFormBeneficios(item.beneficios)
     setFormOrder(item.order ?? 0)
-    setFormComoUsar(item.como_usar || '')
     setFormContraindicacoes(item.contraindicacoes || '')
     setIsDialogOpen(true)
   }
@@ -96,7 +93,6 @@ export default function Aparelhos() {
         funcao: formFuncao,
         beneficios: formBeneficios,
         order: formOrder,
-        como_usar: formComoUsar,
         contraindicacoes: formContraindicacoes,
       }
       if (editingId) {
@@ -239,10 +235,6 @@ export default function Aparelhos() {
                 placeholder="Descreva os benefícios do aparelho"
                 rows={3}
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Como Usar</Label>
-              <ContentEditor value={formComoUsar} onChange={setFormComoUsar} isEditing={true} />
             </div>
             <div className="space-y-2">
               <Label>Contraindicações</Label>

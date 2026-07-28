@@ -4,6 +4,7 @@ import type { RecordModel } from 'pocketbase'
 export interface ReportAparelho extends RecordModel {
   anamnesis: string
   aparelho: string
+  como_usar: string
   expand?: Record<string, any>
 }
 
@@ -16,6 +17,7 @@ export interface SelectedAparelho {
   aparelhoOrder: number
   aparelhoComoUsar: string
   aparelhoContraindicacoes: string
+  como_usar: string
 }
 
 export const getReportAparelhos = (anamnesisId: string) =>
@@ -25,8 +27,11 @@ export const getReportAparelhos = (anamnesisId: string) =>
     sort: 'created',
   })
 
-export const createReportAparelho = (data: { anamnesis: string; aparelho: string }) =>
-  pb.collection('report_aparelhos').create<ReportAparelho>(data)
+export const createReportAparelho = (data: {
+  anamnesis: string
+  aparelho: string
+  como_usar?: string
+}) => pb.collection('report_aparelhos').create<ReportAparelho>(data)
 
 export const deleteReportAparelho = (id: string) => pb.collection('report_aparelhos').delete(id)
 
@@ -35,11 +40,15 @@ export const deleteAllReportAparelhos = async (anamnesisId: string) => {
   await Promise.all(items.map((item) => deleteReportAparelho(item.id)))
 }
 
-export const syncReportAparelhos = async (anamnesisId: string, aparelhoIds: string[]) => {
+export const syncReportAparelhos = async (anamnesisId: string, aparelhos: SelectedAparelho[]) => {
   await deleteAllReportAparelhos(anamnesisId)
   await Promise.all(
-    aparelhoIds.map((aparelhoId) =>
-      createReportAparelho({ anamnesis: anamnesisId, aparelho: aparelhoId }),
+    aparelhos.map((a) =>
+      createReportAparelho({
+        anamnesis: anamnesisId,
+        aparelho: a.aparelho,
+        como_usar: a.como_usar || '',
+      }),
     ),
   )
 }

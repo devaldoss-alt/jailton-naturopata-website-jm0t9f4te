@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 import { Trash2, Search } from 'lucide-react'
 import type { SelectedAparelho } from '@/services/report-aparelhos'
 import type { Aparelho } from '@/services/aparelhos'
@@ -11,6 +13,7 @@ interface AparelhoManagerProps {
   isEditing: boolean
   onAdd: (aparelho: Aparelho) => void
   onRemove: (index: number) => void
+  onComoUsarChange: (index: number, comoUsar: string) => void
 }
 
 export function AparelhoManager({
@@ -19,6 +22,7 @@ export function AparelhoManager({
   isEditing,
   onAdd,
   onRemove,
+  onComoUsarChange,
 }: AparelhoManagerProps) {
   const [search, setSearch] = useState('')
 
@@ -69,24 +73,46 @@ export function AparelhoManager({
 
       <div className="space-y-3">
         {selectedAparelhos.map((ap, index) => (
-          <div
-            key={ap.id || index}
-            className="flex items-center gap-3 p-3 bg-gray-50 rounded-md border border-gray-200"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 text-sm">{ap.aparelhoName}</p>
-              <p className="text-xs text-gray-500">{ap.aparelhoFuncao}</p>
+          <div key={ap.id || index} className="p-3 bg-gray-50 rounded-md border border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-900 text-sm">{ap.aparelhoName}</p>
+                <p className="text-xs text-gray-500">{ap.aparelhoFuncao}</p>
+              </div>
+              {isEditing && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => onRemove(index)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </div>
-            {isEditing && (
-              <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={() => onRemove(index)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+            {ap.aparelhoBeneficios && (
+              <p className="text-xs text-gray-600 mt-2">
+                <strong>Benefícios:</strong> {ap.aparelhoBeneficios}
+              </p>
+            )}
+            {isEditing ? (
+              <div className="mt-2">
+                <Label className="text-xs font-semibold text-gray-700">Como Usar</Label>
+                <Textarea
+                  value={ap.como_usar || ''}
+                  onChange={(e) => onComoUsarChange(index, e.target.value)}
+                  placeholder="Instruções de uso personalizadas para este paciente..."
+                  className="mt-1 text-sm"
+                  rows={2}
+                />
+              </div>
+            ) : (
+              ap.como_usar && (
+                <div className="mt-2 text-xs text-gray-600">
+                  <strong>Como Usar:</strong> {ap.como_usar}
+                </div>
+              )
             )}
           </div>
         ))}

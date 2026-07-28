@@ -143,6 +143,7 @@ export default function Resultado() {
             aparelhoOrder: item.expand?.aparelho?.order ?? 0,
             aparelhoComoUsar: item.expand?.aparelho?.como_usar || '',
             aparelhoContraindicacoes: item.expand?.aparelho?.contraindicacoes || '',
+            como_usar: item.como_usar || '',
           })),
         )
       })
@@ -177,6 +178,7 @@ export default function Resultado() {
             aparelhoOrder: item.expand?.aparelho?.order ?? 0,
             aparelhoComoUsar: item.expand?.aparelho?.como_usar || '',
             aparelhoContraindicacoes: item.expand?.aparelho?.contraindicacoes || '',
+            como_usar: item.como_usar || '',
           })),
         )
       })
@@ -214,12 +216,19 @@ export default function Resultado() {
         aparelhoOrder: aparelho.order ?? 0,
         aparelhoComoUsar: aparelho.como_usar || '',
         aparelhoContraindicacoes: aparelho.contraindicacoes || '',
+        como_usar: '',
       },
     ])
   }
 
   const handleRemoveAparelho = (index: number) => {
     setSelectedAparelhos((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleComoUsarChange = (index: number, comoUsar: string) => {
+    setSelectedAparelhos((prev) =>
+      prev.map((a, i) => (i === index ? { ...a, como_usar: comoUsar } : a)),
+    )
   }
 
   const sortedSelectedAparelhos = [...selectedAparelhos].sort(
@@ -250,11 +259,8 @@ export default function Resultado() {
     setSupplements(restoredSupplements)
 
     try {
-      await syncSuplementos(id as string, restoredSuplements)
-      await syncReportAparelhos(
-        id as string,
-        restoredSupplements.map((s) => s.product),
-      )
+      await syncSuplementos(id as string, restoredSupplements)
+      await syncReportAparelhos(id as string, selectedAparelhos)
       await updateAnamnese(id as string, {
         ia_diagnostico: snapshot.ia_diagnostico || '',
         ia_sugestoes_terapeuticas: snapshot.ia_sugestoes_terapeuticas || '',
@@ -278,10 +284,7 @@ export default function Resultado() {
     setSaving(true)
     try {
       await syncSuplementos(id as string, supplements)
-      await syncReportAparelhos(
-        id as string,
-        supplements.map((s) => s.product),
-      )
+      await syncReportAparelhos(id as string, selectedAparelhos)
       await updateAnamnese(id as string, {
         ia_diagnostico: diagnostico,
         ia_sugestoes_terapeuticas: sugestoes,
@@ -634,6 +637,7 @@ export default function Resultado() {
                         isEditing={isEditing}
                         onAdd={handleAddAparelho}
                         onRemove={handleRemoveAparelho}
+                        onComoUsarChange={handleComoUsarChange}
                       />
                     ) : (
                       <PatientAparelhoList aparelhos={sortedSelectedAparelhos} />
