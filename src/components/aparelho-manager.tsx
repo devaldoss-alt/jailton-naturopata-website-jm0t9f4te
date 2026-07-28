@@ -77,7 +77,6 @@ export function AparelhoManager({
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 text-sm">{ap.aparelhoName}</p>
-                <p className="text-xs text-gray-500">{ap.aparelhoFuncao}</p>
               </div>
               {isEditing && (
                 <Button
@@ -91,8 +90,13 @@ export function AparelhoManager({
                 </Button>
               )}
             </div>
-            {ap.aparelhoBeneficios && (
+            {ap.aparelhoFuncao && (
               <p className="text-xs text-gray-600 mt-2">
+                <strong>Função:</strong> {ap.aparelhoFuncao}
+              </p>
+            )}
+            {ap.aparelhoBeneficios && (
+              <p className="text-xs text-gray-600 mt-1">
                 <strong>Benefícios:</strong> {ap.aparelhoBeneficios}
               </p>
             )}
