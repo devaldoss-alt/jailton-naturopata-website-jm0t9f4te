@@ -33,7 +33,6 @@ export default function Aparelhos() {
   const [formFuncao, setFormFuncao] = useState('')
   const [formBeneficios, setFormBeneficios] = useState('')
   const [formOrder, setFormOrder] = useState(0)
-  const [formContraindicacoes, setFormContraindicacoes] = useState('')
   const [saving, setSaving] = useState(false)
 
   const loadData = async () => {
@@ -66,7 +65,6 @@ export default function Aparelhos() {
     setFormNome('')
     setFormFuncao('')
     setFormBeneficios('')
-    setFormOrder(0)
     setFormContraindicacoes('')
     setIsDialogOpen(true)
   }
@@ -76,7 +74,6 @@ export default function Aparelhos() {
     setFormNome(item.nome)
     setFormFuncao(item.funcao)
     setFormBeneficios(item.beneficios)
-    setFormOrder(item.order ?? 0)
     setFormContraindicacoes(item.contraindicacoes || '')
     setIsDialogOpen(true)
   }
@@ -92,7 +89,6 @@ export default function Aparelhos() {
         nome: formNome,
         funcao: formFuncao,
         beneficios: formBeneficios,
-        order: formOrder,
         contraindicacoes: formContraindicacoes,
       }
       if (editingId) {
@@ -147,7 +143,6 @@ export default function Aparelhos() {
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 border-b">
               <tr>
-                <th className="px-6 py-4 font-medium">Ordem</th>
                 <th className="px-6 py-4 font-medium">Nome</th>
                 <th className="px-6 py-4 font-medium">Função</th>
                 <th className="px-6 py-4 font-medium">Benefícios</th>
@@ -157,20 +152,19 @@ export default function Aparelhos() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
                     Carregando...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
                     Nenhum aparelho encontrado.
                   </td>
                 </tr>
               ) : (
                 filtered.map((item) => (
                   <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50/50">
-                    <td className="px-6 py-4 text-gray-600 font-medium">{item.order ?? 0}</td>
                     <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
                     <td className="px-6 py-4 text-gray-600">{item.funcao}</td>
                     <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{item.beneficios}</td>
@@ -196,26 +190,14 @@ export default function Aparelhos() {
             <DialogTitle>{editingId ? 'Editar Aparelho' : 'Novo Aparelho'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 my-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="aparelho-nome">Nome *</Label>
-                <Input
-                  id="aparelho-nome"
-                  value={formNome}
-                  onChange={(e) => setFormNome(e.target.value)}
-                  placeholder="Ex: Biofeedback Quantum"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="aparelho-order">Ordem</Label>
-                <Input
-                  id="aparelho-order"
-                  type="number"
-                  value={formOrder}
-                  onChange={(e) => setFormOrder(Number(e.target.value))}
-                  placeholder="0"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="aparelho-nome">Nome *</Label>
+              <Input
+                id="aparelho-nome"
+                value={formNome}
+                onChange={(e) => setFormNome(e.target.value)}
+                placeholder="Ex: Biofeedback Quantum"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="aparelho-funcao">Função *</Label>

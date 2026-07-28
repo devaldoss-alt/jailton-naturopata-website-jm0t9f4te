@@ -221,18 +221,18 @@ export default function Resultado() {
     ])
   }
 
-  const handleRemoveAparelho = (index: number) => {
-    setSelectedAparelhos((prev) => prev.filter((_, i) => i !== index))
+  const handleRemoveAparelho = (aparelhoId: string) => {
+    setSelectedAparelhos((prev) => prev.filter((a) => a.aparelho !== aparelhoId))
   }
 
-  const handleComoUsarChange = (index: number, comoUsar: string) => {
+  const handleComoUsarChange = (aparelhoId: string, comoUsar: string) => {
     setSelectedAparelhos((prev) =>
-      prev.map((a, i) => (i === index ? { ...a, como_usar: comoUsar } : a)),
+      prev.map((a) => (a.aparelho === aparelhoId ? { ...a, como_usar: comoUsar } : a)),
     )
   }
 
-  const sortedSelectedAparelhos = [...selectedAparelhos].sort(
-    (a, b) => a.aparelhoOrder - b.aparelhoOrder || a.aparelhoName.localeCompare(b.aparelhoName),
+  const sortedSelectedAparelhos = [...selectedAparelhos].sort((a, b) =>
+    a.aparelhoName.localeCompare(b.aparelhoName),
   )
 
   const handleRestore = async (snapshot: any, versionNumber: number) => {

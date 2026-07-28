@@ -12,8 +12,8 @@ interface AparelhoManagerProps {
   allAparelhos: Aparelho[]
   isEditing: boolean
   onAdd: (aparelho: Aparelho) => void
-  onRemove: (index: number) => void
-  onComoUsarChange: (index: number, comoUsar: string) => void
+  onRemove: (aparelhoId: string) => void
+  onComoUsarChange: (aparelhoId: string, comoUsar: string) => void
 }
 
 export function AparelhoManager({
@@ -72,8 +72,8 @@ export function AparelhoManager({
       )}
 
       <div className="space-y-3">
-        {selectedAparelhos.map((ap, index) => (
-          <div key={ap.id || index} className="p-3 bg-gray-50 rounded-md border border-gray-200">
+        {selectedAparelhos.map((ap) => (
+          <div key={ap.aparelho} className="p-3 bg-gray-50 rounded-md border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 text-sm">{ap.aparelhoName}</p>
@@ -83,7 +83,7 @@ export function AparelhoManager({
                   variant="ghost"
                   size="icon"
                   type="button"
-                  onClick={() => onRemove(index)}
+                  onClick={() => onRemove(ap.aparelho)}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -105,7 +105,7 @@ export function AparelhoManager({
                 <Label className="text-xs font-semibold text-gray-700">Como Usar</Label>
                 <Textarea
                   value={ap.como_usar || ''}
-                  onChange={(e) => onComoUsarChange(index, e.target.value)}
+                  onChange={(e) => onComoUsarChange(ap.aparelho, e.target.value)}
                   placeholder="Instruções de uso personalizadas para este paciente..."
                   className="mt-1 text-sm"
                   rows={2}
