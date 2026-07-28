@@ -7,6 +7,7 @@ import {
   type SelectedSupplement,
 } from '@/services/report-suplementos'
 import { getProducts, type Product } from '@/services/products'
+import { getAparelhos, type Aparelho } from '@/services/aparelhos'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -58,6 +59,7 @@ export default function Resultado() {
 
   const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
   const [products, setProducts] = useState<Product[]>([])
+  const [aparelhosList, setAparelhosList] = useState<Aparelho[]>([])
 
   const isProfessional = isAuthenticated && !!user
 
@@ -116,6 +118,10 @@ export default function Resultado() {
     getProducts()
       .then(setProducts)
       .catch(() => setProducts([]))
+
+    getAparelhos()
+      .then(setAparelhosList)
+      .catch(() => setAparelhosList([]))
   }, [id, isEditing, isAuthenticated])
 
   useRealtime('anamnesis', (e) => {
@@ -475,16 +481,14 @@ export default function Resultado() {
                     true,
                   )}
                   {renderEditorSection('Sugestões Terapêuticas', sugestoes, setSugestoes, true)}
-                  {isProfessional && (
-                    <div className="avoid-break">
-                      {renderEditorSection(
-                        'Suplementação (IA)',
-                        suplementacao,
-                        setSuplementacao,
-                        true,
-                      )}
-                    </div>
-                  )}
+                  <div className="avoid-break no-print">
+                    {renderEditorSection(
+                      'Suplementação (IA)',
+                      suplementacao,
+                      setSuplementacao,
+                      true,
+                    )}
+                  </div>
 
                   <div className="avoid-break" style={{ marginTop: '30px' }}>
                     <h3 style={sectionTitle('Suplementos Recomendados')}>
@@ -536,12 +540,54 @@ export default function Resultado() {
                     </div>
                   )}
 
-                  {renderEditorSection(
-                    'Orientação de Aparelhos',
-                    aparelhos,
-                    setAparelhos,
-                    !!aparelhos,
-                  )}
+                  <div className="no-print">
+                    {renderEditorSection(
+                      'Orientação de Aparelhos',
+                      aparelhos,
+                      setAparelhos,
+                      !!aparelhos,
+                    )}
+                  </div>
+
+                  <div className="avoid-break" style={{ marginTop: '30px' }}>
+                    <h3 style={sectionTitle('Aparelhos Recomendados')}>Aparelhos Recomendados</h3>
+                    {aparelhosList.length === 0 ? (
+                      <p style={{ fontSize: '14px', color: '#718096' }}>
+                        Nenhum aparelho recomendado.
+                      </p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {aparelhosList.map((item) => (
+                          <div
+                            key={item.id}
+                            style={{
+                              backgroundColor: '#f4f7f5',
+                              padding: '15px 20px',
+                              borderRadius: '8px',
+                              border: '1px solid #e2e8e4',
+                            }}
+                          >
+                            <p
+                              style={{
+                                margin: '0 0 5px',
+                                fontSize: '15px',
+                                fontWeight: 'bold',
+                                color: '#1a4025',
+                              }}
+                            >
+                              {item.nome}
+                            </p>
+                            <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#111' }}>
+                              <strong>Função:</strong> {item.funcao}
+                            </p>
+                            <p style={{ margin: '0', fontSize: '14px', color: '#111' }}>
+                              <strong>Benefícios:</strong> {item.beneficios}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <div className="avoid-break">
                     <h3 style={sectionTitle('Referências', true)}>Referências</h3>

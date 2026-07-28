@@ -15,6 +15,7 @@ import Resultado from './pages/admin/Resultado'
 import UploadProtocolos from './pages/admin/UploadProtocolos'
 import Depoimentos from './pages/admin/Depoimentos'
 import Produtos from './pages/admin/Produtos'
+import Aparelhos from './pages/admin/Aparelhos'
 import ConsultarResultado from './pages/ConsultarResultado'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminLayout } from './components/AdminLayout'
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/admin/upload-protocolos" element={<UploadProtocolos />} />
               <Route path="/admin/depoimentos" element={<Depoimentos />} />
               <Route path="/admin/produtos" element={<Produtos />} />
+              <Route path="/admin/aparelhos" element={<Aparelhos />} />
             </Route>
           </Route>
 

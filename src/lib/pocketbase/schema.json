@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T20:38:57.537Z",
+  "generatedAt": "2026-07-28T12:50:44.126Z",
   "collections": [
     {
       "name": "users",
@@ -589,6 +589,52 @@
       "indexes": [
         "CREATE UNIQUE INDEX idx_report_revisions_anamnesis ON report_revisions (anamnesis, version_number)"
       ]
+    },
+    {
+      "name": "aparelhos",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "funcao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "beneficios",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_aparelhos_nome ON aparelhos (nome)"]
     }
   ]
 }
