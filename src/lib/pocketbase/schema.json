@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-28T12:50:44.126Z",
+  "generatedAt": "2026-07-28T13:07:49.819Z",
   "collections": [
     {
       "name": "users",
@@ -632,9 +632,75 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "order",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "como_usar",
+          "type": "editor",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contraindicacoes",
+          "type": "editor",
+          "required": false,
+          "system": false
         }
       ],
-      "indexes": ["CREATE INDEX idx_aparelhos_nome ON aparelhos (nome)"]
+      "indexes": [
+        "CREATE INDEX idx_aparelhos_nome ON aparelhos (nome)",
+        "CREATE INDEX `idx_aparelhos_order` ON `aparelhos` (order)"
+      ]
+    },
+    {
+      "name": "report_aparelhos",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "anamnesis",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "anamnesis"
+        },
+        {
+          "name": "aparelho",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "aparelhos"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_report_aparelhos_anamnesis ON report_aparelhos (anamnesis)",
+        "CREATE INDEX idx_report_aparelhos_aparelho ON report_aparelhos (aparelho)"
+      ]
     }
   ]
 }

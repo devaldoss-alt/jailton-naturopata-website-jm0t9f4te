@@ -9,6 +9,7 @@ import {
   BookOpen,
   MessageSquare,
   Package,
+  Stethoscope,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -95,6 +96,17 @@ export function AdminLayout() {
             )}
           >
             <Package className="w-5 h-5" /> Produtos
+          </Link>
+          <Link
+            to="/admin/aparelhos"
+            className={cn(
+              'flex items-center gap-3 p-3 rounded-md transition-colors',
+              location.pathname === '/admin/aparelhos'
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-gray-600 hover:bg-gray-100',
+            )}
+          >
+            <Stethoscope className="w-5 h-5" /> Aparelhos
           </Link>
         </nav>
         <div className="p-4 border-t">

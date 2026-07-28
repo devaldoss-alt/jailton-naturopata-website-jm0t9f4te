@@ -8,6 +8,11 @@ import {
 } from '@/services/report-suplementos'
 import { getProducts, type Product } from '@/services/products'
 import { getAparelhos, type Aparelho } from '@/services/aparelhos'
+import {
+  getReportAparelhos,
+  syncReportAparelhos,
+  type SelectedAparelho,
+} from '@/services/report-aparelhos'
 import { useRealtime } from '@/hooks/use-realtime'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -16,6 +21,8 @@ import { Label } from '@/components/ui/label'
 import { ContentEditor } from '@/components/content-editor'
 import { SupplementManager } from '@/components/supplement-manager'
 import { PatientSupplementTable } from '@/components/patient-supplement-table'
+import { AparelhoManager } from '@/components/aparelho-manager'
+import { PatientAparelhoList } from '@/components/patient-aparelho-list'
 import { VersionHistory } from '@/components/version-history'
 
 import { format } from 'date-fns'
@@ -60,6 +67,7 @@ export default function Resultado() {
   const [supplements, setSupplements] = useState<SelectedSupplement[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [aparelhosList, setAparelhosList] = useState<Aparelho[]>([])
+  const [selectedAparelhos, setSelectedAparelhos] = useState<SelectedAparelho[]>([])
 
   const isProfessional = isAuthenticated && !!user
 
@@ -122,6 +130,23 @@ export default function Resultado() {
     getAparelhos()
       .then(setAparelhosList)
       .catch(() => setAparelhosList([]))
+
+    getReportAparelhos(id)
+      .then((items) => {
+        setSelectedAparelhos(
+          items.map((item) => ({
+            id: item.id,
+            aparelho: item.aparelho,
+            aparelhoName: item.expand?.aparelho?.nome || 'Aparelho',
+            aparelhoFuncao: item.expand?.aparelho?.funcao || '',
+            aparelhoBeneficios: item.expand?.aparelho?.beneficios || '',
+            aparelhoOrder: item.expand?.aparelho?.order ?? 0,
+            aparelhoComoUsar: item.expand?.aparelho?.como_usar || '',
+            aparelhoContraindicacoes: item.expand?.aparelho?.contraindicacoes || '',
+          })),
+        )
+      })
+      .catch(() => setSelectedAparelhos([]))
   }, [id, isEditing, isAuthenticated])
 
   useRealtime('anamnesis', (e) => {
@@ -136,6 +161,26 @@ export default function Resultado() {
       setOutrasRecomendacoes(e.record.suplementacao_outras_recomendacoes || '')
       setObservacoesGerais(e.record.observacoes_gerais || '')
     }
+  })
+
+  useRealtime('report_aparelhos', () => {
+    if (!id) return
+    getReportAparelhos(id)
+      .then((items) => {
+        setSelectedAparelhos(
+          items.map((item) => ({
+            id: item.id,
+            aparelho: item.aparelho,
+            aparelhoName: item.expand?.aparelho?.nome || 'Aparelho',
+            aparelhoFuncao: item.expand?.aparelho?.funcao || '',
+            aparelhoBeneficios: item.expand?.aparelho?.beneficios || '',
+            aparelhoOrder: item.expand?.aparelho?.order ?? 0,
+            aparelhoComoUsar: item.expand?.aparelho?.como_usar || '',
+            aparelhoContraindicacoes: item.expand?.aparelho?.contraindicacoes || '',
+          })),
+        )
+      })
+      .catch(() => {})
   })
 
   const handleAddSupplement = (product: Product) => {
@@ -157,6 +202,29 @@ export default function Resultado() {
   const handlePosologyChange = (index: number, posology: string) => {
     setSupplements((prev) => prev.map((s, i) => (i === index ? { ...s, posology } : s)))
   }
+
+  const handleAddAparelho = (aparelho: Aparelho) => {
+    setSelectedAparelhos((prev) => [
+      ...prev,
+      {
+        aparelho: aparelho.id,
+        aparelhoName: aparelho.nome,
+        aparelhoFuncao: aparelho.funcao,
+        aparelhoBeneficios: aparelho.beneficios,
+        aparelhoOrder: aparelho.order ?? 0,
+        aparelhoComoUsar: aparelho.como_usar || '',
+        aparelhoContraindicacoes: aparelho.contraindicacoes || '',
+      },
+    ])
+  }
+
+  const handleRemoveAparelho = (index: number) => {
+    setSelectedAparelhos((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const sortedSelectedAparelhos = [...selectedAparelhos].sort(
+    (a, b) => a.aparelhoOrder - b.aparelhoOrder || a.aparelhoName.localeCompare(b.aparelhoName),
+  )
 
   const handleRestore = async (snapshot: any, versionNumber: number) => {
     setRestoring(true)
@@ -182,7 +250,11 @@ export default function Resultado() {
     setSupplements(restoredSupplements)
 
     try {
-      await syncSuplementos(id as string, restoredSupplements)
+      await syncSuplementos(id as string, restoredSuplements)
+      await syncReportAparelhos(
+        id as string,
+        restoredSupplements.map((s) => s.product),
+      )
       await updateAnamnese(id as string, {
         ia_diagnostico: snapshot.ia_diagnostico || '',
         ia_sugestoes_terapeuticas: snapshot.ia_sugestoes_terapeuticas || '',
@@ -206,6 +278,10 @@ export default function Resultado() {
     setSaving(true)
     try {
       await syncSuplementos(id as string, supplements)
+      await syncReportAparelhos(
+        id as string,
+        supplements.map((s) => s.product),
+      )
       await updateAnamnese(id as string, {
         ia_diagnostico: diagnostico,
         ia_sugestoes_terapeuticas: sugestoes,
@@ -551,41 +627,16 @@ export default function Resultado() {
 
                   <div className="avoid-break" style={{ marginTop: '30px' }}>
                     <h3 style={sectionTitle('Aparelhos Recomendados')}>Aparelhos Recomendados</h3>
-                    {aparelhosList.length === 0 ? (
-                      <p style={{ fontSize: '14px', color: '#718096' }}>
-                        Nenhum aparelho recomendado.
-                      </p>
+                    {isProfessional ? (
+                      <AparelhoManager
+                        selectedAparelhos={sortedSelectedAparelhos}
+                        allAparelhos={aparelhosList}
+                        isEditing={isEditing}
+                        onAdd={handleAddAparelho}
+                        onRemove={handleRemoveAparelho}
+                      />
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {aparelhosList.map((item) => (
-                          <div
-                            key={item.id}
-                            style={{
-                              backgroundColor: '#f4f7f5',
-                              padding: '15px 20px',
-                              borderRadius: '8px',
-                              border: '1px solid #e2e8e4',
-                            }}
-                          >
-                            <p
-                              style={{
-                                margin: '0 0 5px',
-                                fontSize: '15px',
-                                fontWeight: 'bold',
-                                color: '#1a4025',
-                              }}
-                            >
-                              {item.nome}
-                            </p>
-                            <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#111' }}>
-                              <strong>Função:</strong> {item.funcao}
-                            </p>
-                            <p style={{ margin: '0', fontSize: '14px', color: '#111' }}>
-                              <strong>Benefícios:</strong> {item.beneficios}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                      <PatientAparelhoList aparelhos={sortedSelectedAparelhos} />
                     )}
                   </div>
 

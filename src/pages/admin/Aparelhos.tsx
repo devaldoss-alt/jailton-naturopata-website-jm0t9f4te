@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ContentEditor } from '@/components/content-editor'
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,9 @@ export default function Aparelhos() {
   const [formNome, setFormNome] = useState('')
   const [formFuncao, setFormFuncao] = useState('')
   const [formBeneficios, setFormBeneficios] = useState('')
+  const [formOrder, setFormOrder] = useState(0)
+  const [formComoUsar, setFormComoUsar] = useState('')
+  const [formContraindicacoes, setFormContraindicacoes] = useState('')
   const [saving, setSaving] = useState(false)
 
   const loadData = async () => {
@@ -63,6 +67,9 @@ export default function Aparelhos() {
     setFormNome('')
     setFormFuncao('')
     setFormBeneficios('')
+    setFormOrder(0)
+    setFormComoUsar('')
+    setFormContraindicacoes('')
     setIsDialogOpen(true)
   }
 
@@ -71,17 +78,27 @@ export default function Aparelhos() {
     setFormNome(item.nome)
     setFormFuncao(item.funcao)
     setFormBeneficios(item.beneficios)
+    setFormOrder(item.order ?? 0)
+    setFormComoUsar(item.como_usar || '')
+    setFormContraindicacoes(item.contraindicacoes || '')
     setIsDialogOpen(true)
   }
 
   const handleSave = async () => {
     if (!formNome.trim() || !formFuncao.trim() || !formBeneficios.trim()) {
-      toast.error('Todos os campos são obrigatórios.')
+      toast.error('Nome, Função e Benefícios são obrigatórios.')
       return
     }
     setSaving(true)
     try {
-      const data = { nome: formNome, funcao: formFuncao, beneficios: formBeneficios }
+      const data = {
+        nome: formNome,
+        funcao: formFuncao,
+        beneficios: formBeneficios,
+        order: formOrder,
+        como_usar: formComoUsar,
+        contraindicacoes: formContraindicacoes,
+      }
       if (editingId) {
         await updateAparelho(editingId, data)
         toast.success('Aparelho atualizado!')
@@ -134,6 +151,7 @@ export default function Aparelhos() {
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 border-b">
               <tr>
+                <th className="px-6 py-4 font-medium">Ordem</th>
                 <th className="px-6 py-4 font-medium">Nome</th>
                 <th className="px-6 py-4 font-medium">Função</th>
                 <th className="px-6 py-4 font-medium">Benefícios</th>
@@ -143,19 +161,20 @@ export default function Aparelhos() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     Carregando...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     Nenhum aparelho encontrado.
                   </td>
                 </tr>
               ) : (
                 filtered.map((item) => (
                   <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50/50">
+                    <td className="px-6 py-4 text-gray-600 font-medium">{item.order ?? 0}</td>
                     <td className="px-6 py-4 font-medium text-gray-900">{item.nome}</td>
                     <td className="px-6 py-4 text-gray-600">{item.funcao}</td>
                     <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{item.beneficios}</td>
@@ -176,19 +195,31 @@ export default function Aparelhos() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Editar Aparelho' : 'Novo Aparelho'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 my-4">
-            <div className="space-y-2">
-              <Label htmlFor="aparelho-nome">Nome *</Label>
-              <Input
-                id="aparelho-nome"
-                value={formNome}
-                onChange={(e) => setFormNome(e.target.value)}
-                placeholder="Ex: Biofeedback Quantum"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="aparelho-nome">Nome *</Label>
+                <Input
+                  id="aparelho-nome"
+                  value={formNome}
+                  onChange={(e) => setFormNome(e.target.value)}
+                  placeholder="Ex: Biofeedback Quantum"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="aparelho-order">Ordem</Label>
+                <Input
+                  id="aparelho-order"
+                  type="number"
+                  value={formOrder}
+                  onChange={(e) => setFormOrder(Number(e.target.value))}
+                  placeholder="0"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="aparelho-funcao">Função *</Label>
@@ -206,7 +237,19 @@ export default function Aparelhos() {
                 value={formBeneficios}
                 onChange={(e) => setFormBeneficios(e.target.value)}
                 placeholder="Descreva os benefícios do aparelho"
-                rows={4}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Como Usar</Label>
+              <ContentEditor value={formComoUsar} onChange={setFormComoUsar} isEditing={true} />
+            </div>
+            <div className="space-y-2">
+              <Label>Contraindicações</Label>
+              <ContentEditor
+                value={formContraindicacoes}
+                onChange={setFormContraindicacoes}
+                isEditing={true}
               />
             </div>
           </div>
