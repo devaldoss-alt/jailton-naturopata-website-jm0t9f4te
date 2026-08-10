@@ -26,14 +26,12 @@ export const deleteProduct = async (id: string) => {
     filter: `product = "${id}"`,
   })
 
-  await Promise.all(
-    reports.map((report) =>
-      pb.collection('report_suplementos').update(report.id, {
-        product: null,
-        product_name: product.name,
-      }),
-    ),
-  )
+  for (const report of reports) {
+    await pb.collection('report_suplementos').update(report.id, {
+      product: null,
+      product_name: product.name,
+    })
+  }
 
   await pb.collection('products').delete(id)
 }
