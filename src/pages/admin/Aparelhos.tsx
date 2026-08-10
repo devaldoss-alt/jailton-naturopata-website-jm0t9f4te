@@ -32,7 +32,8 @@ export default function Aparelhos() {
   const [formNome, setFormNome] = useState('')
   const [formFuncao, setFormFuncao] = useState('')
   const [formBeneficios, setFormBeneficios] = useState('')
-  const [formOrder, setFormOrder] = useState(0)
+  const [formComoUsar, setFormComoUsar] = useState('')
+  const [formContraindicacoes, setFormContraindicacoes] = useState('')
   const [saving, setSaving] = useState(false)
 
   const loadData = async () => {
@@ -65,15 +66,17 @@ export default function Aparelhos() {
     setFormNome('')
     setFormFuncao('')
     setFormBeneficios('')
+    setFormComoUsar('')
     setFormContraindicacoes('')
     setIsDialogOpen(true)
   }
 
   const openEdit = (item: Aparelho) => {
     setEditingId(item.id)
-    setFormNome(item.nome)
-    setFormFuncao(item.funcao)
-    setFormBeneficios(item.beneficios)
+    setFormNome(item.nome || '')
+    setFormFuncao(item.funcao || '')
+    setFormBeneficios(item.beneficios || '')
+    setFormComoUsar(item.como_usar || '')
     setFormContraindicacoes(item.contraindicacoes || '')
     setIsDialogOpen(true)
   }
@@ -89,6 +92,7 @@ export default function Aparelhos() {
         nome: formNome,
         funcao: formFuncao,
         beneficios: formBeneficios,
+        como_usar: formComoUsar,
         contraindicacoes: formContraindicacoes,
       }
       if (editingId) {
@@ -219,8 +223,18 @@ export default function Aparelhos() {
               />
             </div>
             <div className="space-y-2">
+              <Label>Como Usar</Label>
+              <ContentEditor
+                key={`como-usar-${editingId || 'new'}`}
+                value={formComoUsar}
+                onChange={setFormComoUsar}
+                isEditing={true}
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Contraindicações</Label>
               <ContentEditor
+                key={`contraindicacoes-${editingId || 'new'}`}
                 value={formContraindicacoes}
                 onChange={setFormContraindicacoes}
                 isEditing={true}

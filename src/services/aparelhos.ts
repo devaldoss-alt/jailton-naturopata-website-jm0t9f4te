@@ -10,8 +10,7 @@ export interface Aparelho extends RecordModel {
   contraindicacoes: string
 }
 
-export const getAparelhos = () =>
-  pb.collection('aparelhos').getFullList<Aparelho>({ sort: 'order,nome' })
+export const getAparelhos = () => pb.collection('aparelhos').getFullList<Aparelho>({ sort: 'nome' })
 
 export const getAparelho = (id: string) => pb.collection('aparelhos').getOne<Aparelho>(id)
 
