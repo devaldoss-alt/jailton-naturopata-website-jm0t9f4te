@@ -115,7 +115,7 @@ export default function Resultado() {
           items.map((item) => ({
             id: item.id,
             product: item.product,
-            productName: item.expand?.product?.name || 'Produto',
+            productName: item.expand?.product?.name || item.product_name || 'Produto',
             productType: item.expand?.product?.type || '',
             posology: item.posology,
           })),
@@ -243,7 +243,7 @@ export default function Resultado() {
             const product = products.find((p) => p.id === s.product)
             return {
               product: s.product,
-              productName: product?.name || 'Produto',
+              productName: product?.name || s.productName || s.product_name || 'Produto',
               productType: product?.type || '',
               posology: s.posology,
             }

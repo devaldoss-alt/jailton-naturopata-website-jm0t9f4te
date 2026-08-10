@@ -3,7 +3,8 @@ import type { RecordModel } from 'pocketbase'
 
 export interface ReportSuplemento extends RecordModel {
   anamnesis: string
-  product: string
+  product: string | null
+  product_name?: string
   posology: string
   expand?: Record<string, any>
 }
@@ -23,8 +24,12 @@ export const getSuplementos = (anamnesisId: string) =>
     sort: 'created',
   })
 
-export const createSuplemento = (data: { anamnesis: string; product: string; posology: string }) =>
-  pb.collection('report_suplementos').create<ReportSuplemento>(data)
+export const createSuplemento = (data: {
+  anamnesis: string
+  product?: string
+  posology: string
+  product_name?: string
+}) => pb.collection('report_suplementos').create<ReportSuplemento>(data)
 
 export const deleteSuplemento = (id: string) => pb.collection('report_suplementos').delete(id)
 
@@ -36,8 +41,19 @@ export const deleteAllSuplementos = async (anamnesisId: string) => {
 export const syncSuplementos = async (anamnesisId: string, items: SelectedSupplement[]) => {
   await deleteAllSuplementos(anamnesisId)
   await Promise.all(
-    items.map((item) =>
-      createSuplemento({ anamnesis: anamnesisId, product: item.product, posology: item.posology }),
-    ),
+    items.map((item) => {
+      const data: {
+        anamnesis: string
+        product?: string
+        posology: string
+        product_name?: string
+      } = {
+        anamnesis: anamnesisId,
+        posology: item.posology,
+      }
+      if (item.product) data.product = item.product
+      if (item.productName) data.product_name = item.productName
+      return createSuplemento(data)
+    }),
   )
 }
