@@ -17,13 +17,9 @@ onRecordDelete((e) => {
       $app.saveNoValidate(report)
     }
   } catch (err) {
-    $app.logger().error(
-      'Failed to unlink product references',
-      'error',
-      String(err),
-      'productId',
-      productId,
-    )
+    $app
+      .logger()
+      .error('Failed to unlink product references', 'error', String(err), 'productId', productId)
   }
 
   e.next()

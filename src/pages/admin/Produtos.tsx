@@ -40,6 +40,7 @@ export default function Produtos() {
   const [formType, setFormType] = useState('cápsula')
   const [formDescription, setFormDescription] = useState('')
   const [saving, setSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const loadData = async () => {
     try {
@@ -107,11 +108,14 @@ export default function Produtos() {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Tem certeza que deseja excluir este produto?')) return
+    setDeletingId(id)
     try {
       await deleteProduct(id)
-      toast.success('Produto excluído.')
+      toast.success('Produto excluído com sucesso!')
     } catch (error) {
-      toast.error('Erro ao excluir: ' + getErrorMessage(error))
+      toast.error('Erro ao excluir produto: ' + getErrorMessage(error))
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -186,8 +190,17 @@ export default function Produtos() {
                       <Button variant="ghost" size="icon" onClick={() => openEdit(product)}>
                         <Edit2 className="w-4 h-4 text-blue-600" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
-                        <Trash2 className="w-4 h-4 text-red-600" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(product.id)}
+                        disabled={deletingId === product.id}
+                      >
+                        {deletingId === product.id ? (
+                          <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        )}
                       </Button>
                     </td>
                   </tr>

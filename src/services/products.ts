@@ -19,4 +19,21 @@ export const updateProduct = (
   data: Partial<{ name: string; type: string; description: string }>,
 ) => pb.collection('products').update<Product>(id, data)
 
-export const deleteProduct = (id: string) => pb.collection('products').delete(id)
+export const deleteProduct = async (id: string) => {
+  const product = await pb.collection('products').getOne<Product>(id)
+
+  const reports = await pb.collection('report_suplementos').getFullList({
+    filter: `product = "${id}"`,
+  })
+
+  await Promise.all(
+    reports.map((report) =>
+      pb.collection('report_suplementos').update(report.id, {
+        product: null,
+        product_name: product.name,
+      }),
+    ),
+  )
+
+  await pb.collection('products').delete(id)
+}
